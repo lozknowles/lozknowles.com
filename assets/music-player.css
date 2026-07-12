@@ -1,0 +1,62 @@
+.music-toggle {
+  position: fixed;
+  right: clamp(1rem, 2.5vw, 2rem);
+  bottom: clamp(1rem, 2.5vw, 2rem);
+  z-index: 20;
+  display: inline-flex;
+  align-items: center;
+  gap: 0.65rem;
+  min-height: 2.75rem;
+  padding: 0.55rem 0.9rem 0.55rem 0.6rem;
+  border: 1px solid rgba(188, 255, 0, 0.42);
+  border-radius: 999px;
+  background: rgba(6, 16, 15, 0.86);
+  color: #e9eee4;
+  font: 500 0.65rem/1 "DM Mono", monospace;
+  letter-spacing: 0.08em;
+  text-transform: uppercase;
+  cursor: pointer;
+  box-shadow: 0 0 0 1px rgba(6, 16, 15, 0.35), 0 10px 35px rgba(0, 0, 0, 0.28);
+  backdrop-filter: blur(12px);
+  transition: border-color 180ms ease, color 180ms ease, transform 180ms ease;
+}
+
+.music-toggle:hover {
+  border-color: #bcff00;
+  color: #bcff00;
+  transform: translateY(-2px);
+}
+
+.music-toggle:focus-visible {
+  outline: 2px solid #bcff00;
+  outline-offset: 3px;
+}
+
+.music-toggle__icon {
+  display: grid;
+  place-items: center;
+  width: 1.65rem;
+  height: 1.65rem;
+  border-radius: 50%;
+  background: #bcff00;
+  color: #06100f;
+  font-size: 1rem;
+}
+
+.music-toggle[aria-pressed="true"] .music-toggle__icon {
+  animation: music-pulse 1.8s ease-in-out infinite;
+}
+
+@keyframes music-pulse {
+  50% { box-shadow: 0 0 0 6px rgba(188, 255, 0, 0.12); }
+}
+
+@media (max-width: 520px) {
+  .music-toggle__label { position: absolute; width: 1px; height: 1px; overflow: hidden; clip: rect(0 0 0 0); }
+  .music-toggle { padding: 0.55rem; }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .music-toggle,
+  .music-toggle__icon { animation: none !important; transition: none; }
+}
