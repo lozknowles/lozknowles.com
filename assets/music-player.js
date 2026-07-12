@@ -33,4 +33,33 @@
 
   audio.addEventListener("pause", () => showState(false));
   audio.addEventListener("play", () => showState(true));
+
+  const startOnFirstInteraction = async (event) => {
+    if (event.target instanceof Node && toggle.contains(event.target)) return;
+
+    try {
+      await audio.play();
+      showState(true);
+      interactionEvents.forEach((eventName) =>
+        window.removeEventListener(eventName, startOnFirstInteraction)
+      );
+    } catch {
+      showState(false);
+    }
+  };
+
+  const interactionEvents = ["pointerdown", "keydown", "touchstart", "wheel"];
+
+  audio.play().then(
+    () => showState(true),
+    () => {
+      showState(false);
+      interactionEvents.forEach((eventName) =>
+        window.addEventListener(eventName, startOnFirstInteraction, {
+          passive: true,
+          once: true,
+        })
+      );
+    }
+  );
 })();
