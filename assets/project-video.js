@@ -24,6 +24,10 @@
   }
 
   videos.forEach((video) => {
+    const keepControlsInteractive = (event) => event.stopPropagation();
+    video.addEventListener("pointerdown", keepControlsInteractive);
+    video.addEventListener("pointerup", keepControlsInteractive);
+
     video.addEventListener("error", () => showFallback(video));
     video.addEventListener("play", () => {
       backgroundMusic?.pause();
