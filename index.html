@@ -10,6 +10,7 @@
     <link rel="stylesheet" crossorigin href="/assets/index-BDTMFuqh.css">
     <link rel="stylesheet" href="/assets/project-video.css">
     <link rel="stylesheet" href="/assets/music-player.css">
+    <link rel="stylesheet" href="/assets/cv.css">
   </head>
   <body>
     <canvas id="field" aria-hidden="true"></canvas>
@@ -23,9 +24,12 @@
         <a href="#place">Place</a>
         <a href="#contact">Contact</a>
       </nav>
-      <a class="signal-link" href="https://www.youtube.com/@LawrenceKnowles-cr9ml" target="_blank" rel="noreferrer">
-        <span class="signal-dot"></span> YouTube
-      </a>
+      <div class="nav-actions">
+        <a class="cv-popup-link" href="/cv.html" target="lawrence-cv" data-cv-popup>CV <span aria-hidden="true">↗</span></a>
+        <a class="signal-link" href="https://www.youtube.com/@LawrenceKnowles-cr9ml" target="_blank" rel="noreferrer">
+          <span class="signal-dot"></span> YouTube
+        </a>
+      </div>
     </header>
 
     <main id="top">
@@ -178,5 +182,6 @@
     </button>
     <script src="/assets/music-player.js"></script>
     <script src="/assets/project-video.js"></script>
+    <script src="/assets/cv-popup.js"></script>
   </body>
 </html>
