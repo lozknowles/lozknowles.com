@@ -26,11 +26,11 @@
       <div class="immersive-hud" id="immersive-hud" aria-hidden="true">
         <div class="view-status">
           <span>Ground observer · double-depth flock · 12 m/s at 1×</span>
-          <b>Drag, swipe, or use arrow keys to move your head</b>
+          <b id="auto-track-status">Auto-tracking the densest flock · drag, swipe, or use arrow keys to look away</b>
         </div>
         <figure class="viewpoint-panel">
           <canvas id="viewpoint-map" width="148" height="148" aria-label="Overhead map of the flock and current viewing direction"></canvas>
-          <figcaption>Flock · viewing cone + head tilt</figcaption>
+          <figcaption>Dense core · viewing cone + head tilt</figcaption>
         </figure>
       </div>
 
@@ -71,6 +71,10 @@
         <label class="view-toggle" for="inside-flock">
           <input id="inside-flock" type="checkbox" checked />
           <span>Ground view</span>
+        </label>
+        <label class="auto-track-toggle" for="auto-track">
+          <input id="auto-track" type="checkbox" checked />
+          <span>Auto track</span>
         </label>
         <button type="button" id="pause">Pause</button>
         <button type="button" id="gather">Gather flock</button>
