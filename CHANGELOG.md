@@ -19,7 +19,7 @@ All notable changes to lozknowles.com are recorded here.
 - Added an **Inside flock** mode that places the viewer at the centre of a bounded half-mile cube filled with birds.
 - Added drag, touch-swipe, and arrow-key controls for looking left, right, up, and down from inside the flock.
 - Added a `1×`–`5×` **Speed** slider that accelerates movement, steering, depth, fear decay, and timed formations together.
-- Added a **Dusk sky** mode with a setting sun, rising moon, warm horizon, and additional layered grey clouds.
+- Added a **Dusk sky** mode with a rising moon, warm afterglow, and additional layered grey clouds.
 
 ### Changed
 
@@ -30,6 +30,7 @@ All notable changes to lozknowles.com are recorded here.
 - Restored access to Murmuration on mobile with a dedicated navigation action beside the CV button.
 - Extended alignment, cohesion, and separation into the depth axis in Inside flock mode, with perspective projection and far-to-near rendering around a stationary viewer.
 - Reworked Inside flock as **Ground view**, placing the observer beneath the flock with a visible horizon, natural smoothed head movement, and an overhead flock-and-viewing-cone graphic.
+- Anchored the moon and birds in world space so head movement changes only their projected viewport positions; bird silhouette rotation remains driven by flight rather than the camera.
 
 ### Documentation
 
