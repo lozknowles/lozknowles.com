@@ -71,6 +71,9 @@ h1 { margin: 0; font: 300 clamp(52px, 8vw, 112px)/.88 Newsreader, Georgia, serif
 .flock-count span { color: rgba(23, 24, 32, .58); font: 500 9px DM Mono, monospace; letter-spacing: .12em; text-transform: uppercase; }
 .flock-count input { width: 58px; border: 0; border-bottom: 1px solid rgba(23, 24, 32, .28); border-radius: 0; padding: 3px 2px 2px; color: var(--ink); background: transparent; font: 300 21px Newsreader, Georgia, serif; text-align: center; }
 .flock-count input:focus { outline: 0; border-bottom-color: var(--rust); }
+.flight-speed { display: flex; align-items: center; gap: 7px; padding: 0 10px 0 5px; border-right: 1px solid rgba(28, 29, 33, .15); color: rgba(23, 24, 32, .7); font: 500 9px DM Mono, monospace; letter-spacing: .08em; text-transform: uppercase; white-space: nowrap; }
+.flight-speed input { width: 66px; margin: 0; accent-color: var(--rust); cursor: pointer; }
+.flight-speed output { min-width: 18px; color: var(--rust); font-size: 10px; text-align: right; }
 .edge-toggle, .cloud-toggle, .view-toggle { display: flex; align-items: center; gap: 6px; padding: 0 8px 0 3px; color: rgba(23, 24, 32, .7); font: 500 9px DM Mono, monospace; letter-spacing: .08em; text-transform: uppercase; cursor: pointer; white-space: nowrap; }
 .edge-toggle input, .cloud-toggle input, .view-toggle input { width: 15px; height: 15px; margin: 0; accent-color: var(--rust); cursor: pointer; }
 .controls button { border: 0; border-radius: 999px; padding: 10px 13px; background: transparent; color: var(--ink); font: 500 10px DM Mono, monospace; letter-spacing: .08em; text-transform: uppercase; cursor: pointer; }
