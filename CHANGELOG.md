@@ -38,6 +38,7 @@ All notable changes to lozknowles.com are recorded here.
 - Made movement use elapsed frame time so the physical speed remains consistent across 60 Hz and 120 Hz displays; higher speed settings now act as accelerated simulation time.
 - Calibrated the existing seven-neighbour steering response to a 100 ms baseline, accelerating naturally under fear and formation pressure.
 - Doubled the Ground-view flock's front-to-back projection depth and increased depth-sorting resolution while preserving calibrated flight speeds.
+- Added a checked-by-default **Auto track** toggle for human-like head tracking of the densest three-dimensional part of the flock; it yields temporarily to manual camera movement, can be disabled for a fully manual view, and marks the tracked core on the viewpoint graphic.
 
 ### Documentation
 
