@@ -4,7 +4,7 @@
     <meta charset="UTF-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
     <meta name="theme-color" content="#aeb8bb" />
-    <meta name="description" content="Guide a bird of prey through an interactive murmuration of up to 2,500 starlings." />
+    <meta name="description" content="Guide a bird of prey through an interactive murmuration of up to 10,000 starlings." />
     <title>Murmuration — Lawrence Knowles</title>
     <link rel="stylesheet" href="/assets/murmuration.css" />
   </head>
@@ -21,11 +21,11 @@
         <i class="cloud cloud-five"></i>
         <i class="cloud cloud-six"></i>
       </div>
-      <canvas id="murmuration" class="sky" tabindex="0" aria-label="An interactive flock of up to 2,500 starlings. Move your pointer to steer a bird of prey, or use Ground view to stand beneath the flock and look around."></canvas>
+      <canvas id="murmuration" class="sky" tabindex="0" aria-label="An interactive flock of up to 10,000 starlings. Move your pointer to steer a bird of prey, or use Ground view to stand beneath the flock and look around."></canvas>
 
       <div class="immersive-hud" id="immersive-hud" aria-hidden="true">
         <div class="view-status">
-          <span>Ground observer · ½ mile airspace · 12 m/s at 1×</span>
+          <span>Ground observer · double-depth flock · 12 m/s at 1×</span>
           <b>Drag, swipe, or use arrow keys to move your head</b>
         </div>
         <figure class="viewpoint-panel">
@@ -49,7 +49,7 @@
       <aside class="controls" aria-label="Game controls">
         <label class="flock-count" for="bird-count">
           <span>Starlings</span>
-          <input id="bird-count" type="number" min="10" max="2500" step="10" value="2500" inputmode="numeric" title="Choose between 10 and 2,500 starlings" />
+          <input id="bird-count" type="number" min="10" max="10000" step="10" value="2500" inputmode="numeric" title="Choose between 10 and 10,000 starlings" />
         </label>
         <label class="flight-speed" for="flight-speed">
           <span>Speed</span>
