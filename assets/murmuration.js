@@ -16,16 +16,23 @@
   const edgeDescription = document.getElementById("edge-description");
   const cloudToggle = document.getElementById("show-clouds");
   const cloudLayer = document.getElementById("cloud-layer");
+  const viewModeInput = document.getElementById("inside-flock");
+  const gameShell = document.getElementById("game-shell");
+  const immersiveHud = document.getElementById("immersive-hud");
   const invitation = document.getElementById("invitation");
+  const invitationText = document.getElementById("invitation-text");
   let birds = [];
   let width = 0;
   let height = 0;
   let paused = false;
   let birdCount = DEFAULT_BIRD_COUNT;
   let avoidEdges = false;
+  let immersiveView = false;
   let depthFrame = 0;
   const depthLayers = Array.from({ length: 8 }, () => []);
+  const immersiveLayers = Array.from({ length: 14 }, () => []);
   const predator = { x: 0, y: 0, active: false };
+  const camera = { yaw: 0, pitch: 0, dragging: false, pointerId: null, lastX: 0, lastY: 0 };
   const formation = {
     active: false,
     nextAt: performance.now() + 6000 + Math.random() * 6000,
@@ -48,7 +55,7 @@
     if (d < -size / 2) d += size;
     return d;
   };
-  const spatialDelta = (a, b, size) => avoidEdges ? b - a : wrappedDelta(a, b, size);
+  const spatialDelta = (a, b, size) => avoidEdges || immersiveView ? b - a : wrappedDelta(a, b, size);
   const formationFlow = now => {
     if (!formation.active && now >= formation.nextAt) {
       formation.active = true;
@@ -76,7 +83,7 @@
     const travel = Math.max(0, (progress - .28) / .72) * Math.min(width, height) * .68;
     let centerX = formation.originX + flowX * travel;
     let centerY = formation.originY + flowY * travel;
-    if (avoidEdges) {
+    if (avoidEdges || immersiveView) {
       centerX = Math.max(width * .18, Math.min(width * .82, centerX));
       centerY = Math.max(height * .18, Math.min(height * .82, centerY));
     } else {
@@ -91,11 +98,11 @@
     birds = Array.from({ length: birdCount }, (_, i) => {
       const angle = i / birdCount * TAU + Math.random() * .5;
       const radius = Math.sqrt(Math.random()) * Math.min(width, height) * .26;
-      const direction = angle + Math.PI / 2 + (Math.random() - .5);
+      const direction = immersiveView ? Math.random() * TAU : angle + Math.PI / 2 + (Math.random() - .5);
       const speed = .85 + Math.random() * .85;
       return {
-        x: cx + Math.cos(angle) * radius,
-        y: cy + Math.sin(angle) * radius * .55,
+        x: immersiveView ? width * (.04 + Math.random() * .92) : cx + Math.cos(angle) * radius,
+        y: immersiveView ? height * (.04 + Math.random() * .92) : cy + Math.sin(angle) * radius * .55,
         vx: Math.cos(direction) * speed,
         vy: Math.sin(direction) * speed,
         ax: 0,
@@ -134,15 +141,15 @@
     if (!birds.length) seedBirds();
     else if (oldWidth && oldHeight) birds.forEach(bird => { bird.x = bird.x / oldWidth * width; bird.y = bird.y / oldHeight * height; });
   };
-  const drawBird = bird => {
-    const angle = Math.atan2(bird.vy, bird.vx);
-    const perspective = .55 + bird.z * .8;
+  const drawBird = (bird, projected = false) => {
+    const angle = projected ? bird.viewAngle : Math.atan2(bird.vy, bird.vx);
+    const perspective = projected ? bird.viewScale : .55 + bird.z * .8;
     const size = (3.25 + Math.min(Math.hypot(bird.vx, bird.vy), 3) * .65) * perspective;
     const bank = Math.max(-.8, Math.min(.8, bird.bank || 0));
     ctx.save();
-    ctx.translate(bird.x, bird.y);
+    ctx.translate(projected ? bird.viewX : bird.x, projected ? bird.viewY : bird.y);
     ctx.rotate(angle);
-    ctx.globalAlpha = .36 + bird.z * .58;
+    ctx.globalAlpha = projected ? bird.viewAlpha : .36 + bird.z * .58;
     ctx.fillStyle = "rgb(17,17,24)";
     ctx.beginPath();
     ctx.moveTo(size * 1.65, 0);
@@ -154,16 +161,59 @@
     ctx.fill();
     ctx.restore();
   };
+  const projectBird = bird => {
+    const worldX = bird.x / width - .5;
+    const worldY = bird.y / height - .5;
+    const worldZ = bird.z - .5;
+    const cosYaw = Math.cos(camera.yaw);
+    const sinYaw = Math.sin(camera.yaw);
+    const cosPitch = Math.cos(camera.pitch);
+    const sinPitch = Math.sin(camera.pitch);
+    const yawX = cosYaw * worldX - sinYaw * worldZ;
+    const yawZ = sinYaw * worldX + cosYaw * worldZ;
+    const viewY = cosPitch * worldY - sinPitch * yawZ;
+    const viewZ = sinPitch * worldY + cosPitch * yawZ;
+    if (viewZ <= .035) return false;
+    const focalLength = Math.min(width, height) * .72;
+    const screenX = width * .5 + yawX / viewZ * focalLength;
+    const screenY = height * .5 + viewY / viewZ * focalLength;
+    const margin = 42;
+    if (screenX < -margin || screenX > width + margin || screenY < -margin || screenY > height + margin) return false;
+    const velocityX = bird.vx / width;
+    const velocityY = bird.vy / height;
+    const yawVelocityX = cosYaw * velocityX - sinYaw * bird.vz;
+    const yawVelocityZ = sinYaw * velocityX + cosYaw * bird.vz;
+    const viewVelocityY = cosPitch * velocityY - sinPitch * yawVelocityZ;
+    bird.viewX = screenX;
+    bird.viewY = screenY;
+    bird.viewAngle = Math.atan2(viewVelocityY, yawVelocityX);
+    bird.viewScale = Math.max(.35, Math.min(3.35, .23 / viewZ));
+    bird.viewAlpha = Math.max(.28, Math.min(.98, 1.04 - viewZ * .7));
+    bird.viewDepth = viewZ;
+    return true;
+  };
   const drawBirds = () => {
+    if (immersiveView) {
+      immersiveLayers.forEach(layer => { layer.length = 0; });
+      birds.forEach(bird => {
+        if (!projectBird(bird)) return;
+        const layer = Math.min(immersiveLayers.length - 1, Math.floor(bird.viewDepth / .75 * immersiveLayers.length));
+        immersiveLayers[layer].push(bird);
+      });
+      for (let i = immersiveLayers.length - 1; i >= 0; i--) immersiveLayers[i].forEach(bird => drawBird(bird, true));
+      return;
+    }
     depthLayers.forEach(layer => { layer.length = 0; });
     birds.forEach(bird => {
       const layer = Math.min(depthLayers.length - 1, Math.floor(bird.z * depthLayers.length));
       depthLayers[layer].push(bird);
     });
-    depthLayers.forEach(layer => layer.forEach(drawBird));
+    depthLayers.forEach(layer => layer.forEach(bird => drawBird(bird)));
   };
   const update = () => {
-    const neighbourRadius = Math.max(18, Math.min(MAX_NEIGHBOUR_RADIUS, 900 / Math.sqrt(birds.length)));
+    const neighbourRadius = immersiveView
+      ? Math.max(42, Math.min(104, 700 / Math.cbrt(birds.length)))
+      : Math.max(18, Math.min(MAX_NEIGHBOUR_RADIUS, 900 / Math.sqrt(birds.length)));
     const { grid, columns, rows } = buildNeighbourGrid(neighbourRadius);
     const nextStates = new Array(birds.length);
     const now = performance.now();
@@ -179,7 +229,7 @@
         for (let cellX = -1; cellX <= 1; cellX++) {
           const candidateColumn = ownColumn + cellX;
           const candidateRow = ownRow + cellY;
-          if (avoidEdges && (candidateColumn < 0 || candidateColumn >= columns || candidateRow < 0 || candidateRow >= rows)) continue;
+          if ((avoidEdges || immersiveView) && (candidateColumn < 0 || candidateColumn >= columns || candidateRow < 0 || candidateRow >= rows)) continue;
           const column = (candidateColumn + columns) % columns;
           const row = (candidateRow + rows) % rows;
           const candidates = grid[row * columns + column];
@@ -188,10 +238,12 @@
             const other = birds[j];
             const dx = spatialDelta(bird.x, other.x, width);
             const dy = spatialDelta(bird.y, other.y, height);
-            const distSq = dx * dx + dy * dy;
+            const dz = other.z - bird.z;
+            const depthDistance = immersiveView ? dz * Math.min(width, height) : 0;
+            const distSq = dx * dx + dy * dy + depthDistance * depthDistance;
             if (distSq < neighbourRadius * neighbourRadius) {
               if (nearest.length === TOPOLOGICAL_NEIGHBOURS && distSq >= nearest[nearest.length - 1].distSq) continue;
-              const neighbour = { bird: other, dx, dy, distSq };
+              const neighbour = { bird: other, dx, dy, dz, distSq };
               let position = nearest.length;
               while (position > 0 && nearest[position - 1].distSq > distSq) position--;
               nearest.splice(position, 0, neighbour);
@@ -200,8 +252,8 @@
           }
         }
       }
-      let alignX = 0, alignY = 0, cohesionX = 0, cohesionY = 0;
-      let separateX = 0, separateY = 0, totalWeight = 0, neighbourFear = 0;
+      let alignX = 0, alignY = 0, alignZ = 0, cohesionX = 0, cohesionY = 0, cohesionZ = 0;
+      let separateX = 0, separateY = 0, separateZ = 0, totalWeight = 0, neighbourFear = 0;
       const speed = Math.hypot(bird.vx, bird.vy) || 1;
       const headingX = bird.vx / speed;
       const headingY = bird.vy / speed;
@@ -213,8 +265,10 @@
         const weight = (facing < -.35 ? .32 : 1) * (1 - distance / neighbourRadius * .25) * depthWeight;
         alignX += neighbour.bird.vx * weight;
         alignY += neighbour.bird.vy * weight;
+        alignZ += neighbour.bird.vz * weight;
         cohesionX += neighbour.dx * weight;
         cohesionY += neighbour.dy * weight;
+        cohesionZ += neighbour.dz * weight;
         totalWeight += weight;
         neighbourFear = Math.max(neighbourFear, neighbour.bird.fear * (1 - distance / (neighbourRadius * 1.35)));
         const spacing = 27 - flow.compression * 14;
@@ -222,6 +276,7 @@
           const pressure = Math.pow(1 - distance / spacing, 2);
           separateX -= neighbour.dx / distance * pressure;
           separateY -= neighbour.dy / distance * pressure;
+          separateZ -= Math.sign(neighbour.dz) * pressure;
         }
       });
       let ax = 0, ay = 0;
@@ -267,7 +322,7 @@
           ay += (inwardY * inwardPull + tangentY * .045 * flow.ribbon + ribbonY * .034 * flow.ribbon) * influence;
         }
       }
-      if (avoidEdges) {
+      if (avoidEdges || immersiveView) {
         const horizontalMargin = Math.min(EDGE_MARGIN, width * .25);
         const verticalMargin = Math.min(EDGE_MARGIN, height * .25);
         if (bird.x < horizontalMargin) ax += (1 - bird.x / horizontalMargin) * .18;
@@ -298,7 +353,20 @@
       const bank = bird.bank * .78 + (headingX * vy / newSpeed - headingY * vx / newSpeed) * 3.4;
       let z = bird.z;
       let vz = bird.vz;
-      if (advanceDepth) {
+      if (immersiveView) {
+        let depthAcceleration = 0;
+        if (totalWeight) {
+          depthAcceleration += (alignZ / totalWeight - bird.vz) * .04;
+          depthAcceleration += cohesionZ / totalWeight * .0022;
+          depthAcceleration += separateZ * .0018;
+        }
+        if (bird.z < .12) depthAcceleration += (1 - bird.z / .12) * .0011;
+        if (bird.z > .88) depthAcceleration -= (1 - (1 - bird.z) / .12) * .0011;
+        if (flow.intensity) {
+          depthAcceleration += Math.sin(bird.x * .016 + bird.y * .011 - time * 2.4 + flow.phase) * flow.ribbon * .0007;
+        }
+        vz = Math.max(-.008, Math.min(.008, bird.vz * .982 + depthAcceleration));
+      } else if (advanceDepth) {
         let depthTarget = .5 + Math.sin(time * .31 + bird.phase + bird.x * .0015) * .34;
         if (flow.intensity) {
           const depthWave = Math.sin((bird.x * flow.flowX + bird.y * flow.flowY) * .018 - time * 2.9 + flow.phase);
@@ -314,7 +382,7 @@
       if (z > 1) { z = 1; vz = -Math.abs(vz) * .65; }
       let x;
       let y;
-      if (avoidEdges) {
+      if (avoidEdges || immersiveView) {
         x = bird.x + vx;
         y = bird.y + vy;
         if (x < 1) { x = 1; vx = Math.abs(vx) * .55; }
@@ -343,7 +411,7 @@
     ctx.clearRect(0, 0, width, height);
     if (!paused) update();
     drawBirds();
-    if (predator.active) drawPredator();
+    if (predator.active && !immersiveView) drawPredator();
     requestAnimationFrame(frame);
   };
   const movePredator = event => {
@@ -353,9 +421,47 @@
     predator.active = true;
     invitation.classList.add("hidden");
   };
-  canvas.addEventListener("pointermove", movePredator);
-  canvas.addEventListener("pointerdown", event => { canvas.setPointerCapture(event.pointerId); movePredator(event); });
-  canvas.addEventListener("pointerleave", () => { predator.active = false; });
+  const panCamera = event => {
+    if (!camera.dragging) return;
+    const dx = event.clientX - camera.lastX;
+    const dy = event.clientY - camera.lastY;
+    camera.yaw -= dx * .006;
+    camera.pitch = Math.max(-1.35, Math.min(1.35, camera.pitch + dy * .005));
+    camera.lastX = event.clientX;
+    camera.lastY = event.clientY;
+    invitation.classList.add("hidden");
+  };
+  canvas.addEventListener("pointermove", event => immersiveView ? panCamera(event) : movePredator(event));
+  canvas.addEventListener("pointerdown", event => {
+    canvas.setPointerCapture(event.pointerId);
+    if (canvas.focus) canvas.focus({ preventScroll: true });
+    if (immersiveView) {
+      camera.dragging = true;
+      camera.pointerId = event.pointerId;
+      camera.lastX = event.clientX;
+      camera.lastY = event.clientY;
+      predator.active = false;
+    } else movePredator(event);
+  });
+  const stopPointer = event => {
+    if (camera.pointerId === null || !event || event.pointerId === camera.pointerId) {
+      camera.dragging = false;
+      camera.pointerId = null;
+    }
+    predator.active = false;
+  };
+  canvas.addEventListener("pointerup", stopPointer);
+  canvas.addEventListener("pointercancel", stopPointer);
+  canvas.addEventListener("pointerleave", event => { if (!camera.dragging) stopPointer(event); });
+  canvas.addEventListener("keydown", event => {
+    if (!immersiveView || !["ArrowLeft", "ArrowRight", "ArrowUp", "ArrowDown"].includes(event.key)) return;
+    event.preventDefault();
+    if (event.key === "ArrowLeft") camera.yaw += .1;
+    if (event.key === "ArrowRight") camera.yaw -= .1;
+    if (event.key === "ArrowUp") camera.pitch = Math.max(-1.35, camera.pitch - .08);
+    if (event.key === "ArrowDown") camera.pitch = Math.min(1.35, camera.pitch + .08);
+    invitation.classList.add("hidden");
+  });
   pauseButton.addEventListener("click", () => { paused = !paused; pauseButton.textContent = paused ? "Resume" : "Pause"; });
   gatherButton.addEventListener("click", seedBirds);
   birdCountInput.addEventListener("change", () => {
@@ -365,14 +471,33 @@
     seedBirds();
   });
   birdCountInput.addEventListener("keydown", event => { if (event.key === "Enter") birdCountInput.blur(); });
-  edgeModeInput.addEventListener("change", () => {
-    avoidEdges = edgeModeInput.checked;
+  const updateDescription = () => {
+    if (immersiveView) {
+      edgeDescription.textContent = "Inside a ½ mile cube · drag, swipe, or use arrow keys to look around";
+      return;
+    }
     edgeDescription.textContent = avoidEdges
       ? "Soft boundary active · the flock will turn before the edge"
       : "There are no edges here · every horizon leads back to the sky";
+  };
+  edgeModeInput.addEventListener("change", () => {
+    avoidEdges = edgeModeInput.checked;
+    updateDescription();
   });
   cloudToggle.addEventListener("change", () => {
     cloudLayer.classList.toggle("clouds-hidden", !cloudToggle.checked);
+  });
+  viewModeInput.addEventListener("change", () => {
+    immersiveView = viewModeInput.checked;
+    predator.active = false;
+    camera.dragging = false;
+    camera.pointerId = null;
+    gameShell.classList.toggle("immersive-mode", immersiveView);
+    immersiveHud.setAttribute("aria-hidden", String(!immersiveView));
+    invitationText.textContent = immersiveView ? "Drag or swipe to look around" : "Move here to enter the flock";
+    invitation.classList.remove("hidden");
+    seedBirds();
+    updateDescription();
   });
   window.addEventListener("resize", resize);
   resize();

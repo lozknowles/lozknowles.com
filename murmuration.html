@@ -9,14 +9,19 @@
     <link rel="stylesheet" href="/assets/murmuration.css" />
   </head>
   <body>
-    <main class="game-shell">
+    <main class="game-shell" id="game-shell">
       <div class="cloud-layer" id="cloud-layer" aria-hidden="true">
         <i class="cloud cloud-one"></i>
         <i class="cloud cloud-two"></i>
         <i class="cloud cloud-three"></i>
         <i class="cloud cloud-four"></i>
       </div>
-      <canvas id="murmuration" class="sky" aria-label="An interactive flock of up to 2,500 starlings. Move your pointer to steer a bird of prey."></canvas>
+      <canvas id="murmuration" class="sky" tabindex="0" aria-label="An interactive flock of up to 2,500 starlings. Move your pointer to steer a bird of prey, or use Inside flock mode to look around in three dimensions."></canvas>
+
+      <div class="immersive-hud" id="immersive-hud" aria-hidden="true">
+        <span>½ mile cube</span>
+        <b>Drag or swipe to look around</b>
+      </div>
 
       <header class="title-card">
         <a class="home-link" href="/" aria-label="Back to Lawrence Knowles home">LK<span>•</span></a>
@@ -27,7 +32,7 @@
 
       <div class="invitation" id="invitation" aria-hidden="true">
         <div class="pointer-mark"></div>
-        <span>Move here to enter the flock</span>
+        <span id="invitation-text">Move here to enter the flock</span>
       </div>
 
       <aside class="controls" aria-label="Game controls">
@@ -42,6 +47,10 @@
         <label class="cloud-toggle" for="show-clouds">
           <input id="show-clouds" type="checkbox" checked />
           <span>Clouds</span>
+        </label>
+        <label class="view-toggle" for="inside-flock">
+          <input id="inside-flock" type="checkbox" />
+          <span>Inside flock</span>
         </label>
         <button type="button" id="pause">Pause</button>
         <button type="button" id="gather">Gather flock</button>
