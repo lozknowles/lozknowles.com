@@ -11,6 +11,8 @@ All notable changes to lozknowles.com are recorded here.
 - Added seamless horizontal and vertical wrapping so birds leaving one edge reappear on the opposite edge.
 - Added pause and gather-flock controls, responsive presentation, and reduced-motion support.
 - Added Murmuration to the website's primary navigation.
+- Added an editable flock-size control supporting 10–500 starlings, defaulting to 100.
+- Added spatial neighbour indexing to keep larger murmurations responsive.
 
 ### Documentation
 

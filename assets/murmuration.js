@@ -1,16 +1,21 @@
 (() => {
   "use strict";
-  const BIRD_COUNT = 100;
+  const DEFAULT_BIRD_COUNT = 100;
+  const MIN_BIRD_COUNT = 10;
+  const MAX_BIRD_COUNT = 500;
+  const NEIGHBOUR_RADIUS = 76;
   const TAU = Math.PI * 2;
   const canvas = document.getElementById("murmuration");
   const ctx = canvas.getContext("2d");
   const pauseButton = document.getElementById("pause");
   const gatherButton = document.getElementById("gather");
+  const birdCountInput = document.getElementById("bird-count");
   const invitation = document.getElementById("invitation");
   let birds = [];
   let width = 0;
   let height = 0;
   let paused = false;
+  let birdCount = DEFAULT_BIRD_COUNT;
   const predator = { x: 0, y: 0, active: false };
 
   const limit = (x, y, max) => {
@@ -26,13 +31,24 @@
   const seedBirds = () => {
     const cx = width * .5;
     const cy = height * .48;
-    birds = Array.from({ length: BIRD_COUNT }, (_, i) => {
-      const angle = i / BIRD_COUNT * TAU + Math.random() * .5;
+    birds = Array.from({ length: birdCount }, (_, i) => {
+      const angle = i / birdCount * TAU + Math.random() * .5;
       const radius = Math.sqrt(Math.random()) * Math.min(width, height) * .26;
       const direction = angle + Math.PI / 2 + (Math.random() - .5);
       const speed = .85 + Math.random() * .85;
       return { x: cx + Math.cos(angle) * radius, y: cy + Math.sin(angle) * radius * .55, vx: Math.cos(direction) * speed, vy: Math.sin(direction) * speed };
     });
+  };
+  const buildNeighbourGrid = () => {
+    const columns = Math.max(1, Math.ceil(width / NEIGHBOUR_RADIUS));
+    const rows = Math.max(1, Math.ceil(height / NEIGHBOUR_RADIUS));
+    const grid = Array.from({ length: columns * rows }, () => []);
+    birds.forEach((bird, index) => {
+      const column = Math.min(columns - 1, Math.floor(bird.x / NEIGHBOUR_RADIUS));
+      const row = Math.min(rows - 1, Math.floor(bird.y / NEIGHBOUR_RADIUS));
+      grid[row * columns + column].push(index);
+    });
+    return { grid, columns, rows };
   };
   const resize = () => {
     const box = canvas.getBoundingClientRect();
@@ -65,20 +81,30 @@
     ctx.restore();
   };
   const update = () => {
+    const { grid, columns, rows } = buildNeighbourGrid();
     for (let i = 0; i < birds.length; i++) {
       const bird = birds[i];
       let alignX = 0, alignY = 0, cohesionX = 0, cohesionY = 0, separateX = 0, separateY = 0, neighbours = 0;
-      for (let j = 0; j < birds.length; j++) {
-        if (i === j) continue;
-        const other = birds[j];
-        const dx = wrappedDelta(bird.x, other.x, width);
-        const dy = wrappedDelta(bird.y, other.y, height);
-        const distSq = dx * dx + dy * dy;
-        if (distSq < 76 * 76) {
-          alignX += other.vx; alignY += other.vy; cohesionX += dx; cohesionY += dy; neighbours++;
-          if (distSq < 25 * 25 && distSq > .01) {
-            const force = 1 / Math.sqrt(distSq);
-            separateX -= dx * force; separateY -= dy * force;
+      const ownColumn = Math.min(columns - 1, Math.floor(bird.x / NEIGHBOUR_RADIUS));
+      const ownRow = Math.min(rows - 1, Math.floor(bird.y / NEIGHBOUR_RADIUS));
+      for (let cellY = -1; cellY <= 1; cellY++) {
+        for (let cellX = -1; cellX <= 1; cellX++) {
+          const column = (ownColumn + cellX + columns) % columns;
+          const row = (ownRow + cellY + rows) % rows;
+          const candidates = grid[row * columns + column];
+          for (const j of candidates) {
+            if (i === j) continue;
+            const other = birds[j];
+            const dx = wrappedDelta(bird.x, other.x, width);
+            const dy = wrappedDelta(bird.y, other.y, height);
+            const distSq = dx * dx + dy * dy;
+            if (distSq < NEIGHBOUR_RADIUS * NEIGHBOUR_RADIUS) {
+              alignX += other.vx; alignY += other.vy; cohesionX += dx; cohesionY += dy; neighbours++;
+              if (distSq < 25 * 25 && distSq > .01) {
+                const force = 1 / Math.sqrt(distSq);
+                separateX -= dx * force; separateY -= dy * force;
+              }
+            }
           }
         }
       }
@@ -137,6 +163,13 @@
   canvas.addEventListener("pointerleave", () => { predator.active = false; });
   pauseButton.addEventListener("click", () => { paused = !paused; pauseButton.textContent = paused ? "Resume" : "Pause"; });
   gatherButton.addEventListener("click", seedBirds);
+  birdCountInput.addEventListener("change", () => {
+    const requested = Number.parseInt(birdCountInput.value, 10);
+    birdCount = Number.isFinite(requested) ? Math.min(MAX_BIRD_COUNT, Math.max(MIN_BIRD_COUNT, requested)) : DEFAULT_BIRD_COUNT;
+    birdCountInput.value = String(birdCount);
+    seedBirds();
+  });
+  birdCountInput.addEventListener("keydown", event => { if (event.key === "Enter") birdCountInput.blur(); });
   window.addEventListener("resize", resize);
   resize();
   requestAnimationFrame(frame);

@@ -4,7 +4,7 @@ Static files for [lozknowles.com](https://lozknowles.com), including the site's 
 
 ## Interactive experiments
 
-- **Murmuration** — added 8 August 2026 at `/murmuration.html`. An interactive, edge-wrapping flock of 100 starlings that responds to a mouse, touch input, or stylus-controlled bird of prey. The page is linked from the primary navigation and uses `assets/murmuration.css` and `assets/murmuration.js`.
+- **Murmuration** — added 8 August 2026 at `/murmuration.html`. An interactive, edge-wrapping flock of 10–500 starlings that responds to a mouse, touch input, or stylus-controlled bird of prey. The flock-size input defaults to 100, and spatial neighbour indexing keeps larger flocks responsive. The page is linked from the primary navigation and uses `assets/murmuration.css` and `assets/murmuration.js`.
 
 Serve the repository root with any static web server. For example:
 
