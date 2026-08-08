@@ -25,7 +25,10 @@
       </div>
 
       <aside class="controls" aria-label="Game controls">
-        <div class="flock-count"><strong>100</strong><span>starlings</span></div>
+        <label class="flock-count" for="bird-count">
+          <span>Starlings</span>
+          <input id="bird-count" type="number" min="10" max="500" step="10" value="100" inputmode="numeric" title="Choose between 10 and 500 starlings" />
+        </label>
         <button type="button" id="pause">Pause</button>
         <button type="button" id="gather">Gather flock</button>
       </aside>
