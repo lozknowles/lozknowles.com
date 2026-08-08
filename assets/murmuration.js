@@ -24,6 +24,17 @@
   let birdCount = DEFAULT_BIRD_COUNT;
   let avoidEdges = false;
   const predator = { x: 0, y: 0, active: false };
+  const formation = {
+    active: false,
+    nextAt: performance.now() + 6000 + Math.random() * 6000,
+    startedAt: 0,
+    duration: 0,
+    originX: 0,
+    originY: 0,
+    angle: 0,
+    spin: 1,
+    phase: 0
+  };
 
   const limit = (x, y, max) => {
     const length = Math.hypot(x, y);
@@ -36,6 +47,42 @@
     return d;
   };
   const spatialDelta = (a, b, size) => avoidEdges ? b - a : wrappedDelta(a, b, size);
+  const formationFlow = now => {
+    if (!formation.active && now >= formation.nextAt) {
+      formation.active = true;
+      formation.startedAt = now;
+      formation.duration = 10000 + Math.random() * 4500;
+      formation.originX = width * (.35 + Math.random() * .3);
+      formation.originY = height * (.35 + Math.random() * .3);
+      formation.angle = Math.random() * TAU;
+      formation.spin = Math.random() < .5 ? -1 : 1;
+      formation.phase = Math.random() * TAU;
+    }
+    if (!formation.active) return { intensity: 0, compression: 0, ribbon: 0 };
+    const progress = (now - formation.startedAt) / formation.duration;
+    if (progress >= 1) {
+      formation.active = false;
+      formation.nextAt = now + 15000 + Math.random() * 15000;
+      return { intensity: 0, compression: 0, ribbon: 0 };
+    }
+    const intensity = Math.pow(Math.sin(progress * Math.PI), 2);
+    const transition = Math.max(0, Math.min(1, (progress - .25) / .35));
+    const compression = intensity * (1 - transition * .6);
+    const ribbon = intensity * (.25 + transition * .75);
+    const flowX = Math.cos(formation.angle);
+    const flowY = Math.sin(formation.angle);
+    const travel = Math.max(0, (progress - .28) / .72) * Math.min(width, height) * .68;
+    let centerX = formation.originX + flowX * travel;
+    let centerY = formation.originY + flowY * travel;
+    if (avoidEdges) {
+      centerX = Math.max(width * .18, Math.min(width * .82, centerX));
+      centerY = Math.max(height * .18, Math.min(height * .82, centerY));
+    } else {
+      centerX = (centerX + width) % width;
+      centerY = (centerY + height) % height;
+    }
+    return { intensity, compression, ribbon, progress, flowX, flowY, centerX, centerY, spin: formation.spin, phase: formation.phase };
+  };
   const seedBirds = () => {
     const cx = width * .5;
     const cy = height * .48;
@@ -104,7 +151,9 @@
     const neighbourRadius = Math.max(18, Math.min(MAX_NEIGHBOUR_RADIUS, 900 / Math.sqrt(birds.length)));
     const { grid, columns, rows } = buildNeighbourGrid(neighbourRadius);
     const nextStates = new Array(birds.length);
-    const time = performance.now() * .001;
+    const now = performance.now();
+    const time = now * .001;
+    const flow = formationFlow(now);
     for (let i = 0; i < birds.length; i++) {
       const bird = birds[i];
       const nearest = [];
@@ -150,8 +199,9 @@
         cohesionY += neighbour.dy * weight;
         totalWeight += weight;
         neighbourFear = Math.max(neighbourFear, neighbour.bird.fear * (1 - distance / (neighbourRadius * 1.35)));
-        if (distance < 27) {
-          const pressure = Math.pow(1 - distance / 27, 2);
+        const spacing = 27 - flow.compression * 14;
+        if (distance < spacing) {
+          const pressure = Math.pow(1 - distance / spacing, 2);
           separateX -= neighbour.dx / distance * pressure;
           separateY -= neighbour.dy / distance * pressure;
         }
@@ -160,8 +210,10 @@
       if (totalWeight) {
         const align = limit(alignX / totalWeight, alignY / totalWeight, 2.15);
         const cohesion = limit(cohesionX / totalWeight, cohesionY / totalWeight, 1.3);
-        ax += (align.x - bird.vx) * .042 + cohesion.x * .009 + separateX * .19;
-        ay += (align.y - bird.vy) * .042 + cohesion.y * .009 + separateY * .19;
+        const compression = 1 + flow.compression * 4.5;
+        const separation = .19 * (1 - flow.compression * .7);
+        ax += (align.x - bird.vx) * .042 + cohesion.x * .009 * compression + separateX * separation;
+        ay += (align.y - bird.vy) * .042 + cohesion.y * .009 * compression + separateY * separation;
       }
       let directFear = 0;
       if (predator.active) {
@@ -175,6 +227,28 @@
         }
       }
       const fear = Math.max(directFear, bird.fear * .955, neighbourFear * .92);
+      if (flow.intensity) {
+        const toCenterX = spatialDelta(bird.x, flow.centerX, width);
+        const toCenterY = spatialDelta(bird.y, flow.centerY, height);
+        const centerDistance = Math.hypot(toCenterX, toCenterY) || 1;
+        const reach = Math.min(width, height) * .62;
+        const proximity = Math.max(0, 1 - centerDistance / reach);
+        const influence = (.35 + proximity * .65) * flow.intensity * (1 - fear * .72);
+        if (influence) {
+          const inwardX = toCenterX / centerDistance;
+          const inwardY = toCenterY / centerDistance;
+          const tangentX = -inwardY * flow.spin;
+          const tangentY = inwardX * flow.spin;
+          const alongRibbon = bird.x * flow.flowX + bird.y * flow.flowY;
+          const ribbonWave = Math.sin(alongRibbon * .022 - time * 3.1 + flow.phase);
+          const radialWave = Math.sin(centerDistance * .052 - time * 3.7 + flow.phase);
+          const ribbonX = flow.flowX - flow.flowY * ribbonWave * .58;
+          const ribbonY = flow.flowY + flow.flowX * ribbonWave * .58;
+          const inwardPull = .055 + flow.compression * .22 + radialWave * .16 * flow.ribbon;
+          ax += (inwardX * inwardPull + tangentX * .045 * flow.ribbon + ribbonX * .034 * flow.ribbon) * influence;
+          ay += (inwardY * inwardPull + tangentY * .045 * flow.ribbon + ribbonY * .034 * flow.ribbon) * influence;
+        }
+      }
       if (avoidEdges) {
         const horizontalMargin = Math.min(EDGE_MARGIN, width * .25);
         const verticalMargin = Math.min(EDGE_MARGIN, height * .25);
@@ -186,15 +260,15 @@
       const wander = Math.sin(time * .72 + bird.phase) * .0045;
       ax += -headingY * wander - bird.vy * .0012;
       ay += headingX * wander + bird.vx * .0012;
-      const desiredSpeed = bird.preferredSpeed + fear * 1.8 + Math.sin(time * .38 + bird.phase * .7) * .08;
+      const desiredSpeed = bird.preferredSpeed + fear * 1.8 + flow.intensity * 1.25 + Math.sin(time * .38 + bird.phase * .7) * .08;
       ax += headingX * (desiredSpeed - speed) * .025;
       ay += headingY * (desiredSpeed - speed) * .025;
-      const steering = limit(ax, ay, .075 + fear * .16);
-      const response = .2 + fear * .32;
+      const steering = limit(ax, ay, .075 + fear * .16 + flow.intensity * .08);
+      const response = .2 + fear * .32 + flow.intensity * .12;
       const smoothed = limit(
         bird.ax * (1 - response) + steering.x * response,
         bird.ay * (1 - response) + steering.y * response,
-        .065 + fear * .15
+        .065 + fear * .15 + flow.intensity * .07
       );
       let vx = bird.vx + smoothed.x;
       let vy = bird.vy + smoothed.y;
