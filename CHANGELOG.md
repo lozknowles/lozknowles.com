@@ -21,6 +21,7 @@ All notable changes to lozknowles.com are recorded here.
 
 - Made flight paths more lifelike with seven-neighbour flock awareness, distance and field-of-view weighting, smooth turn limits, individual speed variation, banking, and predator fear that ripples through nearby birds.
 - Updated the simulation in two phases so every bird reacts to the same instant in the flock, avoiding update-order artefacts while retaining spatial indexing for large flocks.
+- Added occasional large-scale formation events that gather starlings into dense dark groups, accelerate the flock into elongated trails, and create twisting inward-and-outward vortex waves.
 
 ### Documentation
 
