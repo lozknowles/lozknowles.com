@@ -27,6 +27,7 @@ All notable changes to lozknowles.com are recorded here.
 - Added simulated depth flight with individual forward/back movement, perspective scaling, atmospheric fading, depth-aware neighbour influence, and far-to-near drawing layers.
 - Restored access to Murmuration on mobile with a dedicated navigation action beside the CV button.
 - Extended alignment, cohesion, and separation into the depth axis in Inside flock mode, with perspective projection and far-to-near rendering around a stationary viewer.
+- Reworked Inside flock as **Ground view**, placing the observer beneath the flock with a visible horizon, natural smoothed head movement, and an overhead flock-and-viewing-cone graphic.
 
 ### Documentation
 
