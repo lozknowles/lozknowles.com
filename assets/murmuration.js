@@ -6,6 +6,16 @@
   const MAX_NEIGHBOUR_RADIUS = 88;
   const TOPOLOGICAL_NEIGHBOURS = 7;
   const EDGE_MARGIN = 96;
+  const AIRSPACE_METERS = 804.672;
+  const SIMULATION_HZ = 60;
+  const REFERENCE_CRUISE_MPS = 12;
+  const MIN_CRUISE_MPS = 10;
+  const MAX_CRUISE_MPS = 14;
+  const MIN_FLIGHT_MPS = 8;
+  const MAX_FLIGHT_MPS = 22;
+  const MAX_VERTICAL_MPS = 6;
+  const BASE_REACTION_SECONDS = .1;
+  const LEGACY_CRUISE_SPEED = 1.575;
   const MOON_VIEW_PARALLAX = .18;
   const NEUTRAL_VIEW_PITCH = .48;
   const TAU = Math.PI * 2;
@@ -37,6 +47,7 @@
   let birdCount = DEFAULT_BIRD_COUNT;
   let simulationSpeed = 4;
   let simulationClock = performance.now();
+  let lastFrameAt = null;
   let duskEnabled = true;
   let duskStartedAt = 0;
   let avoidEdges = false;
@@ -69,6 +80,9 @@
     return d;
   };
   const spatialDelta = (a, b, size) => avoidEdges || immersiveView ? b - a : wrappedDelta(a, b, size);
+  const metresPerSecondToPixelsPerStep = metresPerSecond => metresPerSecond * width / AIRSPACE_METERS / SIMULATION_HZ;
+  const metresPerSecondToWorldStep = metresPerSecond => metresPerSecond / AIRSPACE_METERS / SIMULATION_HZ;
+  const dynamicsScale = () => metresPerSecondToPixelsPerStep(REFERENCE_CRUISE_MPS) / LEGACY_CRUISE_SPEED;
   const formationFlow = now => {
     if (!formation.active && now >= formation.nextAt) {
       formation.active = true;
@@ -93,7 +107,9 @@
     const ribbon = intensity * (.25 + transition * .75);
     const flowX = Math.cos(formation.angle);
     const flowY = Math.sin(formation.angle);
-    const travel = Math.max(0, (progress - .28) / .72) * Math.min(width, height) * .68;
+    const travelProgress = Math.max(0, (progress - .28) / .72);
+    const travelMeters = 18 * formation.duration * .001 * .72;
+    const travel = travelProgress * travelMeters / AIRSPACE_METERS * Math.min(width, height);
     let centerX = formation.originX + flowX * travel;
     let centerY = formation.originY + flowY * travel;
     if (avoidEdges || immersiveView) {
@@ -112,7 +128,8 @@
       const angle = i / birdCount * TAU + Math.random() * .5;
       const radius = Math.sqrt(Math.random()) * Math.min(width, height) * .26;
       const direction = immersiveView ? Math.random() * TAU : angle + Math.PI / 2 + (Math.random() - .5);
-      const speed = .85 + Math.random() * .85;
+      const preferredSpeedMps = MIN_CRUISE_MPS + Math.random() * (MAX_CRUISE_MPS - MIN_CRUISE_MPS);
+      const speed = metresPerSecondToPixelsPerStep(preferredSpeedMps * (.85 + Math.random() * .3));
       return {
         x: immersiveView ? width * (.04 + Math.random() * .92) : cx + Math.cos(angle) * radius,
         y: immersiveView ? height * (.04 + Math.random() * .92) : cy + Math.sin(angle) * radius * .55,
@@ -123,10 +140,10 @@
         fear: 0,
         bank: 0,
         z: Math.random(),
-        vz: (Math.random() - .5) * .004,
+        vz: metresPerSecondToWorldStep((Math.random() - .5) * 4),
         phase: Math.random() * TAU,
         depthBias: Math.random() * 2 - 1,
-        preferredSpeed: 1.35 + Math.random() * .45
+        preferredSpeedMps
       };
     });
   };
@@ -327,17 +344,18 @@
     });
     depthLayers.forEach(layer => layer.forEach(bird => drawBird(bird)));
   };
-  const update = () => {
+  const update = step => {
     const neighbourRadius = immersiveView
       ? Math.max(42, Math.min(104, 700 / Math.cbrt(birds.length)))
       : Math.max(18, Math.min(MAX_NEIGHBOUR_RADIUS, 900 / Math.sqrt(birds.length)));
     const { grid, columns, rows } = buildNeighbourGrid(neighbourRadius);
     const nextStates = new Array(birds.length);
-    const step = simulationSpeed;
     simulationClock += 1000 / 60 * step;
     const now = simulationClock;
     const time = now * .001;
     const flow = formationFlow(now);
+    const motionScale = dynamicsScale();
+    const depthScale = metresPerSecondToWorldStep(MAX_VERTICAL_MPS) / .008;
     const advanceDepth = depthFrame++ % 3 === 0;
     for (let i = 0; i < birds.length; i++) {
       const bird = birds[i];
@@ -400,12 +418,12 @@
       });
       let ax = 0, ay = 0;
       if (totalWeight) {
-        const align = limit(alignX / totalWeight, alignY / totalWeight, 2.15);
+        const align = limit(alignX / totalWeight, alignY / totalWeight, metresPerSecondToPixelsPerStep(MAX_FLIGHT_MPS));
         const cohesion = limit(cohesionX / totalWeight, cohesionY / totalWeight, 1.3);
         const compression = 1 + flow.compression * 4.5;
         const separation = .19 * (1 - flow.compression * .7);
-        ax += (align.x - bird.vx) * .042 + cohesion.x * .009 * compression + separateX * separation;
-        ay += (align.y - bird.vy) * .042 + cohesion.y * .009 * compression + separateY * separation;
+        ax += (align.x - bird.vx) * .042 + cohesion.x * .009 * compression * motionScale + separateX * separation * motionScale;
+        ay += (align.y - bird.vy) * .042 + cohesion.y * .009 * compression * motionScale + separateY * separation * motionScale;
       }
       let directFear = 0;
       if (predator.active) {
@@ -414,7 +432,7 @@
         const distance = Math.hypot(dx, dy);
         if (distance < 175 && distance > .1) {
           directFear = Math.pow(1 - distance / 175, 2);
-          const escape = .18 + directFear * .64;
+          const escape = (.18 + directFear * .64) * motionScale;
           ax += dx / distance * escape; ay += dy / distance * escape;
         }
       }
@@ -437,38 +455,40 @@
           const ribbonX = flow.flowX - flow.flowY * ribbonWave * .58;
           const ribbonY = flow.flowY + flow.flowX * ribbonWave * .58;
           const inwardPull = .055 + flow.compression * .22 + radialWave * .16 * flow.ribbon;
-          ax += (inwardX * inwardPull + tangentX * .045 * flow.ribbon + ribbonX * .034 * flow.ribbon) * influence;
-          ay += (inwardY * inwardPull + tangentY * .045 * flow.ribbon + ribbonY * .034 * flow.ribbon) * influence;
+          ax += (inwardX * inwardPull + tangentX * .045 * flow.ribbon + ribbonX * .034 * flow.ribbon) * influence * motionScale;
+          ay += (inwardY * inwardPull + tangentY * .045 * flow.ribbon + ribbonY * .034 * flow.ribbon) * influence * motionScale;
         }
       }
       if (avoidEdges || immersiveView) {
         const horizontalMargin = Math.min(EDGE_MARGIN, width * .25);
         const verticalMargin = Math.min(EDGE_MARGIN, height * .25);
-        if (bird.x < horizontalMargin) ax += (1 - bird.x / horizontalMargin) * .18;
-        if (bird.x > width - horizontalMargin) ax -= (1 - (width - bird.x) / horizontalMargin) * .18;
-        if (bird.y < verticalMargin) ay += (1 - bird.y / verticalMargin) * .18;
-        if (bird.y > height - verticalMargin) ay -= (1 - (height - bird.y) / verticalMargin) * .18;
+        if (bird.x < horizontalMargin) ax += (1 - bird.x / horizontalMargin) * .18 * motionScale;
+        if (bird.x > width - horizontalMargin) ax -= (1 - (width - bird.x) / horizontalMargin) * .18 * motionScale;
+        if (bird.y < verticalMargin) ay += (1 - bird.y / verticalMargin) * .18 * motionScale;
+        if (bird.y > height - verticalMargin) ay -= (1 - (height - bird.y) / verticalMargin) * .18 * motionScale;
       }
-      const wander = Math.sin(time * .72 + bird.phase) * .0045;
+      const wander = Math.sin(time * .72 + bird.phase) * .0045 * motionScale;
       ax += -headingY * wander - bird.vy * .0012;
       ay += headingX * wander + bird.vx * .0012;
-      const desiredSpeed = bird.preferredSpeed + fear * 1.8 + flow.intensity * 1.25 + Math.sin(time * .38 + bird.phase * .7) * .08;
+      const desiredSpeedMps = Math.min(MAX_FLIGHT_MPS, bird.preferredSpeedMps + fear * 6 + flow.intensity * 4 + Math.sin(time * .38 + bird.phase * .7) * .6);
+      const desiredSpeed = metresPerSecondToPixelsPerStep(desiredSpeedMps);
       ax += headingX * (desiredSpeed - speed) * .025;
       ay += headingY * (desiredSpeed - speed) * .025;
-      const steering = limit(ax, ay, .075 + fear * .16 + flow.intensity * .08);
-      const response = .2 + fear * .32 + flow.intensity * .12;
+      const steering = limit(ax, ay, (.075 + fear * .16 + flow.intensity * .08) * motionScale);
+      const response = Math.min(.95, 1 - Math.exp(-1 / (SIMULATION_HZ * BASE_REACTION_SECONDS)) + fear * .32 + flow.intensity * .12);
       const stepResponse = 1 - Math.pow(1 - response, step);
       const smoothed = limit(
         bird.ax * (1 - stepResponse) + steering.x * stepResponse,
         bird.ay * (1 - stepResponse) + steering.y * stepResponse,
-        .065 + fear * .15 + flow.intensity * .07
+        (.065 + fear * .15 + flow.intensity * .07) * motionScale
       );
       let vx = bird.vx + smoothed.x * step;
       let vy = bird.vy + smoothed.y * step;
-      const velocity = limit(vx, vy, 3.9);
+      const velocity = limit(vx, vy, metresPerSecondToPixelsPerStep(MAX_FLIGHT_MPS));
       const nextSpeed = Math.hypot(velocity.x, velocity.y);
-      vx = nextSpeed < .9 ? velocity.x / (nextSpeed || 1) * .9 : velocity.x;
-      vy = nextSpeed < .9 ? velocity.y / (nextSpeed || 1) * .9 : velocity.y;
+      const minimumSpeed = metresPerSecondToPixelsPerStep(MIN_FLIGHT_MPS);
+      vx = nextSpeed < minimumSpeed ? velocity.x / (nextSpeed || 1) * minimumSpeed : velocity.x;
+      vy = nextSpeed < minimumSpeed ? velocity.y / (nextSpeed || 1) * minimumSpeed : velocity.y;
       const newSpeed = Math.hypot(vx, vy) || 1;
       const bank = bird.bank * Math.pow(.78, step) + (headingX * vy / newSpeed - headingY * vx / newSpeed) * 3.4;
       let z = bird.z;
@@ -477,15 +497,16 @@
         let depthAcceleration = 0;
         if (totalWeight) {
           depthAcceleration += (alignZ / totalWeight - bird.vz) * .04;
-          depthAcceleration += cohesionZ / totalWeight * .0022;
-          depthAcceleration += separateZ * .0018;
+          depthAcceleration += cohesionZ / totalWeight * .0022 * depthScale;
+          depthAcceleration += separateZ * .0018 * depthScale;
         }
-        if (bird.z < .12) depthAcceleration += (1 - bird.z / .12) * .0011;
-        if (bird.z > .88) depthAcceleration -= (1 - (1 - bird.z) / .12) * .0011;
+        if (bird.z < .12) depthAcceleration += (1 - bird.z / .12) * .0011 * depthScale;
+        if (bird.z > .88) depthAcceleration -= (1 - (1 - bird.z) / .12) * .0011 * depthScale;
         if (flow.intensity) {
-          depthAcceleration += Math.sin(bird.x * .016 + bird.y * .011 - time * 2.4 + flow.phase) * flow.ribbon * .0007;
+          depthAcceleration += Math.sin(bird.x * .016 + bird.y * .011 - time * 2.4 + flow.phase) * flow.ribbon * .0007 * depthScale;
         }
-        vz = Math.max(-.008, Math.min(.008, bird.vz * Math.pow(.982, step) + depthAcceleration * step));
+        const maximumVerticalStep = metresPerSecondToWorldStep(MAX_VERTICAL_MPS);
+        vz = Math.max(-maximumVerticalStep, Math.min(maximumVerticalStep, bird.vz * Math.pow(.982, step) + depthAcceleration * step));
       } else if (advanceDepth) {
         let depthTarget = .5 + Math.sin(time * .31 + bird.phase + bird.x * .0015) * .34;
         if (flow.intensity) {
@@ -494,8 +515,9 @@
         }
         depthTarget += bird.depthBias * fear * .14;
         depthTarget = Math.max(.04, Math.min(.96, depthTarget));
-        vz = bird.vz * Math.pow(.885, step) + (depthTarget - bird.z) * .0135 * step;
-        vz = Math.max(-.013, Math.min(.013, vz));
+        vz = bird.vz * Math.pow(.885, step) + (depthTarget - bird.z) * .0135 * depthScale * step;
+        const maximumVerticalStep = metresPerSecondToWorldStep(MAX_VERTICAL_MPS);
+        vz = Math.max(-maximumVerticalStep, Math.min(maximumVerticalStep, vz));
       }
       z = bird.z + vz * step;
       if (z < 0) { z = 0; vz = Math.abs(vz) * .65; }
@@ -527,7 +549,10 @@
     ctx.save(); ctx.translate(predator.x, predator.y); ctx.fillStyle = "#9e3e28";
     ctx.beginPath(); ctx.moveTo(16, 0); ctx.quadraticCurveTo(2, -3, -14, -11); ctx.quadraticCurveTo(-5, 0, -14, 11); ctx.quadraticCurveTo(2, 3, 16, 0); ctx.fill(); ctx.restore();
   };
-  const frame = () => {
+  const frame = frameAt => {
+    const renderedAt = Number.isFinite(frameAt) ? frameAt : performance.now();
+    const elapsedFrames = lastFrameAt === null ? 1 : Math.max(.25, Math.min(3, (renderedAt - lastFrameAt) * SIMULATION_HZ / 1000));
+    lastFrameAt = renderedAt;
     ctx.clearRect(0, 0, width, height);
     if (immersiveView) {
       camera.yaw += (camera.targetYaw - camera.yaw) * .18;
@@ -535,7 +560,7 @@
     }
     drawGroundView();
     updateMoonView();
-    if (!paused) update();
+    if (!paused) update(simulationSpeed * elapsedFrames);
     drawBirds();
     drawViewpointMap();
     if (predator.active && !immersiveView) drawPredator();

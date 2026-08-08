@@ -33,6 +33,9 @@ All notable changes to lozknowles.com are recorded here.
 - Anchored the moon and birds in world space so head movement changes only their projected viewport positions; bird silhouette rotation remains driven by flight rather than the camera.
 - Reduced the moon's apparent head-movement parallax so it reads as a distant celestial object rather than occupying the flock's airspace.
 - Matched the opening controls to the showcased scene: 2,500 birds, `4×` speed, Clouds, Dusk sky, and Ground view on, with Avoid edges off.
+- Calibrated `1×` to a 12 m/s real-world starling cruise within the half-mile airspace, with 10–14 m/s individual variation and a 22 m/s escape ceiling.
+- Made movement use elapsed frame time so the physical speed remains consistent across 60 Hz and 120 Hz displays; higher speed settings now act as accelerated simulation time.
+- Calibrated the existing seven-neighbour steering response to a 100 ms baseline, accelerating naturally under fear and formation pressure.
 
 ### Documentation
 
