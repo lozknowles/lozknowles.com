@@ -19,6 +19,7 @@ All notable changes to lozknowles.com are recorded here.
 - Added an **Inside flock** mode that places the viewer at the centre of a bounded half-mile cube filled with birds.
 - Added drag, touch-swipe, and arrow-key controls for looking left, right, up, and down from inside the flock.
 - Added a `1×`–`5×` **Speed** slider that accelerates movement, steering, depth, fear decay, and timed formations together.
+- Added a **Dusk sky** mode with a setting sun, rising moon, warm horizon, and additional layered grey clouds.
 
 ### Changed
 
