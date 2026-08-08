@@ -10,6 +10,12 @@
   </head>
   <body>
     <main class="game-shell">
+      <div class="cloud-layer" id="cloud-layer" aria-hidden="true">
+        <i class="cloud cloud-one"></i>
+        <i class="cloud cloud-two"></i>
+        <i class="cloud cloud-three"></i>
+        <i class="cloud cloud-four"></i>
+      </div>
       <canvas id="murmuration" class="sky" aria-label="An interactive flock of one hundred starlings. Move your pointer to steer a bird of prey."></canvas>
 
       <header class="title-card">
@@ -32,6 +38,10 @@
         <label class="edge-toggle" for="avoid-edges">
           <input id="avoid-edges" type="checkbox" />
           <span>Avoid edges</span>
+        </label>
+        <label class="cloud-toggle" for="show-clouds">
+          <input id="show-clouds" type="checkbox" checked />
+          <span>Clouds</span>
         </label>
         <button type="button" id="pause">Pause</button>
         <button type="button" id="gather">Gather flock</button>

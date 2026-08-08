@@ -13,6 +13,8 @@
   const birdCountInput = document.getElementById("bird-count");
   const edgeModeInput = document.getElementById("avoid-edges");
   const edgeDescription = document.getElementById("edge-description");
+  const cloudToggle = document.getElementById("show-clouds");
+  const cloudLayer = document.getElementById("cloud-layer");
   const invitation = document.getElementById("invitation");
   let birds = [];
   let width = 0;
@@ -200,6 +202,9 @@
     edgeDescription.textContent = avoidEdges
       ? "Soft boundary active · the flock will turn before the edge"
       : "There are no edges here · every horizon leads back to the sky";
+  });
+  cloudToggle.addEventListener("change", () => {
+    cloudLayer.classList.toggle("clouds-hidden", !cloudToggle.checked);
   });
   window.addEventListener("resize", resize);
   resize();
