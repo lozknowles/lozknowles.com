@@ -23,6 +23,7 @@ All notable changes to lozknowles.com are recorded here.
 - Updated the simulation in two phases so every bird reacts to the same instant in the flock, avoiding update-order artefacts while retaining spatial indexing for large flocks.
 - Added occasional large-scale formation events that gather starlings into dense dark groups, accelerate the flock into elongated trails, and create twisting inward-and-outward vortex waves.
 - Added simulated depth flight with individual forward/back movement, perspective scaling, atmospheric fading, depth-aware neighbour influence, and far-to-near drawing layers.
+- Restored access to Murmuration on mobile with a dedicated navigation action beside the CV button.
 
 ### Documentation
 

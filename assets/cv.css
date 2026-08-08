@@ -4,6 +4,10 @@
   gap: 1.25rem;
 }
 
+.mobile-murmuration-link {
+  display: none;
+}
+
 .cv-popup-link {
   display: inline-flex;
   align-items: center;
@@ -54,14 +58,37 @@
     top: 1.2rem;
     right: var(--pad);
     display: flex !important;
+    gap: 0.5rem;
     margin-left: auto;
     isolation: isolate;
   }
 
+  .mobile-murmuration-link,
   .cv-popup-link {
+    display: inline-flex;
+    align-items: center;
+    min-height: 2rem;
+    padding: 0.5rem 0.7rem;
     border-color: #f2f0e8;
+    border: 1px solid #f2f0e8;
+    border-radius: 999px;
     background: #f2f0e8;
     color: #06100f;
+    font-family: "DM Mono", monospace;
+    font-size: 0.62rem;
+    letter-spacing: 0.06em;
+    line-height: 1;
+    text-decoration: none;
+    text-transform: uppercase;
+  }
+}
+
+@media (max-width: 380px) {
+  .mobile-murmuration-link,
+  .cv-popup-link {
+    padding-right: 0.55rem;
+    padding-left: 0.55rem;
+    font-size: 0.58rem;
   }
 }
 
