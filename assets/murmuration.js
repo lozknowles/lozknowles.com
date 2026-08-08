@@ -23,6 +23,8 @@
   let paused = false;
   let birdCount = DEFAULT_BIRD_COUNT;
   let avoidEdges = false;
+  let depthFrame = 0;
+  const depthLayers = Array.from({ length: 8 }, () => []);
   const predator = { x: 0, y: 0, active: false };
   const formation = {
     active: false,
@@ -100,7 +102,10 @@
         ay: 0,
         fear: 0,
         bank: 0,
+        z: Math.random(),
+        vz: (Math.random() - .5) * .004,
         phase: Math.random() * TAU,
+        depthBias: Math.random() * 2 - 1,
         preferredSpeed: 1.35 + Math.random() * .45
       };
     });
@@ -131,12 +136,14 @@
   };
   const drawBird = bird => {
     const angle = Math.atan2(bird.vy, bird.vx);
-    const size = 3.25 + Math.min(Math.hypot(bird.vx, bird.vy), 3) * .65;
+    const perspective = .55 + bird.z * .8;
+    const size = (3.25 + Math.min(Math.hypot(bird.vx, bird.vy), 3) * .65) * perspective;
     const bank = Math.max(-.8, Math.min(.8, bird.bank || 0));
     ctx.save();
     ctx.translate(bird.x, bird.y);
     ctx.rotate(angle);
-    ctx.fillStyle = "rgba(17,17,24,.84)";
+    ctx.globalAlpha = .36 + bird.z * .58;
+    ctx.fillStyle = "rgb(17,17,24)";
     ctx.beginPath();
     ctx.moveTo(size * 1.65, 0);
     ctx.lineTo(-size * .7, -size * .38);
@@ -147,6 +154,14 @@
     ctx.fill();
     ctx.restore();
   };
+  const drawBirds = () => {
+    depthLayers.forEach(layer => { layer.length = 0; });
+    birds.forEach(bird => {
+      const layer = Math.min(depthLayers.length - 1, Math.floor(bird.z * depthLayers.length));
+      depthLayers[layer].push(bird);
+    });
+    depthLayers.forEach(layer => layer.forEach(drawBird));
+  };
   const update = () => {
     const neighbourRadius = Math.max(18, Math.min(MAX_NEIGHBOUR_RADIUS, 900 / Math.sqrt(birds.length)));
     const { grid, columns, rows } = buildNeighbourGrid(neighbourRadius);
@@ -154,6 +169,7 @@
     const now = performance.now();
     const time = now * .001;
     const flow = formationFlow(now);
+    const advanceDepth = depthFrame++ % 3 === 0;
     for (let i = 0; i < birds.length; i++) {
       const bird = birds[i];
       const nearest = [];
@@ -192,7 +208,9 @@
       nearest.forEach(neighbour => {
         const distance = Math.sqrt(neighbour.distSq) || .01;
         const facing = (neighbour.dx * headingX + neighbour.dy * headingY) / distance;
-        const weight = (facing < -.35 ? .32 : 1) * (1 - distance / neighbourRadius * .25);
+        const depthDifference = Math.abs(bird.z - neighbour.bird.z);
+        const depthWeight = 1 - Math.min(1, depthDifference) * .38;
+        const weight = (facing < -.35 ? .32 : 1) * (1 - distance / neighbourRadius * .25) * depthWeight;
         alignX += neighbour.bird.vx * weight;
         alignY += neighbour.bird.vy * weight;
         cohesionX += neighbour.dx * weight;
@@ -200,7 +218,7 @@
         totalWeight += weight;
         neighbourFear = Math.max(neighbourFear, neighbour.bird.fear * (1 - distance / (neighbourRadius * 1.35)));
         const spacing = 27 - flow.compression * 14;
-        if (distance < spacing) {
+        if (distance < spacing && depthDifference < .42) {
           const pressure = Math.pow(1 - distance / spacing, 2);
           separateX -= neighbour.dx / distance * pressure;
           separateY -= neighbour.dy / distance * pressure;
@@ -278,6 +296,22 @@
       vy = nextSpeed < .9 ? velocity.y / (nextSpeed || 1) * .9 : velocity.y;
       const newSpeed = Math.hypot(vx, vy) || 1;
       const bank = bird.bank * .78 + (headingX * vy / newSpeed - headingY * vx / newSpeed) * 3.4;
+      let z = bird.z;
+      let vz = bird.vz;
+      if (advanceDepth) {
+        let depthTarget = .5 + Math.sin(time * .31 + bird.phase + bird.x * .0015) * .34;
+        if (flow.intensity) {
+          const depthWave = Math.sin((bird.x * flow.flowX + bird.y * flow.flowY) * .018 - time * 2.9 + flow.phase);
+          depthTarget += depthWave * flow.ribbon * .24;
+        }
+        depthTarget += bird.depthBias * fear * .14;
+        depthTarget = Math.max(.04, Math.min(.96, depthTarget));
+        vz = bird.vz * .885 + (depthTarget - bird.z) * .0135;
+        vz = Math.max(-.013, Math.min(.013, vz));
+      }
+      z = bird.z + vz;
+      if (z < 0) { z = 0; vz = Math.abs(vz) * .65; }
+      if (z > 1) { z = 1; vz = -Math.abs(vz) * .65; }
       let x;
       let y;
       if (avoidEdges) {
@@ -291,7 +325,7 @@
         x = (bird.x + vx + width) % width;
         y = (bird.y + vy + height) % height;
       }
-      nextStates[i] = { x, y, vx, vy, ax: smoothed.x, ay: smoothed.y, fear, bank };
+      nextStates[i] = { x, y, vx, vy, ax: smoothed.x, ay: smoothed.y, fear, bank, z, vz };
     }
     birds.forEach((bird, index) => Object.assign(bird, nextStates[index]));
   };
@@ -308,7 +342,7 @@
   const frame = () => {
     ctx.clearRect(0, 0, width, height);
     if (!paused) update();
-    birds.forEach(drawBird);
+    drawBirds();
     if (predator.active) drawPredator();
     requestAnimationFrame(frame);
   };
