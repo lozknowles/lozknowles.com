@@ -49,12 +49,12 @@
       <aside class="controls" aria-label="Game controls">
         <label class="flock-count" for="bird-count">
           <span>Starlings</span>
-          <input id="bird-count" type="number" min="10" max="2500" step="10" value="100" inputmode="numeric" title="Choose between 10 and 2,500 starlings" />
+          <input id="bird-count" type="number" min="10" max="2500" step="10" value="2500" inputmode="numeric" title="Choose between 10 and 2,500 starlings" />
         </label>
         <label class="flight-speed" for="flight-speed">
           <span>Speed</span>
-          <input id="flight-speed" type="range" min="1" max="5" step="1" value="1" aria-describedby="speed-output" />
-          <output id="speed-output" for="flight-speed">1×</output>
+          <input id="flight-speed" type="range" min="1" max="5" step="1" value="4" aria-describedby="speed-output" />
+          <output id="speed-output" for="flight-speed">4×</output>
         </label>
         <label class="edge-toggle" for="avoid-edges">
           <input id="avoid-edges" type="checkbox" />
@@ -65,11 +65,11 @@
           <span>Clouds</span>
         </label>
         <label class="dusk-toggle" for="dusk-sky">
-          <input id="dusk-sky" type="checkbox" />
+          <input id="dusk-sky" type="checkbox" checked />
           <span>Dusk sky</span>
         </label>
         <label class="view-toggle" for="inside-flock">
-          <input id="inside-flock" type="checkbox" />
+          <input id="inside-flock" type="checkbox" checked />
           <span>Ground view</span>
         </label>
         <button type="button" id="pause">Pause</button>

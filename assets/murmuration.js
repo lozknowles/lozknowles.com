@@ -1,6 +1,6 @@
 (() => {
   "use strict";
-  const DEFAULT_BIRD_COUNT = 100;
+  const DEFAULT_BIRD_COUNT = 2500;
   const MIN_BIRD_COUNT = 10;
   const MAX_BIRD_COUNT = 2500;
   const MAX_NEIGHBOUR_RADIUS = 88;
@@ -35,12 +35,12 @@
   let height = 0;
   let paused = false;
   let birdCount = DEFAULT_BIRD_COUNT;
-  let simulationSpeed = 1;
+  let simulationSpeed = 4;
   let simulationClock = performance.now();
-  let duskEnabled = false;
+  let duskEnabled = true;
   let duskStartedAt = 0;
   let avoidEdges = false;
-  let immersiveView = false;
+  let immersiveView = true;
   let depthFrame = 0;
   const depthLayers = Array.from({ length: 8 }, () => []);
   const immersiveLayers = Array.from({ length: 14 }, () => []);
@@ -644,6 +644,14 @@
     updateDescription();
   });
   window.addEventListener("resize", resize);
+  duskStartedAt = performance.now();
+  cloudLayer.classList.toggle("clouds-hidden", !cloudToggle.checked);
+  gameShell.classList.toggle("dusk-mode", duskEnabled);
+  gameShell.classList.toggle("immersive-mode", immersiveView);
+  immersiveHud.setAttribute("aria-hidden", String(!immersiveView));
+  invitationText.textContent = "Look around from beneath the flock";
+  modeIntroduction.textContent = "Stand beneath the murmuration. Follow it across the sky.";
+  updateDescription();
   resize();
   requestAnimationFrame(frame);
 })();
