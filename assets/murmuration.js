@@ -6,6 +6,8 @@
   const MAX_NEIGHBOUR_RADIUS = 88;
   const TOPOLOGICAL_NEIGHBOURS = 7;
   const EDGE_MARGIN = 96;
+  const MOON_VIEW_PARALLAX = .18;
+  const NEUTRAL_VIEW_PITCH = .48;
   const TAU = Math.PI * 2;
   const canvas = document.getElementById("murmuration");
   const ctx = canvas.getContext("2d");
@@ -220,10 +222,12 @@
       const worldX = .55;
       const worldUp = .78 + rise * .12;
       const worldForward = .85;
-      const cosYaw = Math.cos(camera.yaw);
-      const sinYaw = Math.sin(camera.yaw);
-      const cosPitch = Math.cos(camera.pitch);
-      const sinPitch = Math.sin(camera.pitch);
+      const moonYaw = camera.yaw * MOON_VIEW_PARALLAX;
+      const moonPitch = NEUTRAL_VIEW_PITCH + (camera.pitch - NEUTRAL_VIEW_PITCH) * MOON_VIEW_PARALLAX;
+      const cosYaw = Math.cos(moonYaw);
+      const sinYaw = Math.sin(moonYaw);
+      const cosPitch = Math.cos(moonPitch);
+      const sinPitch = Math.sin(moonPitch);
       const yawX = cosYaw * worldX - sinYaw * worldForward;
       const yawForward = sinYaw * worldX + cosYaw * worldForward;
       const viewUp = cosPitch * worldUp - sinPitch * yawForward;

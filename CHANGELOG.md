@@ -31,6 +31,7 @@ All notable changes to lozknowles.com are recorded here.
 - Extended alignment, cohesion, and separation into the depth axis in Inside flock mode, with perspective projection and far-to-near rendering around a stationary viewer.
 - Reworked Inside flock as **Ground view**, placing the observer beneath the flock with a visible horizon, natural smoothed head movement, and an overhead flock-and-viewing-cone graphic.
 - Anchored the moon and birds in world space so head movement changes only their projected viewport positions; bird silhouette rotation remains driven by flight rather than the camera.
+- Reduced the moon's apparent head-movement parallax so it reads as a distant celestial object rather than occupying the flock's airspace.
 
 ### Documentation
 
