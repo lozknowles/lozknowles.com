@@ -4,18 +4,22 @@
   const MIN_BIRD_COUNT = 10;
   const MAX_BIRD_COUNT = 500;
   const NEIGHBOUR_RADIUS = 76;
+  const EDGE_MARGIN = 96;
   const TAU = Math.PI * 2;
   const canvas = document.getElementById("murmuration");
   const ctx = canvas.getContext("2d");
   const pauseButton = document.getElementById("pause");
   const gatherButton = document.getElementById("gather");
   const birdCountInput = document.getElementById("bird-count");
+  const edgeModeInput = document.getElementById("avoid-edges");
+  const edgeDescription = document.getElementById("edge-description");
   const invitation = document.getElementById("invitation");
   let birds = [];
   let width = 0;
   let height = 0;
   let paused = false;
   let birdCount = DEFAULT_BIRD_COUNT;
+  let avoidEdges = false;
   const predator = { x: 0, y: 0, active: false };
 
   const limit = (x, y, max) => {
@@ -28,6 +32,7 @@
     if (d < -size / 2) d += size;
     return d;
   };
+  const spatialDelta = (a, b, size) => avoidEdges ? b - a : wrappedDelta(a, b, size);
   const seedBirds = () => {
     const cx = width * .5;
     const cy = height * .48;
@@ -89,14 +94,17 @@
       const ownRow = Math.min(rows - 1, Math.floor(bird.y / NEIGHBOUR_RADIUS));
       for (let cellY = -1; cellY <= 1; cellY++) {
         for (let cellX = -1; cellX <= 1; cellX++) {
-          const column = (ownColumn + cellX + columns) % columns;
-          const row = (ownRow + cellY + rows) % rows;
+          const candidateColumn = ownColumn + cellX;
+          const candidateRow = ownRow + cellY;
+          if (avoidEdges && (candidateColumn < 0 || candidateColumn >= columns || candidateRow < 0 || candidateRow >= rows)) continue;
+          const column = (candidateColumn + columns) % columns;
+          const row = (candidateRow + rows) % rows;
           const candidates = grid[row * columns + column];
           for (const j of candidates) {
             if (i === j) continue;
             const other = birds[j];
-            const dx = wrappedDelta(bird.x, other.x, width);
-            const dy = wrappedDelta(bird.y, other.y, height);
+            const dx = spatialDelta(bird.x, other.x, width);
+            const dy = spatialDelta(bird.y, other.y, height);
             const distSq = dx * dx + dy * dy;
             if (distSq < NEIGHBOUR_RADIUS * NEIGHBOUR_RADIUS) {
               alignX += other.vx; alignY += other.vy; cohesionX += dx; cohesionY += dy; neighbours++;
@@ -116,13 +124,21 @@
         ay += (align.y - bird.vy) * .034 + cohesion.y * .008 + separateY * .075;
       }
       if (predator.active) {
-        const dx = wrappedDelta(predator.x, bird.x, width);
-        const dy = wrappedDelta(predator.y, bird.y, height);
+        const dx = spatialDelta(predator.x, bird.x, width);
+        const dy = spatialDelta(predator.y, bird.y, height);
         const distance = Math.hypot(dx, dy);
         if (distance < 155 && distance > .1) {
           const fear = Math.pow(1 - distance / 155, 2) * .72;
           ax += dx / distance * fear; ay += dy / distance * fear;
         }
+      }
+      if (avoidEdges) {
+        const horizontalMargin = Math.min(EDGE_MARGIN, width * .25);
+        const verticalMargin = Math.min(EDGE_MARGIN, height * .25);
+        if (bird.x < horizontalMargin) ax += (1 - bird.x / horizontalMargin) * .18;
+        if (bird.x > width - horizontalMargin) ax -= (1 - (width - bird.x) / horizontalMargin) * .18;
+        if (bird.y < verticalMargin) ay += (1 - bird.y / verticalMargin) * .18;
+        if (bird.y > height - verticalMargin) ay -= (1 - (height - bird.y) / verticalMargin) * .18;
       }
       ax += -bird.vy * .0016; ay += bird.vx * .0016;
       bird.vx += ax; bird.vy += ay;
@@ -130,8 +146,17 @@
       const speed = Math.hypot(velocity.x, velocity.y);
       bird.vx = speed < 1.05 ? velocity.x / (speed || 1) * 1.05 : velocity.x;
       bird.vy = speed < 1.05 ? velocity.y / (speed || 1) * 1.05 : velocity.y;
-      bird.x = (bird.x + bird.vx + width) % width;
-      bird.y = (bird.y + bird.vy + height) % height;
+      if (avoidEdges) {
+        bird.x += bird.vx;
+        bird.y += bird.vy;
+        if (bird.x < 1) { bird.x = 1; bird.vx = Math.abs(bird.vx) * .55; }
+        if (bird.x > width - 1) { bird.x = width - 1; bird.vx = -Math.abs(bird.vx) * .55; }
+        if (bird.y < 1) { bird.y = 1; bird.vy = Math.abs(bird.vy) * .55; }
+        if (bird.y > height - 1) { bird.y = height - 1; bird.vy = -Math.abs(bird.vy) * .55; }
+      } else {
+        bird.x = (bird.x + bird.vx + width) % width;
+        bird.y = (bird.y + bird.vy + height) % height;
+      }
     }
   };
   const drawPredator = () => {
@@ -170,6 +195,12 @@
     seedBirds();
   });
   birdCountInput.addEventListener("keydown", event => { if (event.key === "Enter") birdCountInput.blur(); });
+  edgeModeInput.addEventListener("change", () => {
+    avoidEdges = edgeModeInput.checked;
+    edgeDescription.textContent = avoidEdges
+      ? "Soft boundary active · the flock will turn before the edge"
+      : "There are no edges here · every horizon leads back to the sky";
+  });
   window.addEventListener("resize", resize);
   resize();
   requestAnimationFrame(frame);

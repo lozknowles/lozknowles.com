@@ -13,6 +13,7 @@ All notable changes to lozknowles.com are recorded here.
 - Added Murmuration to the website's primary navigation.
 - Added an editable flock-size control supporting 10–500 starlings, defaulting to 100.
 - Added spatial neighbour indexing to keep larger murmurations responsive.
+- Added an **Avoid edges** checkbox that switches between seamless wraparound and soft bounding-box steering.
 
 ### Documentation
 
