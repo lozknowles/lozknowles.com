@@ -16,6 +16,7 @@ All notable changes to lozknowles.com are recorded here.
 - Added an **Avoid edges** checkbox that switches between seamless wraparound and soft bounding-box steering.
 - Added a blue-grey hazy sky and layered wispy clouds with a checked-by-default **Clouds** visibility toggle.
 - Increased the adjustable flock limit to 2,500 starlings.
+- Increased the adjustable flock limit to 10,000 starlings while retaining the 2,500-bird default.
 - Added an **Inside flock** mode that places the viewer at the centre of a bounded half-mile cube filled with birds.
 - Added drag, touch-swipe, and arrow-key controls for looking left, right, up, and down from inside the flock.
 - Added a `1×`–`5×` **Speed** slider that accelerates movement, steering, depth, fear decay, and timed formations together.
@@ -36,8 +37,11 @@ All notable changes to lozknowles.com are recorded here.
 - Calibrated `1×` to a 12 m/s real-world starling cruise within the half-mile airspace, with 10–14 m/s individual variation and a 22 m/s escape ceiling.
 - Made movement use elapsed frame time so the physical speed remains consistent across 60 Hz and 120 Hz displays; higher speed settings now act as accelerated simulation time.
 - Calibrated the existing seven-neighbour steering response to a 100 ms baseline, accelerating naturally under fear and formation pressure.
+- Doubled the Ground-view flock's front-to-back projection depth and increased depth-sorting resolution while preserving calibrated flight speeds.
 
 ### Documentation
 
 - Documented the Murmuration page and its assets in `README.md`.
-- Extended the cottageserver deployment instructions to include the new page, stylesheet, and script.
+- Extended the generic deployment guidance to include the Murmuration page, stylesheet, and script.
+- Replaced host-, path-, service-, and private-origin-specific deployment notes with reusable static-hosting guidance suitable for a public repository.
+- Documented the flight algorithm directly in the simulation source, including physical calibration, spatial indexing, seven-neighbour selection, boid forces, fear propagation, formation fields, projection, integration, and frame timing.

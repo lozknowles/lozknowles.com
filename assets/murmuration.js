@@ -1,8 +1,22 @@
 (() => {
   "use strict";
+
+  /*
+   * FLIGHT MODEL
+   * -----------
+   * Positions are stored in canvas coordinates plus a normalised altitude z.
+   * Velocities are integrated at a nominal 60 simulation steps per second and
+   * converted from real metres per second across the half-mile reference width.
+   * The user speed control advances simulation time; it does not change the
+   * biological cruise and burst limits below.
+   *
+   * Each update is two-phase: every bird reads the same previous flock state,
+   * writes a proposed next state, and only then are all birds committed. This
+   * prevents array order from influencing the flock.
+   */
   const DEFAULT_BIRD_COUNT = 2500;
   const MIN_BIRD_COUNT = 10;
-  const MAX_BIRD_COUNT = 2500;
+  const MAX_BIRD_COUNT = 10000;
   const MAX_NEIGHBOUR_RADIUS = 88;
   const TOPOLOGICAL_NEIGHBOURS = 7;
   const EDGE_MARGIN = 96;
@@ -16,6 +30,7 @@
   const MAX_VERTICAL_MPS = 6;
   const BASE_REACTION_SECONDS = .1;
   const LEGACY_CRUISE_SPEED = 1.575;
+  const GROUND_DEPTH_MULTIPLIER = 2;
   const MOON_VIEW_PARALLAX = .18;
   const NEUTRAL_VIEW_PITCH = .48;
   const TAU = Math.PI * 2;
@@ -54,7 +69,7 @@
   let immersiveView = true;
   let depthFrame = 0;
   const depthLayers = Array.from({ length: 8 }, () => []);
-  const immersiveLayers = Array.from({ length: 14 }, () => []);
+  const immersiveLayers = Array.from({ length: 20 }, () => []);
   const predator = { x: 0, y: 0, active: false };
   const camera = { yaw: 0, pitch: .48, targetYaw: 0, targetPitch: .48, dragging: false, pointerId: null, lastX: 0, lastY: 0 };
   const formation = {
@@ -83,6 +98,12 @@
   const metresPerSecondToPixelsPerStep = metresPerSecond => metresPerSecond * width / AIRSPACE_METERS / SIMULATION_HZ;
   const metresPerSecondToWorldStep = metresPerSecond => metresPerSecond / AIRSPACE_METERS / SIMULATION_HZ;
   const dynamicsScale = () => metresPerSecondToPixelsPerStep(REFERENCE_CRUISE_MPS) / LEGACY_CRUISE_SPEED;
+
+  /*
+   * A formation is a temporary flock-wide field layered over local boid rules.
+   * It first compresses birds toward a moving centre, then blends longitudinal,
+   * tangential and radial sine waves to form knots, ribbons and vortices.
+   */
   const formationFlow = now => {
     if (!formation.active && now >= formation.nextAt) {
       formation.active = true;
@@ -121,6 +142,8 @@
     }
     return { intensity, compression, ribbon, progress, flowX, flowY, centerX, centerY, spin: formation.spin, phase: formation.phase };
   };
+
+  /* Seed individual cruise preferences and headings; no two birds are identical. */
   const seedBirds = () => {
     const cx = width * .5;
     const cy = height * .48;
@@ -147,16 +170,27 @@
       };
     });
   };
+
+  /*
+   * Spatial hashing limits neighbour searches to the surrounding 3×3 cells.
+   * Within those candidates, update() retains the seven closest influential
+   * birds—the topological rule observed in real starling flocks.
+   */
   const buildNeighbourGrid = neighbourRadius => {
     const columns = Math.max(1, Math.ceil(width / neighbourRadius));
     const rows = Math.max(1, Math.ceil(height / neighbourRadius));
-    const grid = Array.from({ length: columns * rows }, () => []);
+    // Ground view also hashes altitude. This prevents a 10,000-bird flock from
+    // testing every vertically distant bird that happens to share a screen cell.
+    const depthCell = immersiveView ? neighbourRadius / Math.min(width, height) : 1;
+    const depthSlices = immersiveView ? Math.max(1, Math.ceil(1 / depthCell)) : 1;
+    const grid = Array.from({ length: columns * rows * depthSlices }, () => []);
     birds.forEach((bird, index) => {
       const column = Math.min(columns - 1, Math.floor(bird.x / neighbourRadius));
       const row = Math.min(rows - 1, Math.floor(bird.y / neighbourRadius));
-      grid[row * columns + column].push(index);
+      const depth = Math.min(depthSlices - 1, Math.floor(bird.z / depthCell));
+      grid[(depth * rows + row) * columns + column].push(index);
     });
-    return { grid, columns, rows };
+    return { grid, columns, rows, depthCell, depthSlices };
   };
   const resize = () => {
     const box = canvas.getBoundingClientRect();
@@ -191,10 +225,15 @@
     ctx.fill();
     ctx.restore();
   };
+  /*
+   * Ground view projects a world-space bird through camera yaw and pitch.
+   * Front-to-back coordinates are deliberately doubled to give the flock twice
+   * its previous visual depth without changing its calibrated flight velocity.
+   */
   const projectBird = bird => {
     const worldX = bird.x / width - .5;
     const worldUp = .18 + bird.z * .72;
-    const worldForward = bird.y / height - .5;
+    const worldForward = (bird.y / height - .5) * GROUND_DEPTH_MULTIPLIER;
     const cosYaw = Math.cos(camera.yaw);
     const sinYaw = Math.sin(camera.yaw);
     const cosPitch = Math.cos(camera.pitch);
@@ -331,7 +370,7 @@
       immersiveLayers.forEach(layer => { layer.length = 0; });
       birds.forEach(bird => {
         if (!projectBird(bird)) return;
-        const layer = Math.min(immersiveLayers.length - 1, Math.floor(bird.viewDepth / .75 * immersiveLayers.length));
+        const layer = Math.min(immersiveLayers.length - 1, Math.floor(bird.viewDepth / (GROUND_DEPTH_MULTIPLIER * .75) * immersiveLayers.length));
         immersiveLayers[layer].push(bird);
       });
       for (let i = immersiveLayers.length - 1; i >= 0; i--) immersiveLayers[i].forEach(bird => drawBird(bird, true));
@@ -344,11 +383,19 @@
     });
     depthLayers.forEach(layer => layer.forEach(bird => drawBird(bird)));
   };
+  /*
+   * One flock update:
+   *  1. find seven nearby neighbours;
+   *  2. combine alignment, cohesion and collision separation;
+   *  3. propagate predator fear and optional formation pressure;
+   *  4. apply bounded steering, 100 ms response and real-world speed limits;
+   *  5. integrate horizontal and vertical positions into nextStates.
+   */
   const update = step => {
     const neighbourRadius = immersiveView
       ? Math.max(42, Math.min(104, 700 / Math.cbrt(birds.length)))
       : Math.max(18, Math.min(MAX_NEIGHBOUR_RADIUS, 900 / Math.sqrt(birds.length)));
-    const { grid, columns, rows } = buildNeighbourGrid(neighbourRadius);
+    const { grid, columns, rows, depthCell, depthSlices } = buildNeighbourGrid(neighbourRadius);
     const nextStates = new Array(birds.length);
     simulationClock += 1000 / 60 * step;
     const now = simulationClock;
@@ -362,29 +409,37 @@
       const nearest = [];
       const ownColumn = Math.min(columns - 1, Math.floor(bird.x / neighbourRadius));
       const ownRow = Math.min(rows - 1, Math.floor(bird.y / neighbourRadius));
-      for (let cellY = -1; cellY <= 1; cellY++) {
-        for (let cellX = -1; cellX <= 1; cellX++) {
-          const candidateColumn = ownColumn + cellX;
-          const candidateRow = ownRow + cellY;
-          if ((avoidEdges || immersiveView) && (candidateColumn < 0 || candidateColumn >= columns || candidateRow < 0 || candidateRow >= rows)) continue;
-          const column = (candidateColumn + columns) % columns;
-          const row = (candidateRow + rows) % rows;
-          const candidates = grid[row * columns + column];
-          for (const j of candidates) {
-            if (i === j) continue;
-            const other = birds[j];
-            const dx = spatialDelta(bird.x, other.x, width);
-            const dy = spatialDelta(bird.y, other.y, height);
-            const dz = other.z - bird.z;
-            const depthDistance = immersiveView ? dz * Math.min(width, height) : 0;
-            const distSq = dx * dx + dy * dy + depthDistance * depthDistance;
-            if (distSq < neighbourRadius * neighbourRadius) {
-              if (nearest.length === TOPOLOGICAL_NEIGHBOURS && distSq >= nearest[nearest.length - 1].distSq) continue;
-              const neighbour = { bird: other, dx, dy, dz, distSq };
-              let position = nearest.length;
-              while (position > 0 && nearest[position - 1].distSq > distSq) position--;
-              nearest.splice(position, 0, neighbour);
-              if (nearest.length > TOPOLOGICAL_NEIGHBOURS) nearest.pop();
+      const ownDepth = Math.min(depthSlices - 1, Math.floor(bird.z / depthCell));
+      // Gather, sort and retain only the seven nearest candidates.
+      const depthStart = immersiveView ? -1 : 0;
+      const depthEnd = immersiveView ? 1 : 0;
+      for (let cellDepth = depthStart; cellDepth <= depthEnd; cellDepth++) {
+        const candidateDepth = ownDepth + cellDepth;
+        if (candidateDepth < 0 || candidateDepth >= depthSlices) continue;
+        for (let cellY = -1; cellY <= 1; cellY++) {
+          for (let cellX = -1; cellX <= 1; cellX++) {
+            const candidateColumn = ownColumn + cellX;
+            const candidateRow = ownRow + cellY;
+            if ((avoidEdges || immersiveView) && (candidateColumn < 0 || candidateColumn >= columns || candidateRow < 0 || candidateRow >= rows)) continue;
+            const column = (candidateColumn + columns) % columns;
+            const row = (candidateRow + rows) % rows;
+            const candidates = grid[(candidateDepth * rows + row) * columns + column];
+            for (const j of candidates) {
+              if (i === j) continue;
+              const other = birds[j];
+              const dx = spatialDelta(bird.x, other.x, width);
+              const dy = spatialDelta(bird.y, other.y, height);
+              const dz = other.z - bird.z;
+              const depthDistance = immersiveView ? dz * Math.min(width, height) : 0;
+              const distSq = dx * dx + dy * dy + depthDistance * depthDistance;
+              if (distSq < neighbourRadius * neighbourRadius) {
+                if (nearest.length === TOPOLOGICAL_NEIGHBOURS && distSq >= nearest[nearest.length - 1].distSq) continue;
+                const neighbour = { bird: other, dx, dy, dz, distSq };
+                let position = nearest.length;
+                while (position > 0 && nearest[position - 1].distSq > distSq) position--;
+                nearest.splice(position, 0, neighbour);
+                if (nearest.length > TOPOLOGICAL_NEIGHBOURS) nearest.pop();
+              }
             }
           }
         }
@@ -394,6 +449,7 @@
       const speed = Math.hypot(bird.vx, bird.vy) || 1;
       const headingX = bird.vx / speed;
       const headingY = bird.vy / speed;
+      // Local boid forces are weighted by distance, field of view and altitude.
       nearest.forEach(neighbour => {
         const distance = Math.sqrt(neighbour.distSq) || .01;
         const facing = (neighbour.dx * headingX + neighbour.dy * headingY) / distance;
@@ -425,6 +481,7 @@
         ax += (align.x - bird.vx) * .042 + cohesion.x * .009 * compression * motionScale + separateX * separation * motionScale;
         ay += (align.y - bird.vy) * .042 + cohesion.y * .009 * compression * motionScale + separateY * separation * motionScale;
       }
+      // Fear starts at the predator and decays as it propagates through neighbours.
       let directFear = 0;
       if (predator.active) {
         const dx = spatialDelta(predator.x, bird.x, width);
@@ -437,6 +494,7 @@
         }
       }
       const fear = Math.max(directFear, bird.fear * Math.pow(.955, step), neighbourFear * Math.pow(.92, step));
+      // Formation pressure is additive, so local collision avoidance still wins.
       if (flow.intensity) {
         const toCenterX = spatialDelta(bird.x, flow.centerX, width);
         const toCenterY = spatialDelta(bird.y, flow.centerY, height);
@@ -470,6 +528,7 @@
       const wander = Math.sin(time * .72 + bird.phase) * .0045 * motionScale;
       ax += -headingY * wander - bird.vy * .0012;
       ay += headingX * wander + bird.vx * .0012;
+      // Cruise, fear and formation components resolve to a biological m/s target.
       const desiredSpeedMps = Math.min(MAX_FLIGHT_MPS, bird.preferredSpeedMps + fear * 6 + flow.intensity * 4 + Math.sin(time * .38 + bird.phase * .7) * .6);
       const desiredSpeed = metresPerSecondToPixelsPerStep(desiredSpeedMps);
       ax += headingX * (desiredSpeed - speed) * .025;
@@ -537,6 +596,7 @@
       }
       nextStates[i] = { x, y, vx, vy, ax: smoothed.x, ay: smoothed.y, fear, bank, z, vz };
     }
+    // Commit simultaneously so earlier array entries never influence later ones.
     birds.forEach((bird, index) => Object.assign(bird, nextStates[index]));
   };
   const drawPredator = () => {
@@ -549,6 +609,7 @@
     ctx.save(); ctx.translate(predator.x, predator.y); ctx.fillStyle = "#9e3e28";
     ctx.beginPath(); ctx.moveTo(16, 0); ctx.quadraticCurveTo(2, -3, -14, -11); ctx.quadraticCurveTo(-5, 0, -14, 11); ctx.quadraticCurveTo(2, 3, 16, 0); ctx.fill(); ctx.restore();
   };
+  /* requestAnimationFrame timestamps make motion refresh-rate independent. */
   const frame = frameAt => {
     const renderedAt = Number.isFinite(frameAt) ? frameAt : performance.now();
     const elapsedFrames = lastFrameAt === null ? 1 : Math.max(.25, Math.min(3, (renderedAt - lastFrameAt) * SIMULATION_HZ / 1000));
