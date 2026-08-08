@@ -19,6 +19,7 @@
   const cloudToggle = document.getElementById("show-clouds");
   const cloudLayer = document.getElementById("cloud-layer");
   const duskToggle = document.getElementById("dusk-sky");
+  const risingMoon = document.getElementById("rising-moon");
   const viewModeInput = document.getElementById("inside-flock");
   const gameShell = document.getElementById("game-shell");
   const immersiveHud = document.getElementById("immersive-hud");
@@ -34,6 +35,8 @@
   let birdCount = DEFAULT_BIRD_COUNT;
   let simulationSpeed = 1;
   let simulationClock = performance.now();
+  let duskEnabled = false;
+  let duskStartedAt = 0;
   let avoidEdges = false;
   let immersiveView = false;
   let depthFrame = 0;
@@ -187,15 +190,9 @@
     const screenY = height * .5 - viewUp / viewForward * focalLength;
     const margin = 42;
     if (screenX < -margin || screenX > width + margin || screenY < -margin || screenY > height + margin) return false;
-    const velocityX = bird.vx / width;
-    const velocityUp = bird.vz * .72;
-    const velocityForward = bird.vy / height;
-    const yawVelocityX = cosYaw * velocityX - sinYaw * velocityForward;
-    const yawVelocityForward = sinYaw * velocityX + cosYaw * velocityForward;
-    const viewVelocityUp = cosPitch * velocityUp - sinPitch * yawVelocityForward;
     bird.viewX = screenX;
     bird.viewY = screenY;
-    bird.viewAngle = Math.atan2(-viewVelocityUp, yawVelocityX);
+    bird.viewAngle = Math.atan2(bird.vy, bird.vx);
     bird.viewScale = Math.max(.32, Math.min(3.25, .19 / viewForward));
     bird.viewAlpha = Math.max(.3, Math.min(.98, 1.02 - viewForward * .62));
     bird.viewDepth = viewForward;
@@ -212,6 +209,36 @@
       ctx.fillStyle = "rgba(225, 226, 204, .42)";
       ctx.fillRect(0, Math.max(0, top - 2), width, 3);
     }
+  };
+  const updateMoonView = () => {
+    if (!duskEnabled) return;
+    const rise = Math.min(1, (performance.now() - duskStartedAt) / 100000);
+    let screenX = width * .82;
+    let screenY = height * (.24 - rise * .1);
+    let visible = true;
+    if (immersiveView) {
+      const worldX = .55;
+      const worldUp = .78 + rise * .12;
+      const worldForward = .85;
+      const cosYaw = Math.cos(camera.yaw);
+      const sinYaw = Math.sin(camera.yaw);
+      const cosPitch = Math.cos(camera.pitch);
+      const sinPitch = Math.sin(camera.pitch);
+      const yawX = cosYaw * worldX - sinYaw * worldForward;
+      const yawForward = sinYaw * worldX + cosYaw * worldForward;
+      const viewUp = cosPitch * worldUp - sinPitch * yawForward;
+      const viewForward = sinPitch * worldUp + cosPitch * yawForward;
+      if (viewForward <= .035) visible = false;
+      else {
+        const focalLength = Math.min(width, height) * .76;
+        screenX = width * .5 + yawX / viewForward * focalLength;
+        screenY = height * .5 - viewUp / viewForward * focalLength;
+        visible = screenX > -90 && screenX < width + 90 && screenY > -90 && screenY < height + 90;
+      }
+    }
+    risingMoon.style.left = `${screenX}px`;
+    risingMoon.style.top = `${screenY}px`;
+    risingMoon.style.opacity = visible ? "1" : "0";
   };
   const drawViewpointMap = () => {
     if (!immersiveView) return;
@@ -503,6 +530,7 @@
       camera.pitch += (camera.targetPitch - camera.pitch) * .18;
     }
     drawGroundView();
+    updateMoonView();
     if (!paused) update();
     drawBirds();
     drawViewpointMap();
@@ -589,7 +617,10 @@
     cloudLayer.classList.toggle("clouds-hidden", !cloudToggle.checked);
   });
   duskToggle.addEventListener("change", () => {
-    gameShell.classList.toggle("dusk-mode", duskToggle.checked);
+    duskEnabled = duskToggle.checked;
+    duskStartedAt = performance.now();
+    gameShell.classList.toggle("dusk-mode", duskEnabled);
+    updateMoonView();
   });
   viewModeInput.addEventListener("change", () => {
     immersiveView = viewModeInput.checked;
