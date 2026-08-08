@@ -18,6 +18,7 @@
   const edgeDescription = document.getElementById("edge-description");
   const cloudToggle = document.getElementById("show-clouds");
   const cloudLayer = document.getElementById("cloud-layer");
+  const duskToggle = document.getElementById("dusk-sky");
   const viewModeInput = document.getElementById("inside-flock");
   const gameShell = document.getElementById("game-shell");
   const immersiveHud = document.getElementById("immersive-hud");
@@ -586,6 +587,9 @@
   });
   cloudToggle.addEventListener("change", () => {
     cloudLayer.classList.toggle("clouds-hidden", !cloudToggle.checked);
+  });
+  duskToggle.addEventListener("change", () => {
+    gameShell.classList.toggle("dusk-mode", duskToggle.checked);
   });
   viewModeInput.addEventListener("change", () => {
     immersiveView = viewModeInput.checked;

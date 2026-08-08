@@ -10,11 +10,17 @@
   </head>
   <body>
     <main class="game-shell" id="game-shell">
+      <div class="celestial-layer" aria-hidden="true">
+        <i class="setting-sun"></i>
+        <i class="rising-moon"></i>
+      </div>
       <div class="cloud-layer" id="cloud-layer" aria-hidden="true">
         <i class="cloud cloud-one"></i>
         <i class="cloud cloud-two"></i>
         <i class="cloud cloud-three"></i>
         <i class="cloud cloud-four"></i>
+        <i class="cloud cloud-five"></i>
+        <i class="cloud cloud-six"></i>
       </div>
       <canvas id="murmuration" class="sky" tabindex="0" aria-label="An interactive flock of up to 2,500 starlings. Move your pointer to steer a bird of prey, or use Ground view to stand beneath the flock and look around."></canvas>
 
@@ -58,6 +64,10 @@
         <label class="cloud-toggle" for="show-clouds">
           <input id="show-clouds" type="checkbox" checked />
           <span>Clouds</span>
+        </label>
+        <label class="dusk-toggle" for="dusk-sky">
+          <input id="dusk-sky" type="checkbox" />
+          <span>Dusk sky</span>
         </label>
         <label class="view-toggle" for="inside-flock">
           <input id="inside-flock" type="checkbox" />
