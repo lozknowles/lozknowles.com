@@ -15,6 +15,12 @@ All notable changes to lozknowles.com are recorded here.
 - Added spatial neighbour indexing to keep larger murmurations responsive.
 - Added an **Avoid edges** checkbox that switches between seamless wraparound and soft bounding-box steering.
 - Added a blue-grey hazy sky and layered wispy clouds with a checked-by-default **Clouds** visibility toggle.
+- Increased the adjustable flock limit to 2,500 starlings.
+
+### Changed
+
+- Made flight paths more lifelike with seven-neighbour flock awareness, distance and field-of-view weighting, smooth turn limits, individual speed variation, banking, and predator fear that ripples through nearby birds.
+- Updated the simulation in two phases so every bird reacts to the same instant in the flock, avoiding update-order artefacts while retaining spatial indexing for large flocks.
 
 ### Documentation
 
