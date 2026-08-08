@@ -25,7 +25,7 @@
 
       <div class="immersive-hud" id="immersive-hud" aria-hidden="true">
         <div class="view-status">
-          <span>Ground observer · ½ mile airspace</span>
+          <span>Ground observer · ½ mile airspace · 12 m/s at 1×</span>
           <b>Drag, swipe, or use arrow keys to move your head</b>
         </div>
         <figure class="viewpoint-panel">
@@ -53,7 +53,7 @@
         </label>
         <label class="flight-speed" for="flight-speed">
           <span>Speed</span>
-          <input id="flight-speed" type="range" min="1" max="5" step="1" value="4" aria-describedby="speed-output" />
+          <input id="flight-speed" type="range" min="1" max="5" step="1" value="4" aria-describedby="speed-output" title="1× is calibrated to a starling's 12 m/s murmuration speed" />
           <output id="speed-output" for="flight-speed">4×</output>
         </label>
         <label class="edge-toggle" for="avoid-edges">
