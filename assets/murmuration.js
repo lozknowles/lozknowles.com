@@ -31,6 +31,8 @@
   const BASE_REACTION_SECONDS = .1;
   const LEGACY_CRUISE_SPEED = 1.575;
   const GROUND_DEPTH_MULTIPLIER = 2;
+  const DENSITY_TRACK_INTERVAL_MS = 140;
+  const MANUAL_LOOK_PAUSE_MS = 1400;
   const MOON_VIEW_PARALLAX = .18;
   const NEUTRAL_VIEW_PITCH = .48;
   const TAU = Math.PI * 2;
@@ -48,6 +50,8 @@
   const duskToggle = document.getElementById("dusk-sky");
   const risingMoon = document.getElementById("rising-moon");
   const viewModeInput = document.getElementById("inside-flock");
+  const autoTrackInput = document.getElementById("auto-track");
+  const autoTrackStatus = document.getElementById("auto-track-status");
   const gameShell = document.getElementById("game-shell");
   const immersiveHud = document.getElementById("immersive-hud");
   const viewpointMap = document.getElementById("viewpoint-map");
@@ -67,11 +71,17 @@
   let duskStartedAt = 0;
   let avoidEdges = false;
   let immersiveView = true;
+  let autoTrackEnabled = autoTrackInput.checked;
   let depthFrame = 0;
   const depthLayers = Array.from({ length: 8 }, () => []);
   const immersiveLayers = Array.from({ length: 20 }, () => []);
   const predator = { x: 0, y: 0, active: false };
-  const camera = { yaw: 0, pitch: .48, targetYaw: 0, targetPitch: .48, dragging: false, pointerId: null, lastX: 0, lastY: 0 };
+  const camera = {
+    yaw: 0, pitch: .48, targetYaw: 0, targetPitch: .48,
+    dragging: false, pointerId: null, lastX: 0, lastY: 0,
+    manualUntil: 0, lastDensityTrackAt: 0,
+    denseX: .5, denseY: .5, denseZ: .5
+  };
   const formation = {
     active: false,
     nextAt: performance.now() + 6000 + Math.random() * 6000,
@@ -268,6 +278,76 @@
       ctx.fillRect(0, Math.max(0, top - 2), width, 3);
     }
   };
+  /*
+   * Human observers naturally follow the most visually active, compact part of
+   * a murmuration. A coarse 10×10×6 density field finds the busiest local 3D
+   * neighbourhood, then aims the camera at its weighted centroid. Target angles
+   * and head angles are both eased, avoiding mechanical snaps. A manual drag,
+   * swipe or arrow-key look temporarily takes priority before tracking resumes.
+   */
+  const trackDensestFlock = now => {
+    if (!immersiveView || !autoTrackEnabled || camera.dragging || now < camera.manualUntil || !birds.length || now - camera.lastDensityTrackAt < DENSITY_TRACK_INTERVAL_MS) return;
+    camera.lastDensityTrackAt = now;
+    const binsX = 10;
+    const binsY = 10;
+    const binsZ = 6;
+    const layerSize = binsX * binsY;
+    const cellCount = layerSize * binsZ;
+    const counts = new Uint16Array(cellCount);
+    const sumsX = new Float64Array(cellCount);
+    const sumsY = new Float64Array(cellCount);
+    const sumsZ = new Float64Array(cellCount);
+    birds.forEach(bird => {
+      const cellX = Math.min(binsX - 1, Math.floor(bird.x / width * binsX));
+      const cellY = Math.min(binsY - 1, Math.floor(bird.y / height * binsY));
+      const cellZ = Math.min(binsZ - 1, Math.floor(bird.z * binsZ));
+      const index = cellZ * layerSize + cellY * binsX + cellX;
+      counts[index]++;
+      sumsX[index] += bird.x;
+      sumsY[index] += bird.y;
+      sumsZ[index] += bird.z;
+    });
+    let best = { score: -1, x: 0, y: 0, z: 0, count: 0 };
+    for (let z = 0; z < binsZ; z++) {
+      for (let y = 0; y < binsY; y++) {
+        for (let x = 0; x < binsX; x++) {
+          let score = 0, sumX = 0, sumY = 0, sumZ = 0, count = 0;
+          for (let dz = -1; dz <= 1; dz++) {
+            const nz = z + dz;
+            if (nz < 0 || nz >= binsZ) continue;
+            for (let dy = -1; dy <= 1; dy++) {
+              const ny = y + dy;
+              if (ny < 0 || ny >= binsY) continue;
+              for (let dx = -1; dx <= 1; dx++) {
+                const nx = x + dx;
+                if (nx < 0 || nx >= binsX) continue;
+                const index = nz * layerSize + ny * binsX + nx;
+                const proximityWeight = dx === 0 && dy === 0 && dz === 0 ? 1 : .55;
+                score += counts[index] * proximityWeight;
+                count += counts[index];
+                sumX += sumsX[index];
+                sumY += sumsY[index];
+                sumZ += sumsZ[index];
+              }
+            }
+          }
+          if (score > best.score && count) best = { score, x: sumX / count, y: sumY / count, z: sumZ / count, count };
+        }
+      }
+    }
+    if (!best.count) return;
+    camera.denseX = best.x / width;
+    camera.denseY = best.y / height;
+    camera.denseZ = best.z;
+    const worldX = camera.denseX - .5;
+    const worldForward = (camera.denseY - .5) * GROUND_DEPTH_MULTIPLIER;
+    const worldUp = .18 + camera.denseZ * .72;
+    const desiredYaw = Math.atan2(worldX, worldForward);
+    const yawDelta = Math.atan2(Math.sin(desiredYaw - camera.targetYaw), Math.cos(desiredYaw - camera.targetYaw));
+    const desiredPitch = Math.max(-.3, Math.min(1.42, Math.atan2(worldUp, Math.hypot(worldX, worldForward))));
+    camera.targetYaw += yawDelta * .24;
+    camera.targetPitch += (desiredPitch - camera.targetPitch) * .2;
+  };
   const updateMoonView = () => {
     if (!duskEnabled) return;
     const rise = Math.min(1, (performance.now() - duskStartedAt) / 100000);
@@ -335,6 +415,17 @@
       mapCtx.strokeStyle = "rgba(17, 17, 24, .62)";
       mapCtx.beginPath();
       mapCtx.arc(centroidX, centroidY, 5, 0, TAU);
+      mapCtx.stroke();
+    }
+
+    // Red ring: the densest 3D neighbourhood currently being tracked.
+    if (autoTrackEnabled) {
+      const denseMapX = pad + camera.denseX * plotWidth;
+      const denseMapY = pad + camera.denseY * plotHeight;
+      mapCtx.strokeStyle = "rgba(158, 62, 40, .9)";
+      mapCtx.lineWidth = 1.5;
+      mapCtx.beginPath();
+      mapCtx.arc(denseMapX, denseMapY, 6.5, 0, TAU);
       mapCtx.stroke();
     }
 
@@ -616,6 +707,7 @@
     lastFrameAt = renderedAt;
     ctx.clearRect(0, 0, width, height);
     if (immersiveView) {
+      trackDensestFlock(performance.now());
       camera.yaw += (camera.targetYaw - camera.yaw) * .18;
       camera.pitch += (camera.targetPitch - camera.pitch) * .18;
     }
@@ -640,6 +732,7 @@
     const dy = event.clientY - camera.lastY;
     camera.targetYaw -= dx * .006;
     camera.targetPitch = Math.max(-.3, Math.min(1.42, camera.targetPitch - dy * .005));
+    camera.manualUntil = performance.now() + MANUAL_LOOK_PAUSE_MS;
     camera.lastX = event.clientX;
     camera.lastY = event.clientY;
     invitation.classList.add("hidden");
@@ -650,6 +743,7 @@
     if (canvas.focus) canvas.focus({ preventScroll: true });
     if (immersiveView) {
       camera.dragging = true;
+      camera.manualUntil = performance.now() + MANUAL_LOOK_PAUSE_MS;
       camera.pointerId = event.pointerId;
       camera.lastX = event.clientX;
       camera.lastY = event.clientY;
@@ -673,6 +767,7 @@
     if (event.key === "ArrowRight") camera.targetYaw -= .12;
     if (event.key === "ArrowUp") camera.targetPitch = Math.min(1.42, camera.targetPitch + .09);
     if (event.key === "ArrowDown") camera.targetPitch = Math.max(-.3, camera.targetPitch - .09);
+    camera.manualUntil = performance.now() + MANUAL_LOOK_PAUSE_MS;
     invitation.classList.add("hidden");
   });
   pauseButton.addEventListener("click", () => { paused = !paused; pauseButton.textContent = paused ? "Resume" : "Pause"; });
@@ -692,7 +787,9 @@
   });
   const updateDescription = () => {
     if (immersiveView) {
-      edgeDescription.textContent = "Standing beneath the flock · drag, swipe, or use arrow keys to look around";
+      edgeDescription.textContent = autoTrackEnabled
+        ? "Standing beneath the flock · following its densest movement"
+        : "Standing beneath the flock · manual drag, swipe, or arrow-key view";
       return;
     }
     edgeDescription.textContent = avoidEdges
@@ -712,6 +809,15 @@
     gameShell.classList.toggle("dusk-mode", duskEnabled);
     updateMoonView();
   });
+  autoTrackInput.addEventListener("change", () => {
+    autoTrackEnabled = autoTrackInput.checked;
+    camera.manualUntil = 0;
+    camera.lastDensityTrackAt = 0;
+    autoTrackStatus.textContent = autoTrackEnabled
+      ? "Auto-tracking the densest flock · drag, swipe, or use arrow keys to look away"
+      : "Manual view · drag, swipe, or use arrow keys to look around";
+    updateDescription();
+  });
   viewModeInput.addEventListener("change", () => {
     immersiveView = viewModeInput.checked;
     predator.active = false;
@@ -721,6 +827,8 @@
     camera.targetYaw = 0;
     camera.pitch = .48;
     camera.targetPitch = .48;
+    camera.manualUntil = 0;
+    camera.lastDensityTrackAt = 0;
     gameShell.classList.toggle("immersive-mode", immersiveView);
     immersiveHud.setAttribute("aria-hidden", String(!immersiveView));
     invitationText.textContent = immersiveView ? "Look around from beneath the flock" : "Move here to enter the flock";
