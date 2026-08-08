@@ -12,6 +12,8 @@
   const pauseButton = document.getElementById("pause");
   const gatherButton = document.getElementById("gather");
   const birdCountInput = document.getElementById("bird-count");
+  const speedInput = document.getElementById("flight-speed");
+  const speedOutput = document.getElementById("speed-output");
   const edgeModeInput = document.getElementById("avoid-edges");
   const edgeDescription = document.getElementById("edge-description");
   const cloudToggle = document.getElementById("show-clouds");
@@ -29,6 +31,8 @@
   let height = 0;
   let paused = false;
   let birdCount = DEFAULT_BIRD_COUNT;
+  let simulationSpeed = 1;
+  let simulationClock = performance.now();
   let avoidEdges = false;
   let immersiveView = false;
   let depthFrame = 0;
@@ -297,7 +301,9 @@
       : Math.max(18, Math.min(MAX_NEIGHBOUR_RADIUS, 900 / Math.sqrt(birds.length)));
     const { grid, columns, rows } = buildNeighbourGrid(neighbourRadius);
     const nextStates = new Array(birds.length);
-    const now = performance.now();
+    const step = simulationSpeed;
+    simulationClock += 1000 / 60 * step;
+    const now = simulationClock;
     const time = now * .001;
     const flow = formationFlow(now);
     const advanceDepth = depthFrame++ % 3 === 0;
@@ -380,7 +386,7 @@
           ax += dx / distance * escape; ay += dy / distance * escape;
         }
       }
-      const fear = Math.max(directFear, bird.fear * .955, neighbourFear * .92);
+      const fear = Math.max(directFear, bird.fear * Math.pow(.955, step), neighbourFear * Math.pow(.92, step));
       if (flow.intensity) {
         const toCenterX = spatialDelta(bird.x, flow.centerX, width);
         const toCenterY = spatialDelta(bird.y, flow.centerY, height);
@@ -419,19 +425,20 @@
       ay += headingY * (desiredSpeed - speed) * .025;
       const steering = limit(ax, ay, .075 + fear * .16 + flow.intensity * .08);
       const response = .2 + fear * .32 + flow.intensity * .12;
+      const stepResponse = 1 - Math.pow(1 - response, step);
       const smoothed = limit(
-        bird.ax * (1 - response) + steering.x * response,
-        bird.ay * (1 - response) + steering.y * response,
+        bird.ax * (1 - stepResponse) + steering.x * stepResponse,
+        bird.ay * (1 - stepResponse) + steering.y * stepResponse,
         .065 + fear * .15 + flow.intensity * .07
       );
-      let vx = bird.vx + smoothed.x;
-      let vy = bird.vy + smoothed.y;
+      let vx = bird.vx + smoothed.x * step;
+      let vy = bird.vy + smoothed.y * step;
       const velocity = limit(vx, vy, 3.9);
       const nextSpeed = Math.hypot(velocity.x, velocity.y);
       vx = nextSpeed < .9 ? velocity.x / (nextSpeed || 1) * .9 : velocity.x;
       vy = nextSpeed < .9 ? velocity.y / (nextSpeed || 1) * .9 : velocity.y;
       const newSpeed = Math.hypot(vx, vy) || 1;
-      const bank = bird.bank * .78 + (headingX * vy / newSpeed - headingY * vx / newSpeed) * 3.4;
+      const bank = bird.bank * Math.pow(.78, step) + (headingX * vy / newSpeed - headingY * vx / newSpeed) * 3.4;
       let z = bird.z;
       let vz = bird.vz;
       if (immersiveView) {
@@ -446,7 +453,7 @@
         if (flow.intensity) {
           depthAcceleration += Math.sin(bird.x * .016 + bird.y * .011 - time * 2.4 + flow.phase) * flow.ribbon * .0007;
         }
-        vz = Math.max(-.008, Math.min(.008, bird.vz * .982 + depthAcceleration));
+        vz = Math.max(-.008, Math.min(.008, bird.vz * Math.pow(.982, step) + depthAcceleration * step));
       } else if (advanceDepth) {
         let depthTarget = .5 + Math.sin(time * .31 + bird.phase + bird.x * .0015) * .34;
         if (flow.intensity) {
@@ -455,24 +462,24 @@
         }
         depthTarget += bird.depthBias * fear * .14;
         depthTarget = Math.max(.04, Math.min(.96, depthTarget));
-        vz = bird.vz * .885 + (depthTarget - bird.z) * .0135;
+        vz = bird.vz * Math.pow(.885, step) + (depthTarget - bird.z) * .0135 * step;
         vz = Math.max(-.013, Math.min(.013, vz));
       }
-      z = bird.z + vz;
+      z = bird.z + vz * step;
       if (z < 0) { z = 0; vz = Math.abs(vz) * .65; }
       if (z > 1) { z = 1; vz = -Math.abs(vz) * .65; }
       let x;
       let y;
       if (avoidEdges || immersiveView) {
-        x = bird.x + vx;
-        y = bird.y + vy;
+        x = bird.x + vx * step;
+        y = bird.y + vy * step;
         if (x < 1) { x = 1; vx = Math.abs(vx) * .55; }
         if (x > width - 1) { x = width - 1; vx = -Math.abs(vx) * .55; }
         if (y < 1) { y = 1; vy = Math.abs(vy) * .55; }
         if (y > height - 1) { y = height - 1; vy = -Math.abs(vy) * .55; }
       } else {
-        x = (bird.x + vx + width) % width;
-        y = (bird.y + vy + height) % height;
+        x = (bird.x + vx * step + width) % width;
+        y = (bird.y + vy * step + height) % height;
       }
       nextStates[i] = { x, y, vx, vy, ax: smoothed.x, ay: smoothed.y, fear, bank, z, vz };
     }
@@ -558,6 +565,12 @@
     seedBirds();
   });
   birdCountInput.addEventListener("keydown", event => { if (event.key === "Enter") birdCountInput.blur(); });
+  speedInput.addEventListener("input", () => {
+    const requested = Number.parseInt(speedInput.value, 10);
+    simulationSpeed = Number.isFinite(requested) ? Math.min(5, Math.max(1, requested)) : 1;
+    speedInput.value = String(simulationSpeed);
+    speedOutput.textContent = `${simulationSpeed}×`;
+  });
   const updateDescription = () => {
     if (immersiveView) {
       edgeDescription.textContent = "Standing beneath the flock · drag, swipe, or use arrow keys to look around";

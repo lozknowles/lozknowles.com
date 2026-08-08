@@ -46,6 +46,11 @@
           <span>Starlings</span>
           <input id="bird-count" type="number" min="10" max="2500" step="10" value="100" inputmode="numeric" title="Choose between 10 and 2,500 starlings" />
         </label>
+        <label class="flight-speed" for="flight-speed">
+          <span>Speed</span>
+          <input id="flight-speed" type="range" min="1" max="5" step="1" value="1" aria-describedby="speed-output" />
+          <output id="speed-output" for="flight-speed">1×</output>
+        </label>
         <label class="edge-toggle" for="avoid-edges">
           <input id="avoid-edges" type="checkbox" />
           <span>Avoid edges</span>
