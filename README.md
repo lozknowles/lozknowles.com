@@ -2,6 +2,10 @@
 
 Static files for [lozknowles.com](https://lozknowles.com), including the site's images, scripts, styles, and optional looping background music.
 
+## Interactive experiments
+
+- **Murmuration** — added 8 August 2026 at `/murmuration.html`. An interactive, edge-wrapping flock of 100 starlings that responds to a mouse, touch input, or stylus-controlled bird of prey. The page is linked from the primary navigation and uses `assets/murmuration.css` and `assets/murmuration.js`.
+
 Serve the repository root with any static web server. For example:
 
 ```sh
@@ -13,9 +17,9 @@ npx serve .
 The production site is served by Apache from `/var/www/lozknowles.com/public_html/dist` on `cottageserver`. Commit and push `main` to `origin`, then deploy over SSH on port `2222`:
 
 ```bash
-scp -P 2222 index.html cv.html LawrenceKnowlesCV.pdf README.md .htaccess cottageserver:/var/www/lozknowles.com/public_html/dist/
-scp -P 2222 assets/project-video.css assets/project-video.js assets/cv.css assets/cv-popup.js assets/cv-page.js cottageserver:/var/www/lozknowles.com/public_html/dist/assets/
-ssh -p 2222 cottageserver 'chmod 644 /var/www/lozknowles.com/public_html/dist/.htaccess /var/www/lozknowles.com/public_html/dist/index.html /var/www/lozknowles.com/public_html/dist/cv.html /var/www/lozknowles.com/public_html/dist/LawrenceKnowlesCV.pdf /var/www/lozknowles.com/public_html/dist/README.md /var/www/lozknowles.com/public_html/dist/assets/project-video.css /var/www/lozknowles.com/public_html/dist/assets/project-video.js /var/www/lozknowles.com/public_html/dist/assets/cv.css /var/www/lozknowles.com/public_html/dist/assets/cv-popup.js /var/www/lozknowles.com/public_html/dist/assets/cv-page.js'
+scp -P 2222 index.html cv.html murmuration.html LawrenceKnowlesCV.pdf README.md .htaccess cottageserver:/var/www/lozknowles.com/public_html/dist/
+scp -P 2222 assets/project-video.css assets/project-video.js assets/cv.css assets/cv-popup.js assets/cv-page.js assets/murmuration.css assets/murmuration.js cottageserver:/var/www/lozknowles.com/public_html/dist/assets/
+ssh -p 2222 cottageserver 'chmod 644 /var/www/lozknowles.com/public_html/dist/.htaccess /var/www/lozknowles.com/public_html/dist/index.html /var/www/lozknowles.com/public_html/dist/cv.html /var/www/lozknowles.com/public_html/dist/murmuration.html /var/www/lozknowles.com/public_html/dist/LawrenceKnowlesCV.pdf /var/www/lozknowles.com/public_html/dist/README.md /var/www/lozknowles.com/public_html/dist/assets/project-video.css /var/www/lozknowles.com/public_html/dist/assets/project-video.js /var/www/lozknowles.com/public_html/dist/assets/cv.css /var/www/lozknowles.com/public_html/dist/assets/cv-popup.js /var/www/lozknowles.com/public_html/dist/assets/cv-page.js /var/www/lozknowles.com/public_html/dist/assets/murmuration.css /var/www/lozknowles.com/public_html/dist/assets/murmuration.js'
 ```
 
 Deploy only the intended files so unrelated content in the document root is preserved. Ensure `.htaccess` is readable by Apache; an unreadable file causes Apache to return `403` for the whole site.

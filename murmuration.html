@@ -1,0 +1,37 @@
+<!doctype html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <meta name="theme-color" content="#aeb8bb" />
+    <meta name="description" content="Guide a bird of prey through an interactive murmuration of one hundred starlings." />
+    <title>Murmuration — Lawrence Knowles</title>
+    <link rel="stylesheet" href="/assets/murmuration.css" />
+  </head>
+  <body>
+    <main class="game-shell">
+      <canvas id="murmuration" class="sky" aria-label="An interactive flock of one hundred starlings. Move your pointer to steer a bird of prey."></canvas>
+
+      <header class="title-card">
+        <a class="home-link" href="/" aria-label="Back to Lawrence Knowles home">LK<span>•</span></a>
+        <div class="eyebrow"><i></i> An interactive murmuration</div>
+        <h1>Murmuration</h1>
+        <p>Move the bird of prey. Watch the flock think as one.</p>
+      </header>
+
+      <div class="invitation" id="invitation" aria-hidden="true">
+        <div class="pointer-mark"></div>
+        <span>Move here to enter the flock</span>
+      </div>
+
+      <aside class="controls" aria-label="Game controls">
+        <div class="flock-count"><strong>100</strong><span>starlings</span></div>
+        <button type="button" id="pause">Pause</button>
+        <button type="button" id="gather">Gather flock</button>
+      </aside>
+
+      <footer>There are no edges here <span>·</span> every horizon leads back to the sky</footer>
+    </main>
+    <script src="/assets/murmuration.js"></script>
+  </body>
+</html>
