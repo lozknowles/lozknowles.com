@@ -1,5 +1,11 @@
 # Changelog
 
+## Unreleased
+
+- Replaced the detailed public CV with a privacy-reduced one-page professional profile.
+- Removed the homepage's precise coordinates and location-led hero label.
+- Preserved the existing `/cv.html` route while relabelling it as Professional profile.
+
 All notable changes to lozknowles.com are recorded here.
 
 ## 2026-08-08

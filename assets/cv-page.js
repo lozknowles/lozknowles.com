@@ -1,5 +1,5 @@
 (() => {
-  const pdfUrl = "/LawrenceKnowlesCV.pdf";
+  const pdfUrl = "/LawrenceKnowlesProfessionalProfile.pdf";
   const frame = document.querySelector("#cv-document");
   const printButton = document.querySelector("[data-print-cv]");
   const closeButton = document.querySelector("[data-close-cv]");
@@ -9,7 +9,7 @@
       frame.contentWindow.focus();
       frame.contentWindow.print();
     } catch {
-      window.open(pdfUrl, "lawrence-cv-print");
+      window.open(pdfUrl, "lawrence-profile-print");
     }
   });
 

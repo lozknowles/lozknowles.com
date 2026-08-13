@@ -12,7 +12,7 @@
     const top = Math.max(0, Math.round((window.screen.availHeight - height) / 2));
     const cvWindow = window.open(
       popupLink.href,
-      "lawrence-cv",
+      "lawrence-profile",
       `popup=yes,width=${width},height=${height},left=${left},top=${top},resizable=yes,scrollbars=yes`
     );
 
