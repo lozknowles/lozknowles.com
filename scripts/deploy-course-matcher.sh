@@ -22,7 +22,7 @@ if [ -n "$(git status --porcelain)" ]; then
   exit 1
 fi
 
-npm install
+npm install --package-lock=false
 npm test
 npm run vendor
 
@@ -38,7 +38,7 @@ ssh -p "$DEPLOY_PORT" "$DEPLOY_HOST" \
 
 rsync -av --delete-after \
   -e "ssh -p $DEPLOY_PORT" \
-  index.html styles.css app.js matcher-core.js courses.js vendor/ \
+  index.html styles.css app.js matcher-core.js courses.js vendor \
   "$DEPLOY_HOST:$DEPLOY_DIR/"
 
 curl -fsS "$PUBLIC_URL?release=1.0.0-$STAMP" | grep -q 'Turn your results into useful course conversations'
