@@ -1,0 +1,125 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <meta name="theme-color" content="#112f35">
+  <title>Course Match | Lincoln College demonstration</title>
+  <meta name="description" content="Unofficial Lincoln College course matching demonstration for students and advisers.">
+  <link rel="stylesheet" href="styles.css">
+</head>
+<body>
+  <a class="skip-link" href="#main">Skip to main content</a>
+  <header class="site-header">
+    <div class="brand-wrap">
+      <div class="brand-mark" aria-hidden="true">LC</div>
+      <div>
+        <p class="eyebrow">UNOFFICIAL DEMONSTRATION</p>
+        <h1>Course Match</h1>
+        <p class="subtitle">A results-day prototype inspired by Lincoln College</p>
+      </div>
+    </div>
+    <div class="header-note">Indicative matching only · always verify current course information</div>
+  </header>
+
+  <nav class="mode-tabs" aria-label="Course Match mode">
+    <button class="tab active" data-mode="student" aria-selected="true">Student view</button>
+    <button class="tab" data-mode="adviser" aria-selected="false">Tutor / adviser view</button>
+    <button class="tab" data-mode="about" aria-selected="false">About this demo</button>
+  </nav>
+
+  <main id="main">
+    <section id="student-mode" class="mode-panel active" aria-labelledby="student-heading">
+      <div class="hero-grid">
+        <div>
+          <p class="step-kicker">STUDENT VIEW</p>
+          <h2 id="student-heading">Turn your results into useful course conversations</h2>
+          <p>Upload a results document or type your grades. Course Match extracts what it can, asks you to verify every grade, then ranks relevant courses against encoded published entry criteria.</p>
+        </div>
+        <div class="privacy-card">
+          <strong>Privacy-first prototype</strong>
+          <p>Your results stay in this browser. This version has no backend and sends no student data to an API.</p>
+        </div>
+      </div>
+
+      <div class="steps" aria-label="Student matching steps">
+        <div class="step active" data-step="1"><span>1</span> Results</div>
+        <div class="step" data-step="2"><span>2</span> Check grades</div>
+        <div class="step" data-step="3"><span>3</span> Interests</div>
+        <div class="step" data-step="4"><span>4</span> Matches</div>
+      </div>
+
+      <section class="panel" id="results-entry">
+        <div class="panel-heading"><div><p class="step-kicker">STEP 1</p><h3>Add your results</h3></div><button class="secondary" id="load-golden">Load demo student</button></div>
+        <div class="entry-grid">
+          <div class="upload-zone" id="drop-zone">
+            <input id="result-file" type="file" accept="image/*,.pdf,.txt,.csv" hidden>
+            <div class="upload-icon" aria-hidden="true">↑</div>
+            <h4>Upload or photograph your results</h4>
+            <p>Image, screenshot, PDF, text or CSV. Scans/photos use local Tesseract OCR when the optional local vendor bundle is installed.</p>
+            <button class="primary" id="choose-file">Choose document</button>
+            <p class="micro" id="ocr-status">No file selected.</p>
+          </div>
+          <div class="manual-card">
+            <h4>Or enter them manually</h4>
+            <p class="muted">Add as many subjects as you need. For Combined Science, enter a double award as a pair such as <strong>5-5</strong>.</p>
+            <div id="manual-rows"></div>
+            <button class="secondary" id="add-row">+ Add subject</button>
+          </div>
+        </div>
+        <details class="ocr-details"><summary>Show extracted text</summary><textarea id="ocr-text" rows="8" placeholder="OCR or extracted document text will appear here. You can edit it before parsing."></textarea><button class="secondary" id="parse-text">Parse grades from text</button></details>
+        <div class="actions"><button class="primary" id="to-verify">Check these grades →</button></div>
+      </section>
+
+      <section class="panel hidden" id="verify-panel">
+        <p class="step-kicker">STEP 2</p><h3>Check every grade</h3>
+        <div class="callout warn"><strong>Human check required.</strong> OCR is not authoritative. Correct anything that is wrong or missing before matching.</div>
+        <div class="table-wrap"><table><thead><tr><th>Subject</th><th>Grade</th><th></th></tr></thead><tbody id="verify-body"></tbody></table></div>
+        <div class="actions split"><button class="secondary" data-back="results-entry">← Back</button><button class="primary" id="confirm-grades">I’ve checked these grades →</button></div>
+      </section>
+
+      <section class="panel hidden" id="interest-panel">
+        <p class="step-kicker">STEP 3</p><h3>What are you interested in?</h3>
+        <p>Pick any areas you’d genuinely consider. Leave everything unticked to see a broad grade-based list.</p>
+        <div id="interest-chips" class="chips"></div>
+        <label class="field-label" for="career-text">Career or topic (optional)</label>
+        <input id="career-text" class="text-input" placeholder="e.g. cyber security, nursing, engineering, photography">
+        <div class="actions split"><button class="secondary" data-back="verify-panel">← Back</button><button class="primary" id="run-match">Show my matches →</button></div>
+      </section>
+
+      <section class="hidden" id="matches-panel">
+        <div class="results-heading"><div><p class="step-kicker">STEP 4</p><h3>Your indicative matches</h3><p id="match-summary"></p></div><button class="secondary" id="edit-results">Edit results</button></div>
+        <div class="legend"><span class="badge green">Likely meets encoded grades</span><span class="badge amber">Near match / needs checking</span><span class="badge red">Does not meet encoded grades</span></div>
+        <div id="match-list" class="match-list"></div>
+        <section class="explore-panel"><h3>Explore every published subject area</h3><p>Not every Lincoln College course has been converted into a machine-readable rule in this demonstration. These links let you continue on the official subject pages without Course Match pretending it has assessed criteria it has not encoded.</p><div id="subject-links" class="subject-links"></div></section>
+      </section>
+    </section>
+
+    <section id="adviser-mode" class="mode-panel" aria-labelledby="adviser-heading">
+      <div class="hero-grid compact"><div><p class="step-kicker">TUTOR / ADVISER VIEW</p><h2 id="adviser-heading">Start with a course and find students worth a conversation</h2><p>Use anonymised synthetic data or paste a simple CSV cohort. This is triage, not automated admissions.</p></div><div class="privacy-card"><strong>Expected CSV columns</strong><p><code>id,interest,Mathematics,English Language,...</code></p></div></div>
+      <section class="panel">
+        <div class="adviser-controls">
+          <label>Course<select id="adviser-course"></select></label>
+          <button class="secondary" id="load-cohort">Load synthetic cohort</button>
+          <label class="file-button">Import CSV<input id="cohort-file" type="file" accept=".csv,text/csv" hidden></label>
+        </div>
+        <div id="course-rule-card" class="callout info"></div>
+        <div class="table-wrap"><table><thead><tr><th>Student</th><th>Interest</th><th>Result</th><th>Evidence</th></tr></thead><tbody id="cohort-results"></tbody></table></div>
+      </section>
+    </section>
+
+    <section id="about-mode" class="mode-panel" aria-labelledby="about-heading">
+      <section class="panel prose"><p class="step-kicker">ABOUT</p><h2 id="about-heading">What this demonstration is — and is not</h2>
+        <p>This is an independent prototype built to demonstrate a possible results-day and enrolment workflow. It is not an official Lincoln College service and does not make offers, enrolment decisions or academic judgements.</p>
+        <h3>Design principles</h3>
+        <ul><li>OCR can assist data entry, but a person must verify the result.</li><li>Published grade requirements are evaluated transparently, with each check shown.</li><li>Non-grade requirements such as interviews, references, portfolios, DBS checks, fitness or placement suitability are never silently treated as passed.</li><li>Course data is a dated snapshot and each encoded course links to the official source.</li><li>No uploaded results are transmitted by this static prototype.</li></ul>
+        <h3>Data snapshot</h3><p>Encoded criteria were checked against public Lincoln College pages on <strong>24 August 2026</strong>. The College states that entry requirements differ by course and students should check the specific course page.</p>
+      </section>
+    </section>
+  </main>
+
+  <footer><p><strong>Course Match demonstration</strong> · Independent prototype · Not affiliated with or endorsed by Lincoln College.</p><p>Official course information: <a href="https://www.lincolncollege.ac.uk/school-leavers/course-subjects" target="_blank" rel="noreferrer">Lincoln College course subjects ↗</a></p></footer>
+
+  <script type="module" src="app.js"></script>
+</body>
+</html>
