@@ -5,6 +5,12 @@
 - Replaced the detailed public CV with a privacy-reduced one-page professional profile.
 - Removed the homepage's precise coordinates and location-led hero label.
 - Preserved the existing `/cv.html` route while relabelling it as Professional profile.
+- Added an allowlisted publication build instead of publishing repository files.
+- Added CI and live-site checks for source maps, source/build artefacts, local infrastructure, model/provider markers, secrets, debug/environment traces, Git revision labels, revealing headers, and private media metadata.
+- Removed generator, timestamp, and tool metadata from the professional-profile PDF while retaining its intentional title, author, and subject provenance.
+- Added a uniform custom error page, directory-index protection, source/build-path denials, and non-revealing response-header policy.
+- Removed unnecessary inline-script and runtime-evaluation allowances from the base-site Content Security Policy.
+- Externalised environment-specific deployment and video-proxy values from the public repository.
 
 All notable changes to lozknowles.com are recorded here.
 

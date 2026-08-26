@@ -3,12 +3,13 @@
 
 from pathlib import Path
 
+from reportlab import rl_config
 from reportlab.lib import colors
 from reportlab.lib.colors import HexColor
-from reportlab.lib.enums import TA_LEFT
 from reportlab.lib.pagesizes import A4
 from reportlab.lib.styles import ParagraphStyle
 from reportlab.lib.units import mm
+from reportlab.pdfbase.pdfdoc import PDFDictionary, PDFInfo, PDFString
 from reportlab.platypus import (
     BaseDocTemplate,
     Frame,
@@ -23,15 +24,32 @@ from reportlab.platypus import (
 
 ROOT = Path(__file__).resolve().parents[1]
 OUTPUT = ROOT / "LawrenceKnowlesProfessionalProfile.pdf"
+PROFILE_TITLE = "Lawrence Knowles - Professional Profile"
+PROFILE_AUTHOR = "Lawrence Knowles"
+PROFILE_SUBJECT = "Privacy-reduced professional profile"
+
+# Stable object ordering and identifiers make the checked-in PDF reproducible.
+rl_config.invariant = True
 
 INK = HexColor("#06100F")
-PAPER = HexColor("#F5F7F2")
 TEAL = HexColor("#176B67")
 TEAL_DARK = HexColor("#0D4542")
 MINT = HexColor("#DDF2ED")
-ACID = HexColor("#C8FF68")
 SLATE = HexColor("#526463")
 LINE = HexColor("#CBD8D4")
+
+
+class PublicPDFInfo(PDFInfo):
+    """Keep intentional authorship while omitting tool and timestamp metadata."""
+
+    def format(self, document):
+        return PDFDictionary(
+            {
+                "Title": PDFString(self.title),
+                "Author": PDFString(self.author),
+                "Subject": PDFString(self.subject),
+            }
+        ).format(document)
 
 
 class ProfileDoc(BaseDocTemplate):
@@ -43,12 +61,20 @@ class ProfileDoc(BaseDocTemplate):
             rightMargin=18 * mm,
             topMargin=17 * mm,
             bottomMargin=16 * mm,
-            title="Lawrence Knowles - Professional Profile",
-            author="Lawrence Knowles",
-            subject="Privacy-reduced professional profile",
+            title=PROFILE_TITLE,
+            author=PROFILE_AUTHOR,
+            subject=PROFILE_SUBJECT,
         )
         frame = Frame(self.leftMargin, self.bottomMargin, self.width, self.height, id="profile")
         self.addPageTemplates(PageTemplate(id="profile", frames=[frame], onPage=self._page))
+
+    def beforeDocument(self):
+        super().beforeDocument()
+        info = PublicPDFInfo()
+        info.title = PROFILE_TITLE
+        info.author = PROFILE_AUTHOR
+        info.subject = PROFILE_SUBJECT
+        self.canv._doc.info = info
 
     def _page(self, canvas, doc):
         canvas.saveState()

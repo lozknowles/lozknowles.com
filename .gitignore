@@ -1,2 +1,4 @@
-# Video binaries live on hpubuntu:/fast/media/lozknowles.com, not in Git.
+# Video binaries are deployed from protected media storage, not Git.
 assets/videos/
+build/
+__pycache__/

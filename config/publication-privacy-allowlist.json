@@ -1,0 +1,20 @@
+{
+  "version": 1,
+  "entries": [
+    {
+      "code": "ai-provider-kokoro",
+      "path": "cartoon-collingham/assets/*.js",
+      "reason": "Intentional user-facing attribution for the experiment's open-source speech option"
+    },
+    {
+      "code": "local-unix-path",
+      "path": "*vendor/pdfjs/pdf.worker.mjs",
+      "reason": "PDF.js virtual browser-filesystem default, not a deployment-host path"
+    },
+    {
+      "code": "local-unix-path",
+      "path": "*vendor/tesseract-core/*.js",
+      "reason": "Tesseract Emscripten virtual filesystem, not a deployment-host path"
+    }
+  ]
+}

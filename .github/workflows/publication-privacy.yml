@@ -1,0 +1,54 @@
+name: Publication privacy
+
+on:
+  pull_request:
+  push:
+    branches: [main]
+  workflow_dispatch:
+    inputs:
+      live_url:
+        description: Public site URL to crawl after a release
+        required: false
+        default: https://www.lozknowles.com/
+
+permissions:
+  contents: read
+
+jobs:
+  artefact:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-python@v5
+        with:
+          python-version: "3.12"
+      - uses: actions/setup-node@v4
+        with:
+          node-version: "22"
+      - name: Test privacy rules
+        run: python -m unittest discover -s tests -p "test_*.py"
+      - name: Check JavaScript syntax
+        shell: bash
+        run: |
+          while IFS= read -r -d '' file; do
+            node --check "$file"
+          done < <(find assets lincoln-course-match -type f -name '*.js' -print0)
+      - name: Build and scan publication artefact
+        run: python scripts/build_publication.py
+
+  live:
+    if: github.event_name == 'workflow_dispatch' && inputs.live_url != ''
+    needs: artefact
+    runs-on: ubuntu-latest
+    env:
+      LIVE_URL: ${{ inputs.live_url }}
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-python@v5
+        with:
+          python-version: "3.12"
+      - name: Crawl and probe deployed site
+        run: >-
+          python scripts/publication_privacy.py
+          --allowlist config/publication-privacy-allowlist.json
+          site "$LIVE_URL"

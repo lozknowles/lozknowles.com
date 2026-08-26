@@ -1,8 +1,39 @@
+Options -Indexes -MultiViews
+DirectoryIndex index.html
+ServerSignature Off
+
+ErrorDocument 403 /404.html
+ErrorDocument 404 /404.html
+
 <IfModule mod_rewrite.c>
   RewriteEngine On
-  RewriteRule ^assets/videos/([A-Za-z0-9-]+\.mp4)$ http://100.125.120.114:8100/$1 [P,L,NE]
+
+  # Return the same non-revealing response for publication and build artefacts.
+  RewriteRule "(^|/)\.(?!well-known(?:/|$))" - [R=404,L]
+  RewriteRule "(?i)(^|/)(?:debug|_debug|server-status|server-info|releases?)(?:/|$)" - [R=404,L]
+  RewriteRule "(?i)(^|/)(?:readme|changelog|security)(?:\.[a-z0-9_-]+)?$" - [R=404,L]
+  RewriteRule "(?i)(^|/)(?:package(?:-lock)?|pnpm-lock|yarn\.lock|composer\.lock|vite\.config|webpack\.config|astro\.config|tsconfig)(?:\.[a-z0-9_-]+)?$" - [R=404,L]
+  RewriteRule "(?i)(^|/)(?:asset-|build-)?manifest(?:\.[a-z0-9_-]+)?$" - [R=404,L]
+  RewriteRule "(?i)\.map$" - [R=404,L]
+
+  # Do not let physical directories disclose their contents when no index exists.
+  RewriteCond %{REQUEST_FILENAME} -d
+  RewriteCond %{REQUEST_FILENAME}/index.html !-f
+  RewriteRule ^ - [R=404,L]
 </IfModule>
 
 <IfModule mod_headers.c>
-  Header always set Content-Security-Policy "default-src 'self'; base-uri 'self'; object-src 'none'; script-src 'self' 'unsafe-inline' 'unsafe-eval'; style-src 'self' 'unsafe-inline' https://fonts.googleapis.com; font-src 'self' https://fonts.gstatic.com; img-src 'self' data:; media-src 'self'; frame-src 'self'; frame-ancestors 'self'"
+  Header always unset X-Powered-By
+  Header always unset X-Generator
+  Header always unset X-Runtime
+  Header always unset X-Version
+  Header always unset X-Git-Commit
+  Header always unset SourceMap
+  Header always unset X-SourceMap
+  Header always set X-Content-Type-Options "nosniff"
+  Header always set Referrer-Policy "strict-origin-when-cross-origin"
+  Header always set Permissions-Policy "camera=(), geolocation=(), microphone=()"
+  Header always set X-Frame-Options "SAMEORIGIN"
+  Header always set Cross-Origin-Opener-Policy "same-origin"
+  Header always set Content-Security-Policy "default-src 'self'; base-uri 'self'; object-src 'none'; script-src 'self'; style-src 'self' 'unsafe-inline' https://fonts.googleapis.com; font-src 'self' https://fonts.gstatic.com; img-src 'self' data:; media-src 'self' blob:; frame-src 'self'; frame-ancestors 'self'"
 </IfModule>
