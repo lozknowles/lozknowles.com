@@ -12,6 +12,15 @@ from scripts.publication_privacy import Finding, scan_artifact, scan_text, split
 
 
 class PublicationPrivacyTests(unittest.TestCase):
+    def test_homepage_links_password_beta_as_voice_clone(self) -> None:
+        homepage = (Path(__file__).parents[1] / "index.html").read_text(
+            encoding="utf-8"
+        )
+        self.assertIn(
+            'href="https://www.lozknowles.com/voice-clone/"', homepage
+        )
+        self.assertIn("Voice Clone", homepage)
+
     @unittest.skipIf(os.name == "nt", "Windows does not preserve POSIX publication modes")
     def test_publication_permissions_are_web_readable(self) -> None:
         with tempfile.TemporaryDirectory() as directory:
