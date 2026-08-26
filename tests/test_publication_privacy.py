@@ -1,14 +1,31 @@
 from __future__ import annotations
 
+import os
+import stat
 import tempfile
 import unittest
 from pathlib import Path
 
 from scripts.build_course_matcher_publication import strip_source_map_directive
+from scripts.build_publication import normalise_public_permissions
 from scripts.publication_privacy import Finding, scan_artifact, scan_text, split_allowed, AllowEntry
 
 
 class PublicationPrivacyTests(unittest.TestCase):
+    @unittest.skipIf(os.name == "nt", "Windows does not preserve POSIX publication modes")
+    def test_publication_permissions_are_web_readable(self) -> None:
+        with tempfile.TemporaryDirectory() as directory:
+            root = Path(directory) / "publication"
+            nested = root / "assets"
+            nested.mkdir(parents=True, mode=0o700)
+            asset = nested / "site.js"
+            asset.write_text("void 0;", encoding="utf-8")
+            asset.chmod(0o600)
+            normalise_public_permissions(root)
+            self.assertEqual(stat.S_IMODE(root.stat().st_mode), 0o755)
+            self.assertEqual(stat.S_IMODE(nested.stat().st_mode), 0o755)
+            self.assertEqual(stat.S_IMODE(asset.stat().st_mode), 0o644)
+
     def test_clean_static_file_passes(self) -> None:
         with tempfile.TemporaryDirectory() as directory:
             root = Path(directory)

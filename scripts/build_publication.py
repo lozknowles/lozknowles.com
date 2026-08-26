@@ -8,7 +8,10 @@ import shutil
 import sys
 from pathlib import Path
 
-from publication_privacy import scan_artifact
+if __package__:
+    from .publication_privacy import scan_artifact
+else:
+    from publication_privacy import scan_artifact
 
 
 ROOT = Path(__file__).resolve().parents[1]
@@ -42,13 +45,26 @@ ASSET_FILES = (
     "wisteria-CwTjyfrc.jpg",
     "ww1-BRtzddHk.jpg",
 )
+
+
+def make_public_directory(path: Path) -> None:
+    path.mkdir(parents=True, exist_ok=True)
+    path.chmod(0o755)
+
+
+def normalise_public_permissions(output: Path) -> None:
+    for path in (output, *output.rglob("*")):
+        path.chmod(0o755 if path.is_dir() else 0o644)
+
+
 def copy_file(relative: Path, output: Path) -> None:
     source = ROOT / relative
     if not source.is_file():
         raise FileNotFoundError(f"Required publication file is missing: {relative.as_posix()}")
     destination = output / relative
-    destination.parent.mkdir(parents=True, exist_ok=True)
+    make_public_directory(destination.parent)
     shutil.copyfile(source, destination)
+    destination.chmod(0o644)
 
 
 def prepare_output(output: Path) -> None:
@@ -60,7 +76,7 @@ def prepare_output(output: Path) -> None:
         if output != safe_default:
             raise ValueError(f"Refusing to replace non-default output directory: {output}")
         shutil.rmtree(output)
-    output.mkdir(parents=True)
+    make_public_directory(output)
 
 
 def build(output: Path) -> None:
@@ -70,6 +86,7 @@ def build(output: Path) -> None:
         copy_file(Path(name), output)
     for name in ASSET_FILES:
         copy_file(Path("assets") / name, output)
+    normalise_public_permissions(output)
     findings = scan_artifact(output)
     if findings:
         for finding in findings:

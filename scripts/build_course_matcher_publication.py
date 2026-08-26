@@ -22,11 +22,22 @@ SOURCE_MAP_DIRECTIVE = re.compile(
 )
 
 
+def make_public_directory(path: Path) -> None:
+    path.mkdir(parents=True, exist_ok=True)
+    path.chmod(0o755)
+
+
+def normalise_public_permissions(output: Path) -> None:
+    for path in (output, *output.rglob("*")):
+        path.chmod(0o755 if path.is_dir() else 0o644)
+
+
 def copy(source: Path, destination: Path) -> None:
     if not source.is_file():
         raise FileNotFoundError(f"Required Course Match runtime file is missing: {source}")
-    destination.parent.mkdir(parents=True, exist_ok=True)
+    make_public_directory(destination.parent)
     shutil.copyfile(source, destination)
+    destination.chmod(0o644)
 
 
 def strip_source_map_directive(path: Path) -> None:
@@ -43,7 +54,7 @@ def build(source_root: Path, output: Path) -> None:
         raise ValueError(f"Course Match source directory does not exist: {source_root}")
     if output.exists() and any(output.iterdir()):
         raise ValueError(f"Course Match output directory is not empty: {output}")
-    output.mkdir(parents=True, exist_ok=True)
+    make_public_directory(output)
 
     for name in ROOT_FILES:
         copy(source_root / name, output / name)
@@ -72,6 +83,7 @@ def build(source_root: Path, output: Path) -> None:
     for path in output.rglob("*"):
         if path.is_file() and path.suffix.lower() in {".js", ".mjs", ".css"}:
             strip_source_map_directive(path)
+    normalise_public_permissions(output)
 
     files = [path for path in output.rglob("*") if path.is_file()]
     print(f"Built Course Match publication runtime: {len(files)} files")

@@ -11,6 +11,7 @@
 - Added a uniform custom error page, directory-index protection, source/build-path denials, and non-revealing response-header policy.
 - Removed unnecessary inline-script and runtime-evaluation allowances from the base-site Content Security Policy.
 - Externalised environment-specific deployment and video-proxy values from the public repository.
+- Normalised publication directory and file modes so restrictive build-host umasks cannot make a deployed static site unreadable.
 
 All notable changes to lozknowles.com are recorded here.
 
