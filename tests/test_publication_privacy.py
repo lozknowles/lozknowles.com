@@ -20,6 +20,10 @@ class PublicationPrivacyTests(unittest.TestCase):
 
         self.assertIn('href="/references.html"', profile)
         self.assertIn("data-references-popup", profile)
+        self.assertIn('/assets/cv.css?v=c0c5675', profile)
+        self.assertIn('/assets/cv-page.js?v=5617094', profile)
+        self.assertIn('/assets/cv.css?v=c0c5675', references)
+        self.assertIn('/assets/references-page.js?v=64a84ae', references)
         self.assertEqual(references.count("data-reference-card"), 7)
         self.assertIn("Peter Collinson", references)
         self.assertIn("Sujee Saparamadu", references)
