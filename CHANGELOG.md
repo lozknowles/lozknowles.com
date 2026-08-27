@@ -2,6 +2,7 @@
 
 ## Unreleased
 
+- Required HTML responses to revalidate so an already-cached profile cannot hide newly published controls.
 - Added a References button to the professional profile and a matching popup carousel for seven supplied colleague and client testimonials.
 - Replaced the detailed public CV with a privacy-reduced one-page professional profile.
 - Removed the homepage's precise coordinates and location-led hero label.

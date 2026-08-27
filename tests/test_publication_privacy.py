@@ -13,6 +13,13 @@ from scripts.publication_privacy import Finding, scan_artifact, scan_text, split
 
 
 class PublicationPrivacyTests(unittest.TestCase):
+    def test_html_responses_require_revalidation(self) -> None:
+        htaccess = (Path(__file__).parents[1] / ".htaccess").read_text(
+            encoding="utf-8"
+        )
+        self.assertIn('<FilesMatch "\\.html$">', htaccess)
+        self.assertIn('Cache-Control "no-cache, must-revalidate"', htaccess)
+
     def test_cv_links_packaged_reference_carousel(self) -> None:
         root = Path(__file__).parents[1]
         profile = (root / "cv.html").read_text(encoding="utf-8")
