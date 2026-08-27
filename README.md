@@ -5,6 +5,8 @@ Static files for [lozknowles.com](https://lozknowles.com), including the site's 
 The public professional profile is generated from `professional-profile-source.md` by
 `scripts/build-professional-profile.py`. It intentionally omits direct contact details,
 precise location, education history, named employer chronology, and community-role detail.
+The profile links to a rotating set of supplied professional references at
+`/references.html`; direct telephone and email details are not published.
 
 ## Interactive experiments
 

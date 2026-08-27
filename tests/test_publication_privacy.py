@@ -6,12 +6,28 @@ import tempfile
 import unittest
 from pathlib import Path
 
+from scripts.build_publication import ASSET_FILES, ROOT_FILES
 from scripts.build_course_matcher_publication import strip_source_map_directive
 from scripts.build_publication import normalise_public_permissions
 from scripts.publication_privacy import Finding, scan_artifact, scan_text, split_allowed, AllowEntry
 
 
 class PublicationPrivacyTests(unittest.TestCase):
+    def test_cv_links_packaged_reference_carousel(self) -> None:
+        root = Path(__file__).parents[1]
+        profile = (root / "cv.html").read_text(encoding="utf-8")
+        references = (root / "references.html").read_text(encoding="utf-8")
+
+        self.assertIn('href="/references.html"', profile)
+        self.assertIn("data-references-popup", profile)
+        self.assertEqual(references.count("data-reference-card"), 7)
+        self.assertIn("Peter Collinson", references)
+        self.assertIn("Sujee Saparamadu", references)
+        self.assertNotIn("07553", references)
+        self.assertNotIn("@tiscali.co.uk", references)
+        self.assertIn("references.html", ROOT_FILES)
+        self.assertIn("references-page.js", ASSET_FILES)
+
     def test_homepage_links_password_beta_as_voice_clone(self) -> None:
         homepage = (Path(__file__).parents[1] / "index.html").read_text(
             encoding="utf-8"

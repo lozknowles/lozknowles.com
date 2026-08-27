@@ -2,6 +2,7 @@
 
 ## Unreleased
 
+- Added a References button to the professional profile and a matching popup carousel for seven supplied colleague and client testimonials.
 - Replaced the detailed public CV with a privacy-reduced one-page professional profile.
 - Removed the homepage's precise coordinates and location-led hero label.
 - Preserved the existing `/cv.html` route while relabelling it as Professional profile.

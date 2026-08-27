@@ -22,6 +22,7 @@ ROOT_FILES = (
     "404.html",
     "index.html",
     "cv.html",
+    "references.html",
     "murmuration.html",
     "LawrenceKnowlesProfessionalProfile.pdf",
 )
@@ -30,6 +31,7 @@ ASSET_FILES = (
     "cv-page.js",
     "cv-popup.js",
     "cv.css",
+    "references-page.js",
     "flowers-yU5JYxV5.jpg",
     "hand-sgfIbAv9.jpg",
     "index-BDTMFuqh.css",

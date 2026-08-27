@@ -205,6 +205,7 @@ MP4_VERSION_MARKERS = (
 DEFAULT_PUBLIC_ROUTES = (
     "/murmuration.html",
     "/cv.html",
+    "/references.html",
     "/LawrenceKnowlesProfessionalProfile.pdf",
     "/lincoln-course-match/",
     "/cartoon-collingham/",

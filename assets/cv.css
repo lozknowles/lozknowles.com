@@ -217,6 +217,208 @@
   color: #b7ff2a;
 }
 
+.references-page,
+.references-page body {
+  height: auto;
+  min-height: 100%;
+}
+
+.references-page body {
+  display: block;
+  overflow: auto;
+  background:
+    radial-gradient(circle at 85% 12%, rgba(183, 255, 42, 0.1), transparent 26rem),
+    #07110f;
+}
+
+.references-page .cv-toolbar {
+  position: sticky;
+  z-index: 10;
+  top: 0;
+}
+
+.references-shell {
+  display: grid;
+  min-height: calc(100vh - 64px);
+  padding: clamp(2rem, 5vw, 4.5rem) 1rem;
+  box-sizing: border-box;
+  place-items: center;
+}
+
+.references-panel {
+  width: min(940px, 100%);
+}
+
+.references-intro {
+  max-width: 690px;
+  margin-bottom: clamp(1.5rem, 3vw, 2.5rem);
+}
+
+.references-eyebrow {
+  margin: 0 0 0.75rem;
+  color: #b7ff2a;
+  font-family: "DM Mono", monospace;
+  font-size: 0.72rem;
+  letter-spacing: 0.12em;
+  text-transform: uppercase;
+}
+
+.references-intro h1 {
+  margin: 0;
+  font-size: clamp(2rem, 5vw, 4.4rem);
+  letter-spacing: -0.055em;
+  line-height: 0.98;
+}
+
+.references-intro > p:last-child {
+  max-width: 620px;
+  margin: 1.1rem 0 0;
+  color: rgba(242, 240, 232, 0.64);
+  font-size: clamp(0.92rem, 2vw, 1.05rem);
+  line-height: 1.55;
+}
+
+.references-stack {
+  display: grid;
+}
+
+.reference-card {
+  position: relative;
+  overflow: hidden;
+  padding: clamp(1.5rem, 4vw, 3rem);
+  border: 1px solid rgba(183, 255, 42, 0.34);
+  border-radius: 1.2rem;
+  background: #f2f0e8;
+  box-shadow: 0 2rem 5rem rgba(0, 0, 0, 0.28);
+  color: #07110f;
+}
+
+.reference-card + .reference-card {
+  margin-top: 1rem;
+}
+
+.reference-card::before {
+  position: absolute;
+  top: -0.65rem;
+  right: 1rem;
+  color: rgba(7, 17, 15, 0.07);
+  content: "“";
+  font-family: Georgia, "Times New Roman", serif;
+  font-size: clamp(7rem, 18vw, 13rem);
+  line-height: 1;
+  pointer-events: none;
+}
+
+.reference-card blockquote {
+  position: relative;
+  z-index: 1;
+  margin: 0;
+}
+
+.reference-card blockquote p {
+  margin: 0;
+  font-size: clamp(0.96rem, 1.8vw, 1.12rem);
+  line-height: 1.62;
+}
+
+.reference-card blockquote p + p {
+  margin-top: 1rem;
+}
+
+.reference-attribution {
+  position: relative;
+  z-index: 1;
+  display: grid;
+  gap: 0.3rem;
+  margin-top: 1.6rem;
+  padding-top: 1rem;
+  border-top: 1px solid rgba(7, 17, 15, 0.16);
+}
+
+.reference-attribution cite {
+  font-size: 1rem;
+  font-style: normal;
+  font-weight: 700;
+}
+
+.reference-attribution span {
+  color: rgba(7, 17, 15, 0.64);
+  font-size: 0.82rem;
+}
+
+.references-enhanced .reference-card {
+  animation: reference-enter 360ms ease both;
+}
+
+.references-enhanced .reference-card + .reference-card {
+  margin-top: 0;
+}
+
+.references-controls {
+  display: none;
+  align-items: center;
+  justify-content: center;
+  gap: 0.65rem;
+  margin-top: 1.25rem;
+}
+
+.references-enhanced .references-controls {
+  display: flex;
+}
+
+.references-controls button,
+.references-position {
+  padding: 0.65rem 0.9rem;
+  border: 1px solid rgba(242, 240, 232, 0.28);
+  border-radius: 999px;
+  background: transparent;
+  color: #f2f0e8;
+  font: inherit;
+  font-size: 0.76rem;
+}
+
+.references-controls button {
+  cursor: pointer;
+  transition: border-color 160ms ease, background-color 160ms ease;
+}
+
+.references-controls button:hover,
+.references-controls button:focus-visible {
+  border-color: #b7ff2a;
+  background: rgba(183, 255, 42, 0.1);
+  outline: none;
+}
+
+.references-position {
+  min-width: 3.4rem;
+  border-color: transparent;
+  color: rgba(242, 240, 232, 0.62);
+  text-align: center;
+}
+
+.visually-hidden {
+  position: absolute;
+  width: 1px;
+  height: 1px;
+  padding: 0;
+  overflow: hidden;
+  clip: rect(0, 0, 0, 0);
+  white-space: nowrap;
+  border: 0;
+}
+
+@keyframes reference-enter {
+  from {
+    opacity: 0;
+    transform: translateY(0.5rem);
+  }
+
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
+}
+
 @media (max-width: 640px) {
   .cv-toolbar {
     align-items: flex-start;
@@ -237,6 +439,45 @@
   .cv-actions button {
     padding: 0.55rem 0.7rem;
     font-size: 0.7rem;
+  }
+
+  .references-page .cv-toolbar {
+    min-height: 64px;
+  }
+
+  .references-shell {
+    min-height: calc(100vh - 64px);
+    padding-top: 1.8rem;
+  }
+
+  .references-intro {
+    margin-bottom: 1.3rem;
+  }
+
+  .reference-card {
+    padding: 1.2rem;
+    border-radius: 0.9rem;
+  }
+
+  .reference-card blockquote p {
+    font-size: 0.92rem;
+    line-height: 1.55;
+  }
+
+  .references-controls {
+    gap: 0.45rem;
+  }
+
+  .references-controls button,
+  .references-position {
+    padding: 0.58rem 0.68rem;
+    font-size: 0.7rem;
+  }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .references-enhanced .reference-card {
+    animation: none;
   }
 }
 
