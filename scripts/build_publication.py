@@ -24,6 +24,7 @@ ROOT_FILES = (
     "cv.html",
     "references.html",
     "murmuration.html",
+    "cheeky-phone.html",
     "LawrenceKnowlesProfessionalProfile.pdf",
 )
 ASSET_FILES = (
@@ -37,6 +38,9 @@ ASSET_FILES = (
     "index-BDTMFuqh.css",
     "index-qfeM6zl_.js",
     "murmuration.css",
+    "cheeky-phone.css",
+    "cheeky-phone.js",
+    "cheeky-nav.css",
     "murmuration.js",
     "music-player.css",
     "music-player.js",
