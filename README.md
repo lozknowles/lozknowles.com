@@ -72,3 +72,26 @@ verification expectations.
 ## Video assets
 
 Large MP4 files may be kept outside Git and deployed separately to `assets/videos/`, or served from a media origin configured by the operator. The host should support HTTP byte-range requests so browsers can seek efficiently. `assets/project-video.js` pauses inactive videos, prevents overlapping playback, and restores poster images when media is unavailable.
+
+## Cheeky Phone deployment
+
+Run `scripts/deploy-cheeky-phone.sh` from a clean checkout on a machine with the
+established server SSH access. Supply `DEPLOY_HOST`, `DEPLOY_PATH`, `LIVE_URL`,
+and optionally `DEPLOY_PORT` (default 2222) as environment variables after
+verifying the live Apache document root. Deployment values stay outside Git.
+The script runs the publication checks, stages and backs up exactly five files
+outside the public root, refuses a homepage that differs from the reviewed
+baseline or this release, transfers assets before updating the homepage, and
+compares all five public responses byte-for-byte before the full privacy crawl.
+Unrelated routes are preserved. A transfer exception restores backed-up files.
+If HTTP verification or the wider crawl fails after transfer, the files remain
+installed and the printed backup directory is retained for investigation or
+rollback; do not report that state as a verified release.
+
+The deployment script has been syntax checked, and the app's face-down phrase,
+cooldown, hidden-page pause, listener cleanup, denied-permission behaviour and
+Stop-during-permission handling have been checked with mocked browser APIs.
+These checks are not physical sensor/audio qualification. After deployment,
+open the page on a phone, tap Start, allow motion, check the volume and hold the
+screen face down for two seconds after the selected minimum gap. Confirm the
+exact response, voice choice, quiet mode, Stop and return from another app.
