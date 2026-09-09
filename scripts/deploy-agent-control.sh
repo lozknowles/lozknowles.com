@@ -45,8 +45,13 @@ for kind,paths in [('static',files+['assets/videos/'+n for n in names]),
         rows.append(dict(path=name,sha256=digest,baselineSha256=baseline.get(name)))
     manifest=dict(siteCommit=commit,kind=kind,files=rows)
     if kind=='static':
-        original=json.loads(Path('/fast/qualification/poe-dashboard-operator-20260908/site-access-review-20260909/server-readonly.json').read_text())
-        manifest['protected']=[dict(path=n,sha256=original['live'][n]['sha256']) for n in ['cheeky-phone.html','assets/cheeky-phone.css','assets/cheeky-phone.js','assets/cheeky-nav.css']]
+        protected={
+            'cheeky-phone.html':'6a7d80e8ef4ce79f2b76feddf998f9bca824103dd3a7d7ec3d8c2ed640f57bc2',
+            'assets/cheeky-phone.css':'e13cec4510de9320a53267a0daae5e6d19ba60f821b11d54a92ccb2da115df76',
+            'assets/cheeky-phone.js':'7e52bdd8fb785a53200c83ad89478bb1174c6c94f3e645cbe6e2174c4bcafde3',
+            'assets/cheeky-nav.css':'012e7a07568f9f0f646f9a159466a3643ba8445881eb1763a8d27fc1debb7331',
+        }
+        manifest['protected']=[dict(path=name,sha256=digest) for name,digest in protected.items()]
     (target/'deploy-manifest.json').write_text(json.dumps(manifest,indent=2))
 PY
 remote_stage=$(ssh -p 2222 -o BatchMode=yes -o ConnectTimeout=15 cottageserver 'mktemp -d /var/tmp/agent-control-site-deploy.XXXXXXXX')

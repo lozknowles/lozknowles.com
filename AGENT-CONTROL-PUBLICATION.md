@@ -42,6 +42,10 @@ labels in that transcript have narrow path-and-rule privacy allowances. The
 video, poster and transcript remain outside Git and are deployed through the
 existing reviewed Agent Control media path.
 
+The current Cheeky Phone page and assets remain independent of this publication.
+Their public/server hashes were reconciled before deployment and are retained
+as protected drift guards; this procedure neither sources nor replaces them.
+
 ## Scoped publication
 
 Run the existing Python tests and `scripts/build_publication.py`; do not commit
