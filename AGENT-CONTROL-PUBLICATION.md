@@ -1,87 +1,58 @@
-# Agent Control overview: publication preparation
+# Agent Control public tour delivery
 
-This page is staged source, not a published or media-qualified release. Do not
-deploy its homepage links while the referenced media or versioned release links
-are absent. The static publication privacy scan does not establish playback.
+The public tour is at https://lozknowles.com/agent-control.html. The homepage
+has POE Demo after Murmuration, Cheeky Phone, and Area 51 immediately before
+Contact in both desktop and mobile navigation. Area 51 points to the existing
+authenticated service at https://files.lozknowles.com.
 
-The homepage places Agent Control immediately after Murmuration in the primary
-navigation and the mobile action row. The overview uses native video controls,
-inline mobile playback, an English caption track, transcript links and versioned
-documentation. It does not autoplay.
+## Narration revision, 9 September 2026
 
-## Media gate
+The operator requested a consistent male narrator, one introduction, and no
+subsequent spoken use of the guide's name. The revised public soundtrack is
+generated with OmniVoice using one fixed original synthetic male voice reference
+for every chapter. It is not a real person's cloned voice. The new script is
+aligned to the 21 chapters of the existing 6:12 edit, with ASR-aligned captions
+and a matching transcript. An editorial label identifies the new narration;
+the conversation visible inside the recorded dashboard remains the original
+interaction. The page identifies recorded footage with new narration. Media
+URLs have a version query so returning viewers request the revised assets.
 
-The existing separate media directory must receive these four privacy-reviewed
-files, derived from the accepted genuine browser recording:
+The original qualification recording and earlier public edit remain private
+evidence. This public media revision does not alter the v4.1.0 product tag,
+deployed product commit, runtime voice configuration or qualification claims.
+Human listening is not separately attested. Review checks include every spoken
+passage against ASR, one fixed voice-prompt digest, complete caption text,
+measured signal levels and pauses, representative legible frames, public
+browser audio decoding, captions and forward/backward seeking.
 
-- `assets/videos/agent-control-overview.mp4`
-- `assets/videos/agent-control-overview-poster.jpg`
-- `assets/videos/agent-control-overview.en.vtt`
-- `assets/videos/agent-control-overview-transcript.html`
+## Scoped publication
 
-Do not commit the large recording to Git. Do not fabricate narration, captions,
-transcript or telemetry to fill these paths. Preserve the unedited qualification
-recording privately. Check the complete export for intelligibility, sync, personal
-information, credentials, private routes and operational details before upload.
-Use caption timestamps from the actual edited recording. Strip unnecessary media
-metadata. Scan the caption/transcript text as public text as well as reviewing it.
+Run the existing Python tests and `scripts/build_publication.py`; do not commit
+large media. The MP4 belongs in the existing hpubuntu media origin because
+Apache already proxies `/assets/videos/*.mp4` there with byte-range support.
+Poster, captions and transcript are static files under `assets/videos/`.
 
-## Existing build and deployment boundary
+Stage seven allowlisted static files and one MP4 against their current deployed
+hashes. Back up exact replaced files outside the public roots. Retain the
+Cheeky Phone page and three asset hashes as protected drift guards. Use the
+existing atomic applier and publish the homepage last. Keep public directories
+0755 and files 0644. Preserve unrelated routes, media and service configuration.
+Rollback restores only files named by this revision's recorded transaction.
 
-Run `python3 scripts/build_publication.py` and the existing Python tests. The
-allowlist includes the overview HTML and stylesheet; media remains separate.
-Headless checks at 1920, 390 and 320 pixels verify layout and link order only.
+Verify all media hashes from public HTTPS, 206 byte-range responses, native
+video dimensions/duration, decoded audio, captions, transcript, seeking,
+desktop/mobile navigation and the three menu destinations. Keep autoplay off.
 
-After the Agent Control release and media gates pass, confirm all four versioned
-GitHub links resolve. Verify the current website deployment identity again.
-Back up only files this change replaces, outside the webroot, recording hashes
-and which files were previously absent. Copy the approved media and changed
-allowlisted static files to staging paths on the existing Apache host. Check
-hashes, then replace each with a same-directory atomic rename. Publish the
-homepage link last. Do not use a broad delete or overwrite unrelated routes.
-Keep public directories 0755 and files 0644.
+## Whole-site privacy review
 
-Verify the overview from the public origin: HTTP status, desktop and mobile
-navigation, start/pause, seeking (HTTP range response), English captions,
-transcript, poster, release/documentation links, secure context and no unwanted
-sound autoplay. Repeat the existing publication privacy check.
+The earlier negative probes of `.htaccess` and `server-status` caused Fail2ban
+to ban the home's public IP. Removing only that runtime ban restored access.
+Subsequent complete scans retain all rules, probes and allowances, resolving
+the site to its existing trusted LAN address within the scanner process only;
+TLS and SNI are preserved. Normal public-address checks verify home access.
 
-For rollback, first restore the previous homepage, then restore only backed-up
-files and remove only newly introduced overview files listed in this change's
-deployment record. Do not remove or alter other media. Verify the previous
-homepage and Murmuration remain available.
-
-## Current evidence
-
-The staged source passes the existing publication privacy build and all 13 Python
-tests. Headless browser checks pass at 1920, 390 and 320 pixels, and the desktop
-overview and narrow mobile homepage screenshots have been visually reviewed.
-The referenced media and v4.1.0 release are still pending; no public playback,
-seeking, caption or deployment success is claimed.
-
-
-## Accepted publication, 9 September 2026
-
-The operator authorized publication of the edited genuine 6:12 POE tour and
-three homepage links: POE Demo after Murmuration, Cheeky Phone, and Area 51
-(https://files.lozknowles.com) immediately before Contact. Desktop and mobile
-navigation carry these links. Cheeky Phone's existing page/assets are protected
-by deployment hashes; the restored homepage is the expected live baseline.
-
-The MP4 belongs in the existing hpubuntu media origin. Apache already proxies
-`/assets/videos/*.mp4` there and the media server supports byte ranges. Poster,
-captions and transcript remain static website files. The scoped deployment
-stages seven static files and one MP4, verifies drift and hashes, retains private
-rollback records and replaces the homepage last. No service configuration or
-authentication changes are required.
-
-The earlier scan's negative probes of `.htaccess` and `server-status` caused
-Fail2ban to ban the home's public IP. Removing only that runtime ban restored
-normal public-address access. Subsequent full before/after scans retain all
-rules, probes and allowlists while resolving the site to its existing trusted
-LAN address within that scanner process only; TLS/SNI are preserved. Five
-pre-existing wider-site findings remain separate and are not suppressed. Public
-homepage, media and navigation checks use the normal website address.
-
-The operator corrected Area 51's destination to https://files.lozknowles.com
-before publication. Its existing authentication remains unchanged.
+The wider scan retains seven unrelated findings: three main-site source asset
+paths, two Course Matcher asset paths, a PDF.js source-map directive and the
+authenticated voice-clone destination returning 401. These are reported, not
+suppressed or described as a clean whole-site scan. The two exact caption and
+transcript allowances cover intentional spoken provider attribution only.
