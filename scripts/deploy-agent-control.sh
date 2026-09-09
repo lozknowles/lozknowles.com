@@ -22,11 +22,13 @@ sha=lambda p:hashlib.sha256(p.read_bytes()).hexdigest()
 baseline={
     'index.html':'2581fdaaaa45db273be5e62ac2a057ce82652a0c3761728d4476fc99b27a8c5b',
     'assets/cv.css':'1fb27ed09044957b6eaa75111246988b8be8672af2608e1e9688f876009100ad',
-    'agent-control.html':'747fa35669879088a92d2be77884c814101a8fde201074cbc83b672bad0ba019',
-    'assets/agent-control.css':'7845e09853e5c4ae0ce2e6222d0d4cebdb28a2724d1092af9a9e62e7d37e9970',
+    'agent-control.html':'111326efae179da49039418a7322cdd549a95900cd96cd54a5a395f75a9471bc',
+    'assets/agent-control.css':'9e419249b9072803b277ab9e53b1b391ae2f612069a19943b5d51e40d159fa88',
     'assets/videos/agent-control-overview-poster.jpg':'d7a6048ebbc84884a004b9e648f3ebb5ea0ca21e5b7ba7432734ea705cb3bfe2',
     'assets/videos/agent-control-overview.en.vtt':'33f4f1e6cd13fc514b6402190615e555e49372fe319ed80a31dd4a493e53e47b',
     'assets/videos/agent-control-overview-transcript.html':'8c35389d8f48faa19a7d36b5ecd861f88b5ff603d715099244bec3ea88e07628',
+    'assets/videos/agent-control-live-run-poster.jpg':'3b4cad7aae2387e67c8942f476145aa27e6b26cccbb0f33a50e771a996930204',
+    'assets/videos/agent-control-live-run-transcript.html':'76ea7a8e8a3d840b7419e205401ca639d4a364d397fd49114a3e7d00b6ec552c',
     'agent-control-overview.mp4':'6b4c0326bf62e74fc3fdbe027d9f780195c30e3b7bb16b91c991cc0197c912a8',
     'agent-control-live-run.mp4':'cb61e287a5fa711e9a351510cde60253c63238abe481cf2fa509c82bb4020cf1',
 }
