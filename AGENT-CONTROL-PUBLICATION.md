@@ -64,7 +64,7 @@ seeking, caption or deployment success is claimed.
 
 The operator authorized publication of the edited genuine 6:12 POE tour and
 three homepage links: POE Demo after Murmuration, Cheeky Phone, and Area 51
-(https://sites.lozknowles.com) immediately before Contact. Desktop and mobile
+(https://files.lozknowles.com) immediately before Contact. Desktop and mobile
 navigation carry these links. Cheeky Phone's existing page/assets are protected
 by deployment hashes; the restored homepage is the expected live baseline.
 
@@ -83,6 +83,5 @@ LAN address within that scanner process only; TLS/SNI are preserved. Five
 pre-existing wider-site findings remain separate and are not suppressed. Public
 homepage, media and navigation checks use the normal website address.
 
-Area 51's requested hostname had no DNS record at preparation time. Its menu
-destination is preserved exactly as requested; destination availability is a
-separate verification result.
+The operator corrected Area 51's destination to https://files.lozknowles.com
+before publication. Its existing authentication remains unchanged.
