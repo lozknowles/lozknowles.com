@@ -25,6 +25,23 @@ passage against ASR, one fixed voice-prompt digest, complete caption text,
 measured signal levels and pauses, representative legible frames, public
 browser audio decoding, captions and forward/backward seeking.
 
+## Live governed run, 9 September 2026
+
+The showcase includes a second, separate video beneath the narrated tour. This
+is the accepted continuous Agent Control demonstration rather than an edited
+walkthrough: one normal Work Parcel traverses every primary operational view,
+shows all six Crew roles responding to retained work state, exposes live token
+and context authority, records the quality-gate reason, seals a baton, changes
+from Qwen to Codex, verifies the destination result and reconciles the complete
+10,348-token parcel ledger. The 63.96-second H.264 recording is silent,
+unspliced, 1920×1080 at 25 fps and plays at 1× speed.
+
+The complete naturally generated execution transcript is published alongside
+the recording. It is not replaced by a release summary. Intentional provider
+labels in that transcript have narrow path-and-rule privacy allowances. The
+video, poster and transcript remain outside Git and are deployed through the
+existing reviewed Agent Control media path.
+
 ## Scoped publication
 
 Run the existing Python tests and `scripts/build_publication.py`; do not commit
@@ -32,7 +49,7 @@ large media. The MP4 belongs in the existing hpubuntu media origin because
 Apache already proxies `/assets/videos/*.mp4` there with byte-range support.
 Poster, captions and transcript are static files under `assets/videos/`.
 
-Stage seven allowlisted static files and one MP4 against their current deployed
+Stage the allowlisted static files and two MP4s against their current deployed
 hashes. Back up exact replaced files outside the public roots. Retain the
 Cheeky Phone page and three asset hashes as protected drift guards. Use the
 existing atomic applier and publish the homepage last. Keep public directories

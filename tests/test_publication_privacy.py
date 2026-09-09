@@ -48,6 +48,29 @@ class PublicationPrivacyTests(unittest.TestCase):
         )
         self.assertIn("Voice Clone", homepage)
 
+    def test_agent_control_showcase_exposes_both_reviewed_videos(self) -> None:
+        showcase = (Path(__file__).parents[1] / "agent-control.html").read_text(
+            encoding="utf-8"
+        )
+        self.assertEqual(showcase.count("<video controls playsinline"), 2)
+        self.assertIn("/assets/videos/agent-control-overview.mp4", showcase)
+        self.assertIn("/assets/videos/agent-control-live-run.mp4", showcase)
+        self.assertIn("agent-control-live-run-transcript.html", showcase)
+        self.assertIn("Jobs, Lanes, Sessions, Systems, Models, Routing, Crew, POE and Configuration", showcase)
+        self.assertNotIn("autoplay", showcase)
+
+    def test_agent_control_deployment_is_scoped_to_both_videos(self) -> None:
+        root = Path(__file__).parents[1]
+        deployment = (root / "scripts" / "deploy-agent-control.sh").read_text(
+            encoding="utf-8"
+        )
+        applier = (root / "scripts" / "apply-agent-control-site.py").read_text(
+            encoding="utf-8"
+        )
+        for name in ("agent-control-overview.mp4", "agent-control-live-run.mp4"):
+            self.assertIn(name, deployment)
+            self.assertIn(name, applier)
+
     @unittest.skipIf(os.name == "nt", "Windows does not preserve POSIX publication modes")
     def test_publication_permissions_are_web_readable(self) -> None:
         with tempfile.TemporaryDirectory() as directory:

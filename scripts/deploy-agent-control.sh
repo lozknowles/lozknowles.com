@@ -19,11 +19,22 @@ review=json.loads(accepted.read_text())
 assert review['privacyAccepted'] is True and review['synchronizationAccepted'] is True and review['operatorAccepted'] is True
 assert review['publicReady'] is True
 sha=lambda p:hashlib.sha256(p.read_bytes()).hexdigest()
-baseline={'index.html':'7db569c57eba02ec67fdcf95cb65c9103293d862560e70162b679067bb355648','assets/cv.css':'c0c5675930bcb1c4ac918f254f6a994e6cffb768f94741402fca04009dedaa7f'}
+baseline={
+    'index.html':'2581fdaaaa45db273be5e62ac2a057ce82652a0c3761728d4476fc99b27a8c5b',
+    'assets/cv.css':'1fb27ed09044957b6eaa75111246988b8be8672af2608e1e9688f876009100ad',
+    'agent-control.html':'747fa35669879088a92d2be77884c814101a8fde201074cbc83b672bad0ba019',
+    'assets/agent-control.css':'7845e09853e5c4ae0ce2e6222d0d4cebdb28a2724d1092af9a9e62e7d37e9970',
+    'assets/videos/agent-control-overview-poster.jpg':'d7a6048ebbc84884a004b9e648f3ebb5ea0ca21e5b7ba7432734ea705cb3bfe2',
+    'assets/videos/agent-control-overview.en.vtt':'33f4f1e6cd13fc514b6402190615e555e49372fe319ed80a31dd4a493e53e47b',
+    'assets/videos/agent-control-overview-transcript.html':'8c35389d8f48faa19a7d36b5ecd861f88b5ff603d715099244bec3ea88e07628',
+    'agent-control-overview.mp4':'6b4c0326bf62e74fc3fdbe027d9f780195c30e3b7bb16b91c991cc0197c912a8',
+}
 files=['assets/cv.css','agent-control.html','assets/agent-control.css','index.html']
-names=['agent-control-overview-poster.jpg','agent-control-overview.en.vtt','agent-control-overview-transcript.html']
+names=['agent-control-overview-poster.jpg','agent-control-overview.en.vtt','agent-control-overview-transcript.html',
+       'agent-control-live-run-poster.jpg','agent-control-live-run-transcript.html']
 commit=subprocess.check_output(['git','rev-parse','HEAD'],text=True).strip()
-for kind,paths in [('static',files+['assets/videos/'+n for n in names]),('media-origin',['agent-control-overview.mp4'])]:
+for kind,paths in [('static',files+['assets/videos/'+n for n in names]),
+                   ('media-origin',['agent-control-overview.mp4','agent-control-live-run.mp4'])]:
     rows=[]
     target=stage/kind
     for name in paths:
@@ -46,6 +57,8 @@ scp -P 2222 scripts/apply-agent-control-site.py "cottageserver:$remote_stage/app
 python3 scripts/apply-agent-control-site.py /fast/media/lozknowles.com "$prep/media-origin"
 curl --fail --silent --show-error --range 0-1023 --output "$prep/media-range.bin" --dump-header "$prep/media-range.headers" https://lozknowles.com/assets/videos/agent-control-overview.mp4
 grep -q '206 Partial Content' "$prep/media-range.headers"
+curl --fail --silent --show-error --range 0-1023 --output "$prep/live-run-range.bin" --dump-header "$prep/live-run-range.headers" https://lozknowles.com/assets/videos/agent-control-live-run.mp4
+grep -q '206 Partial Content' "$prep/live-run-range.headers"
 ssh -p 2222 -o BatchMode=yes cottageserver python3 "$remote_stage/apply.py" /var/www/lozknowles.com/public_html/dist "$remote_stage"
 printf 'Static rollback: cottageserver:%s/rollback.json\nMedia rollback: hpubuntu:%s/media-origin/rollback.json\n' "$remote_stage" "$prep"
 printf '%s\n' "$remote_stage" > "$prep/remote-stage.txt"

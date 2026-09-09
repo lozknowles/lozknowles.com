@@ -13,8 +13,9 @@ manifest=json.loads((stage/'deploy-manifest.json').read_text())
 files=manifest['files']
 expected={'index.html','assets/cv.css','agent-control.html','assets/agent-control.css',
     'assets/videos/agent-control-overview-poster.jpg',
-    'assets/videos/agent-control-overview.en.vtt','assets/videos/agent-control-overview-transcript.html'}
-if manifest.get('kind')=='media-origin':expected={'agent-control-overview.mp4'}
+    'assets/videos/agent-control-overview.en.vtt','assets/videos/agent-control-overview-transcript.html',
+    'assets/videos/agent-control-live-run-poster.jpg','assets/videos/agent-control-live-run-transcript.html'}
+if manifest.get('kind')=='media-origin':expected={'agent-control-overview.mp4','agent-control-live-run.mp4'}
 if {e['path'] for e in files}!=expected or len(files)!=len(expected):
     raise SystemExit('Unexpected publication file list.')
 protected=manifest.get('protected',[])

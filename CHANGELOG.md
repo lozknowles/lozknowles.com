@@ -2,6 +2,9 @@
 
 ## Unreleased
 
+- Added the accepted continuous Agent Control live-run video beside the narrated POE tour, showing all operational views, live Crew activity, context/token telemetry, a sealed baton, Qwen → Codex handoff and independent verification.
+- Published the complete naturally generated execution transcript for the live run instead of substituting a release summary.
+- Extended the scoped Agent Control deployment and rollback manifests to cover both showcase videos and the new poster/transcript assets.
 - Required HTML responses to revalidate so an already-cached profile cannot hide newly published controls.
 - Added a References button to the professional profile and a matching popup carousel for seven supplied colleague and client testimonials.
 - Replaced the detailed public CV with a privacy-reduced one-page professional profile.

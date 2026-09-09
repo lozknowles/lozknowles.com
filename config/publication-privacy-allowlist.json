@@ -25,6 +25,16 @@
       "code": "ai-provider-openai",
       "path": "assets/videos/agent-control-overview-transcript.html",
       "reason": "Intentional provider attribution spoken and shown in the operator-requested Agent Control tutorial; preserves accurate captions/transcript. No credential, account identifier or private host is disclosed."
+    },
+    {
+      "code": "ai-provider-openai",
+      "path": "assets/videos/agent-control-live-run-transcript.html",
+      "reason": "Intentional provider and model-route attribution in the complete Agent Control execution transcript. It preserves the naturally generated model-change record; no credential material or private host path is disclosed."
+    },
+    {
+      "code": "ai-provider-llama",
+      "path": "assets/videos/agent-control-live-run-transcript.html",
+      "reason": "Intentional local-provider attribution in the complete Agent Control execution transcript. It preserves the naturally generated source route; no credential material or private host path is disclosed."
     }
   ]
 }
