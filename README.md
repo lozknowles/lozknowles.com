@@ -73,11 +73,14 @@ verification expectations.
 
 Large MP4 files may be kept outside Git and deployed separately to `assets/videos/`, or served from a media origin configured by the operator. The host should support HTTP byte-range requests so browsers can seek efficiently. `assets/project-video.js` pauses inactive videos, prevents overlapping playback, and restores poster images when media is unavailable.
 
-The Agent Control showcase intentionally presents two distinct records: an
-edited narrated tour and a continuous silent live-run recording. The live run
+The Agent Control showcase intentionally presents three distinct records: an
+edited narrated tour, a continuous silent live-run recording, and the complete
+non-OpenAI prompt/KV cache qualification. The live run
 links to Agent Control's complete naturally generated execution transcript so
 the model change, sealed baton, verification and token reconciliation remain
-inspectable rather than being replaced by a release summary. Large media and
+inspectable rather than being replaced by a release summary. Video 3 preserves
+the exact final qualification MP4 and shows authoritative cache counters change
+across three cold, warm and changed-prefix cycles. Large media and
 generated transcript files remain outside Git and pass through the scoped
 Agent Control publication procedure in `AGENT-CONTROL-PUBLICATION.md`.
 

@@ -2,9 +2,10 @@
 
 ## Unreleased
 
+- Added Video 3 to the POE showcase: the exact continuous 1080p non-OpenAI prompt/KV cache qualification recording, with visible cold, warm and changed-prefix measurements and all nine independently verified Work Parcels.
 - Added the accepted continuous Agent Control live-run video beside the narrated POE tour, showing all operational views, live Crew activity, context/token telemetry, a sealed baton, Qwen → Codex handoff and independent verification.
 - Published the complete naturally generated execution transcript for the live run instead of substituting a release summary.
-- Extended the scoped Agent Control deployment and rollback manifests to cover both showcase videos and the new poster/transcript assets.
+- Extended the scoped Agent Control deployment and rollback manifests to cover all three showcase videos and their poster/transcript assets.
 - Reconciled the Agent Control deployment guard with the current independently deployed Cheeky Phone files while continuing to protect them from replacement.
 - Required HTML responses to revalidate so an already-cached profile cannot hide newly published controls.
 - Added a References button to the professional profile and a matching popup carousel for seven supplied colleague and client testimonials.

@@ -42,6 +42,20 @@ labels in that transcript have narrow path-and-rule privacy allowances. The
 video, poster and transcript remain outside Git and are deployed through the
 existing reviewed Agent Control media path.
 
+## Non-OpenAI cache qualification, 9 September 2026
+
+Video 3 is the exact final 9:44 Agent Control physical-qualification MP4, not an
+edited, re-encoded or reconstructed substitute. It records three matched cold,
+warm and changed-prefix cycles through a local Qwen/llama.cpp route. Direct
+backend counters change from `0 / 1328` reused/processed prompt tokens when cold,
+to `1327 / 1` warm, and `497 / 839` after changing the relevant prefix. Every one
+of the nine real Work Parcels passed independent verification. The measured warm
+prompt-processing speedup is 30.45×. No monetary saving or warm-expert delegation
+is claimed.
+
+The MP4 remains outside Git in the existing media origin. Its poster is a
+representative final qualification frame. Video 1 and Video 2 are unchanged.
+
 The current Cheeky Phone page and assets remain independent of this publication.
 Their public/server hashes were reconciled before deployment and are retained
 as protected drift guards; this procedure neither sources nor replaces them.
@@ -53,7 +67,7 @@ large media. The MP4 belongs in the existing hpubuntu media origin because
 Apache already proxies `/assets/videos/*.mp4` there with byte-range support.
 Poster, captions and transcript are static files under `assets/videos/`.
 
-Stage the allowlisted static files and two MP4s against their current deployed
+Stage the allowlisted static files and three MP4s against their current deployed
 hashes. Back up exact replaced files outside the public roots. Retain the
 Cheeky Phone page and three asset hashes as protected drift guards. Use the
 existing atomic applier and publish the homepage last. Keep public directories

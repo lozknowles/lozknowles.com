@@ -34,10 +34,11 @@ baseline={
 }
 files=['assets/cv.css','agent-control.html','assets/agent-control.css','index.html']
 names=['agent-control-overview-poster.jpg','agent-control-overview.en.vtt','agent-control-overview-transcript.html',
-       'agent-control-live-run-poster.jpg','agent-control-live-run-transcript.html']
+       'agent-control-live-run-poster.jpg','agent-control-live-run-transcript.html',
+       'agent-control-cache-qualification-poster.jpg']
 commit=subprocess.check_output(['git','rev-parse','HEAD'],text=True).strip()
 for kind,paths in [('static',files+['assets/videos/'+n for n in names]),
-                   ('media-origin',['agent-control-overview.mp4','agent-control-live-run.mp4'])]:
+                   ('media-origin',['agent-control-overview.mp4','agent-control-live-run.mp4','agent-control-cache-qualification.mp4'])]:
     rows=[]
     target=stage/kind
     for name in paths:
@@ -67,6 +68,8 @@ curl --fail --silent --show-error --range 0-1023 --output "$prep/media-range.bin
 grep -q '206 Partial Content' "$prep/media-range.headers"
 curl --fail --silent --show-error --range 0-1023 --output "$prep/live-run-range.bin" --dump-header "$prep/live-run-range.headers" https://lozknowles.com/assets/videos/agent-control-live-run.mp4
 grep -q '206 Partial Content' "$prep/live-run-range.headers"
+curl --fail --silent --show-error --range 0-1023 --output "$prep/cache-run-range.bin" --dump-header "$prep/cache-run-range.headers" https://lozknowles.com/assets/videos/agent-control-cache-qualification.mp4
+grep -q '206 Partial Content' "$prep/cache-run-range.headers"
 ssh -p 2222 -o BatchMode=yes cottageserver python3 "$remote_stage/apply.py" /var/www/lozknowles.com/public_html/dist "$remote_stage"
 printf 'Static rollback: cottageserver:%s/rollback.json\nMedia rollback: hpubuntu:%s/media-origin/rollback.json\n' "$remote_stage" "$prep"
 printf '%s\n' "$remote_stage" > "$prep/remote-stage.txt"
