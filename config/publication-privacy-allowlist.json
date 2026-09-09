@@ -15,6 +15,16 @@
       "code": "local-unix-path",
       "path": "*vendor/tesseract-core/*.js",
       "reason": "Tesseract Emscripten virtual filesystem, not a deployment-host path"
+    },
+    {
+      "code": "ai-provider-openai",
+      "path": "assets/videos/agent-control-overview.en.vtt",
+      "reason": "Intentional provider attribution spoken and shown in the operator-requested Agent Control tutorial; preserves accurate captions/transcript. No credential, account identifier or private host is disclosed."
+    },
+    {
+      "code": "ai-provider-openai",
+      "path": "assets/videos/agent-control-overview-transcript.html",
+      "reason": "Intentional provider attribution spoken and shown in the operator-requested Agent Control tutorial; preserves accurate captions/transcript. No credential, account identifier or private host is disclosed."
     }
   ]
 }
