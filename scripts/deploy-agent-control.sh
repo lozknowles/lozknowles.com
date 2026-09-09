@@ -28,6 +28,7 @@ baseline={
     'assets/videos/agent-control-overview.en.vtt':'33f4f1e6cd13fc514b6402190615e555e49372fe319ed80a31dd4a493e53e47b',
     'assets/videos/agent-control-overview-transcript.html':'8c35389d8f48faa19a7d36b5ecd861f88b5ff603d715099244bec3ea88e07628',
     'agent-control-overview.mp4':'6b4c0326bf62e74fc3fdbe027d9f780195c30e3b7bb16b91c991cc0197c912a8',
+    'agent-control-live-run.mp4':'cb61e287a5fa711e9a351510cde60253c63238abe481cf2fa509c82bb4020cf1',
 }
 files=['assets/cv.css','agent-control.html','assets/agent-control.css','index.html']
 names=['agent-control-overview-poster.jpg','agent-control-overview.en.vtt','agent-control-overview-transcript.html',
