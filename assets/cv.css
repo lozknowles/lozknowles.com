@@ -4,7 +4,10 @@
   gap: 1.25rem;
 }
 
-.mobile-murmuration-link {
+.mobile-murmuration-link,
+.mobile-agent-control-link,
+.mobile-area51-link,
+.mobile-contact-link {
   display: none;
 }
 
@@ -48,6 +51,10 @@
 }
 
 @media (max-width: 800px) {
+  .hero.section-pad {
+    padding-top: 10rem;
+  }
+
   .nav-shell {
     mix-blend-mode: normal;
   }
@@ -58,12 +65,18 @@
     top: 1.2rem;
     right: var(--pad);
     display: flex !important;
+    flex-wrap: wrap;
+    justify-content: flex-end;
+    max-width: calc(100vw - 5rem);
     gap: 0.5rem;
     margin-left: auto;
     isolation: isolate;
   }
 
   .mobile-murmuration-link,
+  .mobile-agent-control-link,
+  .mobile-area51-link,
+  .mobile-contact-link,
   .cv-popup-link {
     display: inline-flex;
     align-items: center;
@@ -85,6 +98,9 @@
 
 @media (max-width: 380px) {
   .mobile-murmuration-link,
+  .mobile-agent-control-link,
+  .mobile-area51-link,
+  .mobile-contact-link,
   .cv-popup-link {
     padding-right: 0.55rem;
     padding-left: 0.55rem;

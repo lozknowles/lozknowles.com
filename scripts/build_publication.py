@@ -25,6 +25,7 @@ ROOT_FILES = (
     "references.html",
     "murmuration.html",
     "cheeky-phone.html",
+    "agent-control.html",
     "LawrenceKnowlesProfessionalProfile.pdf",
 )
 ASSET_FILES = (
@@ -32,6 +33,7 @@ ASSET_FILES = (
     "cv-page.js",
     "cv-popup.js",
     "cv.css",
+    "agent-control.css",
     "references-page.js",
     "flowers-yU5JYxV5.jpg",
     "hand-sgfIbAv9.jpg",
