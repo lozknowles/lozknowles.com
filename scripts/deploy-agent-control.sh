@@ -1,47 +1,55 @@
 #!/usr/bin/env bash
-# Scoped deployment using the site's existing SSH/rsync/Apache process.
+# Run on the existing hpubuntu media host. Stage only the reviewed files.
 set -euo pipefail
-: "${DEPLOY_HOST:?Set verified SSH host}"
-: "${DEPLOY_PATH:?Set verified existing public document root}"
-: "${LIVE_URL:?Set public HTTPS origin}"
-: "${SITE_MEDIA_DIR:?Set reviewed media directory}"
+: "${SITE_MEDIA_DIR:?Set accepted media directory}"
 : "${MEDIA_REVIEW_MANIFEST:?Set accepted media review manifest}"
-DEPLOY_PORT=${DEPLOY_PORT:-2222}
-[[ "$DEPLOY_HOST" =~ ^[A-Za-z0-9_.@-]+$ && "$DEPLOY_HOST" != -* ]] || exit 2
-[[ "$DEPLOY_PATH" =~ ^/[A-Za-z0-9_./-]+$ && "$DEPLOY_PATH" != / && "$DEPLOY_PATH" != *..* ]] || exit 2
-[[ "$DEPLOY_PORT" =~ ^[0-9]+$ && "$LIVE_URL" == https://* ]] || exit 2
 ROOT="$(cd -- "$(dirname -- "${BASH_SOURCE[0]}")/.." && pwd)"
 cd "$ROOT"
-test -z "$(git status --porcelain)" || { echo 'Commit the reviewed site source before deployment.'; exit 2; }
+test -z "$(git status --porcelain)" || { echo 'Commit the reviewed site source first.'; exit 2; }
+test "$(hostname -s)" = hpubuntu
 python3 -m unittest discover -s tests -p 'test_*.py'
 python3 scripts/build_publication.py
 curl --fail --silent --show-error --location --output /dev/null https://github.com/lozknowles/agent-control/releases/tag/v4.1.0
 prep=$(mktemp -d /var/tmp/agent-control-site-local.XXXXXXXX)
 python3 - "$prep" "$SITE_MEDIA_DIR" "$MEDIA_REVIEW_MANIFEST" <<'PY'
-import pathlib,json,hashlib,subprocess,shutil,sys
-stage,media,accepted=map(pathlib.Path,sys.argv[1:])
+from pathlib import Path
+import json,hashlib,subprocess,shutil,sys
+stage,media,accepted=map(Path,sys.argv[1:])
 review=json.loads(accepted.read_text())
-assert review['privacyAccepted'] is True and review['synchronizationAccepted'] is True and review['listeningAccepted'] is True
+assert review['privacyAccepted'] is True and review['synchronizationAccepted'] is True and review['operatorAccepted'] is True
+assert review['publicReady'] is True
+sha=lambda p:hashlib.sha256(p.read_bytes()).hexdigest()
+baseline={'index.html':'7db569c57eba02ec67fdcf95cb65c9103293d862560e70162b679067bb355648','assets/cv.css':'c0c5675930bcb1c4ac918f254f6a994e6cffb768f94741402fca04009dedaa7f'}
 files=['assets/cv.css','agent-control.html','assets/agent-control.css','index.html']
-names=['agent-control-overview.mp4','agent-control-overview-poster.jpg','agent-control-overview.en.vtt','agent-control-overview-transcript.html']
-rows=[]
-for name in files+['assets/videos/'+n for n in names]:
-    source=media/pathlib.Path(name).name if name.startswith('assets/videos/') else pathlib.Path('build/publication')/name
-    sha=hashlib.sha256(source.read_bytes()).hexdigest()
-    if name.startswith('assets/videos/'):assert review['files'][source.name]['sha256']==sha,source.name
-    baseline=None
-    if name in ['index.html','assets/cv.css']:
-        baseline=hashlib.sha256(subprocess.check_output(['git','show','b846a4165a4628be48274089bbd14d2d3bb89428:'+name])).hexdigest()
-    dest=stage/'new'/name;dest.parent.mkdir(parents=True,exist_ok=True);shutil.copyfile(source,dest)
-    rows.append(dict(path=name,sha256=sha,baselineSha256=baseline))
-(stage/'deploy-manifest.json').write_text(json.dumps(dict(siteCommit=subprocess.check_output(['git','rev-parse','HEAD'],text=True).strip(),files=rows),indent=2))
+names=['agent-control-overview-poster.jpg','agent-control-overview.en.vtt','agent-control-overview-transcript.html']
+commit=subprocess.check_output(['git','rev-parse','HEAD'],text=True).strip()
+for kind,paths in [('static',files+['assets/videos/'+n for n in names]),('media-origin',['agent-control-overview.mp4'])]:
+    rows=[]
+    target=stage/kind
+    for name in paths:
+        source=media/Path(name).name if name.startswith('assets/videos/') or kind=='media-origin' else Path('build/publication')/name
+        digest=sha(source)
+        if source.parent==media:assert review['files'][source.name]['sha256']==digest,source.name
+        dest=target/'new'/name;dest.parent.mkdir(parents=True,exist_ok=True);shutil.copyfile(source,dest)
+        rows.append(dict(path=name,sha256=digest,baselineSha256=baseline.get(name)))
+    manifest=dict(siteCommit=commit,kind=kind,files=rows)
+    if kind=='static':
+        original=json.loads(Path('/fast/qualification/poe-dashboard-operator-20260908/site-access-review-20260909/server-readonly.json').read_text())
+        manifest['protected']=[dict(path=n,sha256=original['live'][n]['sha256']) for n in ['cheeky-phone.html','assets/cheeky-phone.css','assets/cheeky-phone.js','assets/cheeky-nav.css']]
+    (target/'deploy-manifest.json').write_text(json.dumps(manifest,indent=2))
 PY
-ssh_options=(-p "$DEPLOY_PORT" -o BatchMode=yes -o ConnectTimeout=15)
-remote_stage=$(ssh "${ssh_options[@]}" "$DEPLOY_HOST" 'mktemp -d /var/tmp/agent-control-site-deploy.XXXXXXXX')
-[[ "$remote_stage" =~ ^/var/tmp/agent-control-site-deploy\.[A-Za-z0-9]+$ ]] || exit 2
-rsync -a -e "ssh -p $DEPLOY_PORT -o BatchMode=yes" "$prep/" "$DEPLOY_HOST:$remote_stage/"
-scp -P "$DEPLOY_PORT" scripts/apply-agent-control-site.py "$DEPLOY_HOST:$remote_stage/apply.py"
-ssh "${ssh_options[@]}" "$DEPLOY_HOST" python3 "$remote_stage/apply.py" "$DEPLOY_PATH" "$remote_stage"
-python3 scripts/publication_privacy.py --allowlist config/publication-privacy-allowlist.json site "${LIVE_URL%/}/"
-printf 'Scoped files installed. Rollback record: %s/rollback.json\n' "$remote_stage"
-printf 'Complete actual public playback, seeking, captions and mobile checks: %s/agent-control.html\n' "${LIVE_URL%/}"
+remote_stage=$(ssh -p 2222 -o BatchMode=yes -o ConnectTimeout=15 cottageserver 'mktemp -d /var/tmp/agent-control-site-deploy.XXXXXXXX')
+[[ "$remote_stage" =~ ^/var/tmp/agent-control-site-deploy\.[A-Za-z0-9]+$ ]]
+rsync -a -e 'ssh -p 2222 -o BatchMode=yes' "$prep/static/" "cottageserver:$remote_stage/"
+scp -P 2222 scripts/apply-agent-control-site.py "cottageserver:$remote_stage/apply.py"
+# The existing Apache MP4 rule proxies to this existing private media origin.
+python3 scripts/apply-agent-control-site.py /fast/media/lozknowles.com "$prep/media-origin"
+curl --fail --silent --show-error --range 0-1023 --output "$prep/media-range.bin" --dump-header "$prep/media-range.headers" https://lozknowles.com/assets/videos/agent-control-overview.mp4
+grep -q '206 Partial Content' "$prep/media-range.headers"
+ssh -p 2222 -o BatchMode=yes cottageserver python3 "$remote_stage/apply.py" /var/www/lozknowles.com/public_html/dist "$remote_stage"
+printf 'Static rollback: cottageserver:%s/rollback.json\nMedia rollback: hpubuntu:%s/media-origin/rollback.json\n' "$remote_stage" "$prep"
+printf '%s\n' "$remote_stage" > "$prep/remote-stage.txt"
+# Run the full existing scanner separately through the trusted LAN route to avoid
+# Fail2ban bans from required negative probes. Retain all existing findings and
+# compare before/after. Do not alter scan rules, allowlists or authentication.
+printf 'Installed. Complete public browser checks and unchanged full before/after privacy scan.\n'

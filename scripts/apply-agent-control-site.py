@@ -12,10 +12,16 @@ if not root.is_dir() or stage==root or stage.is_relative_to(root):
 manifest=json.loads((stage/'deploy-manifest.json').read_text())
 files=manifest['files']
 expected={'index.html','assets/cv.css','agent-control.html','assets/agent-control.css',
-    'assets/videos/agent-control-overview.mp4','assets/videos/agent-control-overview-poster.jpg',
+    'assets/videos/agent-control-overview-poster.jpg',
     'assets/videos/agent-control-overview.en.vtt','assets/videos/agent-control-overview-transcript.html'}
+if manifest.get('kind')=='media-origin':expected={'agent-control-overview.mp4'}
 if {e['path'] for e in files}!=expected or len(files)!=len(expected):
     raise SystemExit('Unexpected publication file list.')
+protected=manifest.get('protected',[])
+for e in protected:
+    target=root/e['path']
+    if not target.resolve().is_relative_to(root) or not target.is_file() or digest(target)!=e['sha256']:
+        raise SystemExit('Protected existing content drift: '+e['path'])
 for e in files:
     target=root/e['path'];source=stage/'new'/e['path']
     if not target.resolve().is_relative_to(root) or target.is_symlink() or not target.parent.is_dir():
@@ -53,6 +59,7 @@ try:
         written.append(e)
     for e in files:
         assert digest(root/e['path'])==e['sha256'],e['path']
+    for e in protected:assert digest(root/e['path'])==e['sha256'],e['path']
 except BaseException:
     # Restore the old menu first so no link points to partially restored media.
     for e in sorted(written,key=lambda e:e['path']!='index.html'):

@@ -5,7 +5,9 @@
 }
 
 .mobile-murmuration-link,
-.mobile-agent-control-link {
+.mobile-agent-control-link,
+.mobile-area51-link,
+.mobile-contact-link {
   display: none;
 }
 
@@ -49,6 +51,10 @@
 }
 
 @media (max-width: 800px) {
+  .hero.section-pad {
+    padding-top: 10rem;
+  }
+
   .nav-shell {
     mix-blend-mode: normal;
   }
@@ -69,6 +75,8 @@
 
   .mobile-murmuration-link,
   .mobile-agent-control-link,
+  .mobile-area51-link,
+  .mobile-contact-link,
   .cv-popup-link {
     display: inline-flex;
     align-items: center;
@@ -91,6 +99,8 @@
 @media (max-width: 380px) {
   .mobile-murmuration-link,
   .mobile-agent-control-link,
+  .mobile-area51-link,
+  .mobile-contact-link,
   .cv-popup-link {
     padding-right: 0.55rem;
     padding-left: 0.55rem;

@@ -58,3 +58,31 @@ tests. Headless browser checks pass at 1920, 390 and 320 pixels, and the desktop
 overview and narrow mobile homepage screenshots have been visually reviewed.
 The referenced media and v4.1.0 release are still pending; no public playback,
 seeking, caption or deployment success is claimed.
+
+
+## Accepted publication, 9 September 2026
+
+The operator authorized publication of the edited genuine 6:12 POE tour and
+three homepage links: POE Demo after Murmuration, Cheeky Phone, and Area 51
+(https://sites.lozknowles.com) immediately before Contact. Desktop and mobile
+navigation carry these links. Cheeky Phone's existing page/assets are protected
+by deployment hashes; the restored homepage is the expected live baseline.
+
+The MP4 belongs in the existing hpubuntu media origin. Apache already proxies
+`/assets/videos/*.mp4` there and the media server supports byte ranges. Poster,
+captions and transcript remain static website files. The scoped deployment
+stages seven static files and one MP4, verifies drift and hashes, retains private
+rollback records and replaces the homepage last. No service configuration or
+authentication changes are required.
+
+The earlier scan's negative probes of `.htaccess` and `server-status` caused
+Fail2ban to ban the home's public IP. Removing only that runtime ban restored
+normal public-address access. Subsequent full before/after scans retain all
+rules, probes and allowlists while resolving the site to its existing trusted
+LAN address within that scanner process only; TLS/SNI are preserved. Five
+pre-existing wider-site findings remain separate and are not suppressed. Public
+homepage, media and navigation checks use the normal website address.
+
+Area 51's requested hostname had no DNS record at preparation time. Its menu
+destination is preserved exactly as requested; destination availability is a
+separate verification result.
