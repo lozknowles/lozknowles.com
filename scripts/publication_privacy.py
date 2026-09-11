@@ -470,6 +470,13 @@ def canonical_url(url: str) -> str:
     return urlunsplit((split.scheme.lower(), split.netloc.lower(), path, split.query, ""))
 
 
+def source_map_probe_url(url: str) -> str:
+    # Append to the asset path, not its cache-version query. Otherwise dropping
+    # the query later turns a negative probe into a request for the real asset.
+    split = urlsplit(url)
+    return canonical_url(urlunsplit((split.scheme, split.netloc, split.path + ".map", "", "")))
+
+
 def same_site(first: str, second: str) -> bool:
     first_host = (urlsplit(first).hostname or "").lower().removeprefix("www.")
     second_host = (urlsplit(second).hostname or "").lower().removeprefix("www.")
@@ -649,7 +656,7 @@ def scan_site(base_url: str, *, includes: Iterable[str] = (), max_urls: int = 25
                         if same_site(base, candidate) and candidate not in visited:
                             queue.append(candidate)
                     if urlsplit(url).path.lower().endswith((".js", ".css")):
-                        derived_map_urls.add(canonical_url(url + ".map"))
+                        derived_map_urls.add(source_map_probe_url(url))
                 else:
                     findings.extend(scan_binary(path, data))
 

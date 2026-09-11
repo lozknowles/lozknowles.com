@@ -9,10 +9,19 @@ from pathlib import Path
 from scripts.build_publication import ASSET_FILES, ROOT_FILES
 from scripts.build_course_matcher_publication import strip_source_map_directive
 from scripts.build_publication import normalise_public_permissions
-from scripts.publication_privacy import Finding, scan_artifact, scan_text, split_allowed, AllowEntry
+from scripts.publication_privacy import Finding, scan_artifact, scan_text, split_allowed, AllowEntry, source_map_probe_url
 
 
 class PublicationPrivacyTests(unittest.TestCase):
+    def test_versioned_assets_probe_the_map_path_not_the_runtime_asset(self) -> None:
+        for asset in ("arcade.css", "arcade.js"):
+            for suffix in ("", "?v=20260911-1", "?v=20260911-1#section"):
+                with self.subTest(asset=asset, suffix=suffix):
+                    self.assertEqual(
+                        source_map_probe_url(f"https://example.test/assets/{asset}{suffix}"),
+                        f"https://example.test/assets/{asset}.map",
+                    )
+
     def test_html_responses_require_revalidation(self) -> None:
         htaccess = (Path(__file__).parents[1] / ".htaccess").read_text(
             encoding="utf-8"
