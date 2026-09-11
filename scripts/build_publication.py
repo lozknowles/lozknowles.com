@@ -43,6 +43,7 @@ ASSET_FILES = (
     "murmuration.css",
     "arcade.css",
     "arcade.js",
+    "arcade-centipede.js",
     "arcade-nav.css",
     "arcade-sequence.css",
     "arcade-scene.html",
