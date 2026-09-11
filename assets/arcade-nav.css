@@ -1,0 +1,3 @@
+.mobile-arcade-link{display:none}
+@media(min-width:801px) and (max-width:1440px){.nav-shell nav{gap:clamp(.55rem,1.1vw,1rem)}.nav-shell nav a{font-size:.62rem}.nav-shell .signal-link{display:none}}
+@media(max-width:800px){.mobile-arcade-link{display:inline-flex;align-items:center;min-height:2rem;padding:.5rem .7rem;border:1px solid #f2f0e8;border-radius:999px;background:#ffdf63;color:#06100f;font-family:monospace;font-size:.7rem;line-height:1;text-decoration:none;text-transform:uppercase}}

@@ -1,0 +1,78 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <meta name="theme-color" content="#100d1b">
+  <meta name="description" content="Pixels, vectors and the games that got Lawrence Knowles into computing. A little arcade nostalgia, from Space Invaders to Donkey Kong.">
+  <title>Insert Coin — Lawrence Knowles' Arcade</title>
+  <link rel="stylesheet" href="/assets/arcade-sequence.css?v=20260911-1">
+  <link rel="stylesheet" href="/assets/arcade.css?v=20260911-1">
+  <script src="/assets/arcade.js?v=20260911-1" defer></script>
+</head>
+<body class="arcade-page">
+  <a class="skip-link" href="#arcade">Skip to the arcade</a>
+  <header class="arcade-nav">
+    <a class="home-mark" href="/" aria-label="Lawrence Knowles, home">LK<span>■</span></a>
+    <nav aria-label="Main navigation">
+      <a href="/">Home</a>
+      <a href="/murmuration.html">Murmuration</a>
+      <a href="/arcade.html" aria-current="page">Arcade</a>
+    </nav>
+    <a class="private-link" href="https://files.lozknowles.com/area-51"><svg viewBox="0 0 16 16" aria-hidden="true"><path d="M4.5 7V4.5a3.5 3.5 0 0 1 7 0V7M3 7h10v8H3ZM8 10v2"/></svg>Area 51 <span> / private</span></a>
+  </header>
+
+  <main>
+    <section class="arcade-intro" aria-labelledby="arcade-title">
+      <div>
+        <p class="eyebrow"><svg class="pixel-alien" viewBox="0 0 11 8" aria-hidden="true"><path d="M2 0h1v1h-1zM8 0h1v1h-1zM3 1h1v1h-1zM7 1h1v1h-1zM2 2h1v1h-1zM3 2h1v1h-1zM4 2h1v1h-1zM5 2h1v1h-1zM6 2h1v1h-1zM7 2h1v1h-1zM8 2h1v1h-1zM1 3h1v1h-1zM2 3h1v1h-1zM4 3h1v1h-1zM5 3h1v1h-1zM6 3h1v1h-1zM8 3h1v1h-1zM9 3h1v1h-1zM0 4h1v1h-1zM1 4h1v1h-1zM2 4h1v1h-1zM3 4h1v1h-1zM4 4h1v1h-1zM5 4h1v1h-1zM6 4h1v1h-1zM7 4h1v1h-1zM8 4h1v1h-1zM9 4h1v1h-1zM10 4h1v1h-1zM0 5h1v1h-1zM2 5h1v1h-1zM3 5h1v1h-1zM4 5h1v1h-1zM5 5h1v1h-1zM6 5h1v1h-1zM7 5h1v1h-1zM8 5h1v1h-1zM10 5h1v1h-1zM0 6h1v1h-1zM2 6h1v1h-1zM8 6h1v1h-1zM10 6h1v1h-1zM3 7h1v1h-1zM4 7h1v1h-1zM6 7h1v1h-1zM7 7h1v1h-1z"/></svg> Lawrence Knowles / the early levels</p>
+        <h1 id="arcade-title">INSERT<br><span>COIN.</span><span class="title-star" aria-hidden="true">✳</span></h1>
+      </div>
+      <div class="intro-copy">
+        <p class="intro-lead">A few pixels.<br>A whole new world.</p>
+        <p>The games that got me into computing.<br>A little nostalgia. A lot of curiosity.<br>One gloriously unlikely arcade mash-up.</p>
+        <a class="text-link" href="#origin">From player to programmer <span aria-hidden="true">↓</span></a>
+      </div>
+    </section>
+
+    <section class="arcade-machine" id="arcade" aria-label="The arcade sequence">
+      <div class="cabinet-header"><span><i aria-hidden="true"></i> FREE PLAY</span><span>NO POCKET MONEY REQUIRED</span><span class="cabinet-number">PLAYER 01 / LOZ</span></div>
+      <div class="screen-surround">
+        <div class="screen-label"><span id="chapter-label">01 / SPACE INVADERS</span><span id="screen-state">LOADING</span></div>
+        <div class="arcade-stage" id="arcade-stage" tabindex="0" role="group" aria-label="Arcade animation. Space to pause or play. Left and right arrows skip five seconds.">
+          <div id="arcade-scene" aria-hidden="true" inert></div>
+          <p id="load-message" class="load-message">LOADING THE GOOD OLD DAYS<span>…</span></p>
+          <noscript><p class="no-script">Enable JavaScript to play this arcade sequence.</p></noscript>
+        </div>
+        <div class="screen-bottom"><span>PIXELS → MAZES → VECTORS → MAYHEM</span><span aria-hidden="true">SPACE / PAUSE</span></div>
+      </div>
+      <div class="control-deck">
+        <div class="transport">
+          <button type="button" id="play-toggle" class="play-button" disabled><span aria-hidden="true">▶</span> Play</button>
+          <button type="button" id="replay" class="utility-button" disabled><span aria-hidden="true">↺</span> Replay</button>
+        </div>
+        <div class="timeline"><label class="sr-only" for="arcade-time">Position in the arcade sequence</label><input id="arcade-time" type="range" min="0" max="134" step="0.1" value="0" disabled><output for="arcade-time" id="time-readout" aria-hidden="true">0:00 / 2:14</output></div>
+        <button type="button" id="fullscreen" class="utility-button fullscreen-button" disabled><span aria-hidden="true">⛶</span> Full screen</button>
+      </div>
+      <p class="player-status" id="player-status" role="status">Preparing the arcade.</p>
+    </section>
+
+    <div class="chapter-strip" role="group" aria-label="Jump to an arcade chapter">
+      <p>LEVEL<br>SELECT <span aria-hidden="true">→</span></p>
+      <button type="button" data-seek="0" disabled aria-pressed="true"><span>01 / 0:00</span>Invaders</button>
+      <button type="button" data-seek="9.2" disabled aria-pressed="false"><span>02 / 0:09</span>Pac-Man</button>
+      <button type="button" data-seek="46" disabled aria-pressed="false"><span>03 / 0:46</span>Bomberman</button>
+      <button type="button" data-seek="70.5" disabled aria-pressed="false"><span>04 / 1:10</span>The tunnel</button>
+      <button type="button" data-seek="80.5" disabled aria-pressed="false"><span>05 / 1:20</span>Tempest</button>
+      <button type="button" data-seek="97" disabled aria-pressed="false"><span>06 / 1:37</span>Donkey Kong</button>
+    </div>
+
+    <section class="origin-story" id="origin" aria-labelledby="origin-title">
+      <div class="origin-heading"><p class="eyebrow">The next level</p><h2 id="origin-title">FROM PLAYER<br>TO <span>PROGRAMMER.</span></h2><p class="story-signoff">Same curiosity. Bigger playground.</p></div>
+      <div class="origin-copy"><p>Arcade games were my way into computing. A screen full of moving pixels was an invitation to find out how it all worked.</p><p>At 17, I wrote <strong>Space Bike for the Commodore 64</strong>. It was published alongside ten other Imagineered games. Limited memory made room for imagination.</p><p>That thread runs through the things I build today: try an idea, see what happens, then have another go.</p><a class="text-link" href="/#work">See where that curiosity went <span aria-hidden="true">↗</span></a></div>
+    </section>
+    <aside class="bonus-line" aria-label="A little programming nostalgia"><span>READY.</span><code>10 PRINT "WHAT IF?"<br>20 GOTO 10</code><svg class="bonus-alien" viewBox="0 0 11 8" aria-hidden="true"><path d="M2 0h1v1h-1zM8 0h1v1h-1zM3 1h1v1h-1zM7 1h1v1h-1zM2 2h1v1h-1zM3 2h1v1h-1zM4 2h1v1h-1zM5 2h1v1h-1zM6 2h1v1h-1zM7 2h1v1h-1zM8 2h1v1h-1zM1 3h1v1h-1zM2 3h1v1h-1zM4 3h1v1h-1zM5 3h1v1h-1zM6 3h1v1h-1zM8 3h1v1h-1zM9 3h1v1h-1zM0 4h1v1h-1zM1 4h1v1h-1zM2 4h1v1h-1zM3 4h1v1h-1zM4 4h1v1h-1zM5 4h1v1h-1zM6 4h1v1h-1zM7 4h1v1h-1zM8 4h1v1h-1zM9 4h1v1h-1zM10 4h1v1h-1zM0 5h1v1h-1zM2 5h1v1h-1zM3 5h1v1h-1zM4 5h1v1h-1zM5 5h1v1h-1zM6 5h1v1h-1zM7 5h1v1h-1zM8 5h1v1h-1zM10 5h1v1h-1zM0 6h1v1h-1zM2 6h1v1h-1zM8 6h1v1h-1zM10 6h1v1h-1zM3 7h1v1h-1zM4 7h1v1h-1zM6 7h1v1h-1zM7 7h1v1h-1z"/></svg></aside>
+  </main>
+  <footer class="arcade-footer"><a href="/">← Back to lozknowles.com</a><span>STILL CURIOUS. STILL PLAYING.</span><a href="https://files.lozknowles.com/area-51">Area 51 / password protected ↗</a></footer>
+</body>
+</html>
