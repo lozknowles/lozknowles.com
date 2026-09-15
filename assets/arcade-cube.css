@@ -1,0 +1,24 @@
+/* The existing cabinet contains one 3D stage and six game-face selectors. */
+.arcade-stage{cursor:grab;touch-action:none;min-height:350px;background:radial-gradient(ellipse at 50% 48%,#17182e 0%,#0c0d1d 50%,#040610 80%)}
+.arcade-stage:active{cursor:grabbing}
+.arcade-stage canvas{display:block;width:100%;height:100%;position:absolute;inset:0}
+.arcade-stage::after{opacity:.22}
+.arcade-stage::before{display:none}
+.cube-rotation-control{display:flex;gap:20px;align-items:center;flex:1}
+.cube-rotation-control>span{color:var(--muted);font-size:10px;line-height:1.7}
+.cube-rotation-control button{min-width:105px;text-align:left;color:var(--yellow)}
+.cube-face-strip{grid-template-columns:.7fr repeat(6,1fr)}
+.arcade-machine:fullscreen .arcade-stage{min-height:0}
+@media(max-width:800px){
+  .cube-rotation-control{order:3;flex-basis:100%;gap:16px}
+  .cube-face-strip{grid-template-columns:repeat(3,1fr)}
+  .cube-face-strip button:last-child{grid-column:auto;border-left:1px solid var(--line);border-bottom:1px solid var(--line);min-height:70px}
+  .cube-face-strip button:last-child span{display:block;margin-right:0}
+}
+@media(max-width:520px){
+  .arcade-stage{min-height:330px;aspect-ratio:auto}
+  .cube-rotation-control>span{font-size:9px}
+  .cube-rotation-control{gap:10px}
+  .cube-face-strip button{padding:13px 8px}
+  .arcade-machine:fullscreen .cube-rotation-control{order:3;flex-basis:100%}
+}

@@ -6,26 +6,11 @@
   <meta name="theme-color" content="#100d1b">
   <meta name="description" content="Pixels, vectors and the games that got Lawrence Knowles into computing. A little arcade nostalgia, from Space Invaders to Donkey Kong and Centipede.">
   <title>Insert Coin — Lawrence Knowles' Arcade</title>
-  <link rel="stylesheet" href="/assets/arcade-sequence.css?v=20260911-1">
   <link rel="stylesheet" href="/assets/arcade.css?v=20260911-centipede-1">
-  <script type="module" src="/assets/arcade.js?v=20260911-centipede-1"></script>
+  <link rel="stylesheet" href="/assets/arcade-cube.css?v=20260915-cube-1">
+  <script type="module" src="/assets/arcade-cube.js?v=20260915-cube-1"></script>
 </head>
 <body class="arcade-page">
-  <div class="code-rivers" aria-hidden="true" inert>
-    <svg id="code-rivers" viewBox="0 0 1440 1100" preserveAspectRatio="xMidYMid slice" focusable="false" data-flowing="false">
-      <defs>
-        <path id="code-z80" d="M-350 180C180 -100 440 500 790 210S1350 100 1850 410"/>
-        <path id="code-6502" d="M-350 700C50 280 440 830 780 540S1320 330 1850 750"/>
-        <path id="code-68000" d="M-350 1080C150 650 430 1300 880 850S1320 800 1850 990"/>
-      </defs>
-      <text data-code="Z80" dy="0"><textPath href="#code-z80">Z80 · LD HL,SPRITES · LD A,(HL) · INC HL · LD (DE),A · INC DE · DJNZ DRAW · CALL VSYNC · RET · </textPath></text>
-      <text data-code="Z80" dy="17"><textPath href="#code-z80">Z80 · DI · LD SP,$FF00 · XOR A · OUT ($FE),A · LD BC,$0010 · LDIR · EI · HALT · JP LOOP · </textPath></text>
-      <text data-code="6502" dy="0"><textPath href="#code-6502">6502 · LDA #$01 · STA $D020 · LDX #$00 · LDA SPRITES,X · STA $0400,X · INX · BNE DRAW · JSR VSYNC · RTS · </textPath></text>
-      <text data-code="6502" dy="17"><textPath href="#code-6502">6502 · SEI · CLD · LDX #$FF · TXS · LDA $D012 · CMP #$80 · BNE WAIT · INC FRAME · JMP LOOP · </textPath></text>
-      <text data-code="68000" dy="0"><textPath href="#code-68000">68000 · MOVEQ #0,D0 · LEA SCREEN,A0 · MOVE.W D0,(A0)+ · ADDQ.W #1,D0 · DBRA D7,DRAW · JSR VSYNC · RTS · </textPath></text>
-      <text data-code="68000" dy="17"><textPath href="#code-68000">68000 · MOVEM.L D0-D7/A0-A6,-(SP) · MOVE.L #SPRITES,A1 · CMP.W #320,D0 · BNE.S DRAW · ADDQ.L #1,FRAME · </textPath></text>
-    </svg>
-  </div>
   <a class="skip-link" href="#arcade">Skip to the arcade</a>
   <header class="arcade-nav">
     <a class="home-mark" href="/" aria-label="Lawrence Knowles, home">LK<span>■</span></a>
@@ -50,37 +35,35 @@
       </div>
     </section>
 
-    <section class="arcade-machine" id="arcade" aria-label="The arcade sequence">
+    <section class="arcade-machine" id="arcade" aria-label="The neon glass arcade cube">
       <div class="cabinet-header"><span><i aria-hidden="true"></i> FREE PLAY</span><span>NO POCKET MONEY REQUIRED</span><span class="cabinet-number">PLAYER 01 / LOZ</span></div>
       <div class="screen-surround">
-        <div class="screen-label"><span id="chapter-label">01 / SPACE INVADERS</span><span id="screen-state">LOADING</span></div>
-        <div class="arcade-stage" id="arcade-stage" tabindex="0" role="group" aria-label="Arcade animation. Space to pause or play. Left and right arrows skip five seconds.">
-          <div id="arcade-scene" aria-hidden="true" inert></div>
+        <div class="screen-label"><span id="chapter-label">3D / ARCADE CUBE</span><span id="screen-state">LOADING</span></div>
+        <div class="arcade-stage" id="arcade-stage" tabindex="0" role="group" aria-label="Arcade cube. Drag or flick to spin. Space pauses or plays. Left and right arrows select a game face.">
           <p id="load-message" class="load-message">LOADING THE GOOD OLD DAYS<span>…</span></p>
-          <noscript><p class="no-script">Enable JavaScript to play this arcade sequence.</p></noscript>
+          <noscript><p class="no-script">Enable JavaScript to see the arcade cube.</p></noscript>
         </div>
-        <div class="screen-bottom"><span>PIXELS → MAZES → VECTORS → MAYHEM</span><span aria-hidden="true">SPACE / PAUSE</span></div>
+        <div class="screen-bottom"><span>PIXELS → MAZES → VECTORS → MAYHEM</span><span aria-hidden="true">FLICK / SPIN · SPACE / PAUSE</span></div>
       </div>
       <div class="control-deck">
         <div class="transport">
           <button type="button" id="play-toggle" class="play-button" disabled><span aria-hidden="true">▶</span> Play</button>
-          <button type="button" id="replay" class="utility-button" disabled><span aria-hidden="true">↺</span> Replay</button>
+          <button type="button" id="replay" class="utility-button" disabled><span aria-hidden="true">↺</span> Reset</button>
         </div>
-        <div class="timeline"><label class="sr-only" for="arcade-time">Position in the arcade sequence</label><input id="arcade-time" type="range" min="0" max="159" step="0.1" value="0" disabled><output for="arcade-time" id="time-readout" aria-hidden="true">0:00 / 2:39</output></div>
+        <div class="cube-rotation-control"><button type="button" class="utility-button" data-cube-orbit aria-pressed="false" disabled>Rotate cube</button><span>Flick to spin · choose a face below</span></div>
         <button type="button" id="fullscreen" class="utility-button fullscreen-button" disabled><span aria-hidden="true">⛶</span> Full screen</button>
       </div>
       <p class="player-status" id="player-status" role="status">Preparing the arcade.</p>
     </section>
 
-    <div class="chapter-strip" role="group" aria-label="Jump to an arcade chapter">
-      <p>LEVEL<br>SELECT <span aria-hidden="true">→</span></p>
-      <button type="button" data-seek="0" disabled aria-pressed="true"><span>01 / 0:00</span>Invaders</button>
-      <button type="button" data-seek="9.2" disabled aria-pressed="false"><span>02 / 0:09</span>Pac-Man</button>
-      <button type="button" data-seek="46" disabled aria-pressed="false"><span>03 / 0:46</span>Bomberman</button>
-      <button type="button" data-seek="70.5" disabled aria-pressed="false"><span>04 / 1:10</span>The tunnel</button>
-      <button type="button" data-seek="80.5" disabled aria-pressed="false"><span>05 / 1:20</span>Tempest</button>
-      <button type="button" data-seek="97" disabled aria-pressed="false"><span>06 / 1:37</span>Donkey Kong</button>
-      <button type="button" data-seek="116.6" disabled aria-pressed="false"><span>07 / 1:56</span>Centipede</button>
+    <div class="chapter-strip cube-face-strip" role="group" aria-label="Choose an arcade cube face">
+      <p>FACE<br>SELECT <span aria-hidden="true">→</span></p>
+      <button type="button" data-cube-face="0" disabled aria-pressed="false"><span>FACE 01</span>Invaders</button>
+      <button type="button" data-cube-face="1" disabled aria-pressed="false"><span>FACE 02</span>Pac-Man</button>
+      <button type="button" data-cube-face="2" disabled aria-pressed="false"><span>FACE 03</span>Bomberman</button>
+      <button type="button" data-cube-face="3" disabled aria-pressed="false"><span>FACE 04</span>Tempest</button>
+      <button type="button" data-cube-face="4" disabled aria-pressed="false"><span>FACE 05</span>Donkey Kong</button>
+      <button type="button" data-cube-face="5" disabled aria-pressed="false"><span>FACE 06</span>Centipede</button>
     </div>
 
     <section class="origin-story" id="origin" aria-labelledby="origin-title">

@@ -27,6 +27,8 @@ jobs:
           node-version: "22"
       - name: Test privacy rules
         run: python -m unittest discover -s tests -p "test_*.py"
+      - name: Test arcade simulations
+        run: node --test tests/arcade-games.test.mjs
       - name: Check JavaScript syntax
         shell: bash
         run: |
