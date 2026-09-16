@@ -2,6 +2,11 @@
   "version": 1,
   "entries": [
     {
+      "code": "ai-provider-kokoro",
+      "path": "cartoon-view/assets/index-D2ZZdF8d.js",
+      "reason": "Pinned derivative of the already public Cartoon Collingham runtime. Retained speech-provider labels are inactive in the scene-only presentation; no credentials or private service addresses are included."
+    },
+    {
       "code": "local-unix-path",
       "path": "crossword/assets/pdf.worker.min-*.mjs",
       "reason": "PDF.js embedded decoder uses Emscripten virtual /home/web_user, /tmp and /dev paths; these are browser filesystem defaults, not deployment host paths."

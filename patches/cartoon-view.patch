@@ -1,0 +1,192 @@
+--- a/src/App.tsx
++++ b/src/App.tsx
+@@ -102,7 +102,7 @@
+   speaking: false,
+ }
+ 
+-export default function App() {
++export default function App({ sceneOnly = false }: { sceneOnly?: boolean }) {
+   const shell = useRef<HTMLElement>(null!)
+   const guideAudio = useRef<HTMLAudioElement | null>(null)
+   const guideAudioUrl = useRef<string | null>(null)
+@@ -147,7 +147,7 @@
+   })
+   const walkMobileInput = useRef({ strafe: 0, forward: 0 })
+   const walkMobileLook = useRef({ yaw: 0, pitch: 0 })
+-  const environment = useCurrentConditions(atmospherePreview)
++  const environment = useCurrentConditions(atmospherePreview, !sceneOnly)
+   const atmosphericEvening = environment.night > 0.52
+   const surveyQuery = useMemo(() => typeof window === 'undefined' ? null : new URLSearchParams(window.location.search), [])
+   const walkDebugEnabled = surveyQuery?.has('walkDebug') ?? false
+@@ -174,11 +174,13 @@
+   }, [])
+ 
+   useEffect(() => {
++    if (sceneOnly) return
+     try { window.localStorage.setItem(HUD_VISIBILITY_STORAGE_KEY, storedHudVisibility(hudVisible)) }
+     catch { /* local storage is optional */ }
+   }, [hudVisible])
+ 
+   useEffect(() => {
++    if (sceneOnly) return
+     try { window.localStorage.setItem(LANDMARK_VISIBILITY_STORAGE_KEY, storedLandmarkVisibility(landmarkPinsVisible)) }
+     catch { /* local storage is optional */ }
+   }, [landmarkPinsVisible])
+@@ -291,7 +293,7 @@
+     if (!streetSurveyBase) return
+     let saved: StreetSurveyManifest | null = null
+     try {
+-      const raw = window.localStorage.getItem(`cartoon-collingham:street-survey:${surveyStreet}`)
++      const raw = sceneOnly ? null : window.localStorage.getItem(`cartoon-collingham:street-survey:${surveyStreet}`)
+       saved = raw ? JSON.parse(raw) as StreetSurveyManifest : null
+     } catch { saved = null }
+     setSurveyDraft(mergeSurveyDraft(streetSurveyBase, saved))
+@@ -299,7 +301,7 @@
+   }, [streetSurveyBase, surveyStreet])
+ 
+   useEffect(() => {
+-    if (!surveyDraft) return
++    if (sceneOnly || !surveyDraft) return
+     try { window.localStorage.setItem(`cartoon-collingham:street-survey:${surveyStreet}`, JSON.stringify(surveyDraft)) } catch { /* local storage optional */ }
+   }, [surveyDraft, surveyStreet])
+ 
+@@ -358,7 +360,7 @@
+     return streetDetailReviewOn && model && renderMapData ? streetDetailQaPose(model, renderMapData.roads, detailView) : null
+   }, [streetDetails, detailBuildingId, renderMapData, streetDetailReviewOn, detailView])
+   const walkCollisionWorld = useMemo(
+-    () => renderMapData ? buildWalkCollisionWorld(renderMapData) : null,
++    () => !sceneOnly && renderMapData ? buildWalkCollisionWorld(renderMapData) : null,
+     [renderMapData],
+   )
+   const walkPoint = walkMode === 'walking' ? walkPosition : walkPlacement?.point ?? null
+@@ -549,6 +551,7 @@
+   }
+ 
+   useEffect(() => {
++    if (sceneOnly) return
+     let cancelled = false
+     fetch(appApiUrl('api/guide-speech'), { cache: 'no-store' })
+       .then(async (response) => {
+@@ -568,6 +571,7 @@
+   }, [])
+ 
+   useEffect(() => {
++    if (sceneOnly) return
+     const synth = typeof window !== 'undefined' && 'speechSynthesis' in window ? window.speechSynthesis : null
+     const stopAudio = () => {
+       if (guideAudio.current) {
+@@ -832,6 +836,38 @@
+         : guideState?.phase === 'finished'
+           ? 'Tour complete'
+           : `Stop ${(guideState?.stopIndex ?? 0) + 1} of ${guideState?.totalStops ?? tour?.stops.length ?? 0}`
++
++  // The portfolio presentation mounts only the existing village and orbit camera.
++  // No minimap, guide controls, selectable pins or walking UI are created.
++  if (sceneOnly) return (
++    <main ref={shell} className="app-shell app-shell--scene-only" aria-label="Interactive 3D model of Collingham">
++      {renderMapData && (
++        <View className="main-view" index={1}>
++          <VillageScene
++            data={renderMapData}
++            streetDetailModels={streetDetails.models}
++            streetDetailBoundaries={streetBoundaries.models}
++            selectedId={null}
++            onSelect={() => {}}
++            landmarkPinsVisible={false}
++            guideActive={false}
++            guideFollow={false}
++            walkMode="overview"
++            environment={environment}
++          />
++        </View>
++      )}
++      <Canvas className="shared-canvas" eventSource={shell} shadows dpr={[0.82, 1.25]} gl={{ antialias: true, powerPreference: 'high-performance' }}>
++        <View.Port />
++      </Canvas>
++      {(loading || error) && (
++        <section className="load-card" role="status">
++          <div><strong>{loading ? 'Drawing Collingham…' : 'The village could not load.'}</strong>
++          {error && <button type="button" onClick={reload}>Try again</button>}</div>
++        </section>
++      )}
++    </main>
++  )
+ 
+   return (
+     <main ref={shell} className={`app-shell ${streetDetailReviewOn ? 'app-shell--street-review' : ''} ${comparisonFrame ? 'app-shell--comparison-frame' : ''} ${hudVisible ? '' : 'app-shell--hud-hidden'} ${walkMode === 'walking' ? 'app-shell--walking' : walkMode === 'placing' ? 'app-shell--placing' : ''}`}>
+--- a/src/main.tsx
++++ b/src/main.tsx
+@@ -2,9 +2,10 @@
+ import { createRoot } from 'react-dom/client'
+ import App from './App'
+ import './styles.css'
++import './scene-only.css'
+ 
+ createRoot(document.getElementById('root')!).render(
+   <StrictMode>
+-    <App />
++    <App sceneOnly />
+   </StrictMode>,
+ )
+--- /dev/null
++++ b/src/scene-only.css
+@@ -0,0 +1,10 @@
++body { display: flex; flex-direction: column; }
++#root { flex: 1; min-height: 0; height: auto; }
++.app-shell--scene-only { min-height: 0; }
++.map-credit {
++  flex: 0 0 auto; padding: 7px 12px; background: #06100f; color: #b8c7bd;
++  font: 10px/1.5 system-ui, sans-serif; text-align: center;
++}
++.map-credit a { color: inherit; text-underline-offset: 2px; }
++.app-shell--scene-only .load-card { max-width: calc(100% - 32px); }
++.app-shell--scene-only .load-card button { margin-left: 12px; }
+--- a/src/hooks/useCurrentConditions.ts
++++ b/src/hooks/useCurrentConditions.ts
+@@ -71,8 +71,8 @@
+   return `https://api.open-meteo.com/v1/forecast?${params}`
+ }
+ 
+-export function useCurrentConditions(previewMode: EnvironmentPreview = null) {
+-  const [observation, setObservation] = useState<WeatherObservation>(() => cachedObservation() ?? fallbackWeatherObservation())
++export function useCurrentConditions(previewMode: EnvironmentPreview = null, liveWeather = true) {
++  const [observation, setObservation] = useState<WeatherObservation>(() => (liveWeather && cachedObservation()) || fallbackWeatherObservation())
+   const [now, setNow] = useState(() => new Date())
+ 
+   useEffect(() => {
+@@ -92,15 +92,15 @@
+         if ((error as Error).name !== 'AbortError') setObservation((current) => current.source === 'live' ? current : cachedObservation() ?? fallbackWeatherObservation())
+       }
+     }
+-    void refresh()
+-    const refreshTimer = window.setInterval(refresh, COLLINGHAM_WEATHER.refreshMs)
++    if (liveWeather) void refresh()
++    const refreshTimer = liveWeather ? window.setInterval(refresh, COLLINGHAM_WEATHER.refreshMs) : null
+     const clockTimer = window.setInterval(() => setNow(new Date()), 60_000)
+     return () => {
+       controller?.abort()
+-      window.clearInterval(refreshTimer)
++      if (refreshTimer !== null) window.clearInterval(refreshTimer)
+       window.clearInterval(clockTimer)
+     }
+-  }, [])
++  }, [liveWeather])
+ 
+   return useMemo(() => deriveVillageEnvironment(observation, now, previewMode), [now, observation, previewMode])
+ }
+--- a/index.html
++++ b/index.html
+@@ -4,11 +4,12 @@
+     <meta charset="UTF-8" />
+     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+     <meta name="theme-color" content="#d7ebd0" />
+-    <meta name="description" content="Cartoon Collingham — a React Three Fiber village prototype." />
++    <meta name="description" content="Explore a miniature 3D Collingham. Drag to rotate, scroll to zoom and right-drag to pan." />
+     <title>Cartoon Collingham</title>
+   </head>
+   <body>
+     <div id="root"></div>
++    <footer class="map-credit">© <a href="https://www.openstreetmap.org/copyright" target="_blank" rel="noreferrer">OpenStreetMap contributors</a> · Contains OS data © Crown copyright and database right 2026</footer>
+     <script type="module" src="/src/main.tsx"></script>
+   </body>
+ </html>

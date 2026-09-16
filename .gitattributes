@@ -5,3 +5,7 @@
 *.pdf binary
 *.mp3 binary
 *.mp4 binary
+
+# Preserve reviewed runtime hashes and unified patch context exactly.
+/cartoon-view/** -text -whitespace
+/patches/*.patch text eol=lf -whitespace

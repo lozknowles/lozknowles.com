@@ -10,10 +10,11 @@ PAGES = {
     'agent-control.html': 'agent', 'cv.html': 'profile',
     'references.html': 'references', '404.html': 'missing',
     'crossword/index.html': 'crossword',
+    'cartoon-collingham.html': 'village',
 }
 CURRENT = {'arcade': '/arcade.html', 'murmuration': '/murmuration.html',
            'cheeky': '/cheeky-phone.html', 'crossword': '/crossword/',
-           'profile': '/cv.html', 'references': '/cv.html', 'agent': '/#work'}
+           'profile': '/cv.html', 'references': '/cv.html', 'agent': '/#work', 'village': '/#place'}
 
 
 def render_page(text: str, page: str) -> str:

@@ -33,6 +33,7 @@ ROOT_FILES = (
     "arcade.html",
     "cheeky-phone.html",
     "agent-control.html",
+    "cartoon-collingham.html",
     "LawrenceKnowlesProfessionalProfile.pdf",
 )
 ASSET_FILES = (
@@ -41,6 +42,7 @@ ASSET_FILES = (
     "cv-popup.js",
     "cv.css",
     "agent-control.css",
+    "cartoon-view.css",
     "references-page.js",
     "flowers-yU5JYxV5.jpg",
     "hand-sgfIbAv9.jpg",
@@ -139,6 +141,15 @@ def build(output: Path, arcade_media: Path | None = None) -> None:
         copy_file(Path("assets") / name, output)
     if arcade_media is not None:
         copy_arcade_media(arcade_media, output)
+    # The reviewed scene-only derivative is pinned independently of the full app.
+    cartoon = json.loads((ROOT / 'config/cartoon-view.json').read_text(encoding='utf-8'))
+    for name, expected in cartoon['files'].items():
+        relative = Path(name)
+        if not relative.is_relative_to('cartoon-view') or '..' in relative.parts:
+            raise ValueError('Unexpected Cartoon Collingham publication path')
+        if hashlib.sha256((ROOT / relative).read_bytes()).hexdigest() != expected:
+            raise ValueError(f'Cartoon Collingham artifact changed: {name}')
+        copy_file(relative, output)
     build_crossword(output)
     apply_site_shell(output)
     # The embedded header changes the built entry page; record the shipped bytes.

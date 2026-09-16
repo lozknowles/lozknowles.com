@@ -11,6 +11,12 @@ The profile links to a rotating set of supplied professional references at
 
 ## Interactive experiments
 
+Cartoon Collingham is linked from the homepage workbench and Place section at
+`/cartoon-collingham.html`. Its scene-only presentation keeps the 3D village,
+rotation, pan and zoom, with no HUD, menus or first-person mode. The source pin,
+rebuild instructions and publication manifest are documented in
+`docs/cartoon-view.md`.
+
 The homepage, Arcade, Murmuration, Cheeky Phone, Agent Control, profile,
 references, error page and embedded Crossword Studio share a menu from
 `templates/site-header.html`. Update that template, run

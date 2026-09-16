@@ -1,0 +1,21 @@
+{
+  "source": {
+    "repository": "lozknowles/LocalWalks",
+    "revision": "d73f32d83da5b088c1a1cf0e1fe282ddb7a0d25e",
+    "component_revision": "bb74680ea67943ffb79d1f1ccb24828a8491b0fd",
+    "path": "apps/cartoon-collingham",
+    "version": "0.38.0"
+  },
+  "patch": "patches/cartoon-view.patch",
+  "build_environment": {
+    "VITE_BASE_PATH": "/cartoon-view/",
+    "VITE_CARTOON_API_BASE_PATH": "/cartoon-collingham/",
+    "VITE_OVERPASS_REQUEST_FORMAT": "form"
+  },
+  "files": {
+    "cartoon-view/assets/index-CfFWNEFb.css": "f3a441cd1fe1d3d02a1ba01b008a78e24a5d7ad72cd0d52adf072e420d903b5b",
+    "cartoon-view/assets/index-D2ZZdF8d.js": "acc2b0dbbbb8428e3564bb46fbe113c66f1ca01e74ab1c4edb03bd667a3906aa",
+    "cartoon-view/data/os-openmap-buildings.json": "08ffe8eaa53b723e32720dd3b12495e969b9b8ffa2c7628618ce4035a40d16a2",
+    "cartoon-view/index.html": "e8cf72699c0a322f1a21ca0b9c485ae462e49fd579b99556e1705cbacb9d0526"
+  }
+}
