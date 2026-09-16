@@ -5,6 +5,20 @@
   const visible = new Set();
   const userPaused = new Set();
   const managedPauses = new Set();
+  const pending = new Set();
+  const controlInput = new WeakMap();
+  const recoveryAttempts = new WeakMap();
+  const recoveryTimers = new WeakMap();
+
+  function isOnScreen(video) {
+    return !document.hidden && visible.has(video) &&
+      video.closest('.project-card')?.classList.contains('is-active');
+  }
+
+  function clearRecovery(video) {
+    clearTimeout(recoveryTimers.get(video));
+    recoveryTimers.delete(video);
+  }
 
   function pauseVideo(video) {
     if (video.paused) return;
@@ -14,15 +28,36 @@
 
   function updatePlayback() {
     videos.forEach((video) => {
-      const active = video.closest('.project-card')?.classList.contains('is-active');
-      if (document.hidden || !active || !visible.has(video)) {
+      const onScreen = isOnScreen(video);
+      const shouldPlay = onScreen && !navigator.connection?.saveData && !userPaused.has(video);
+      // The native flag also lets the browser start when enough media has loaded.
+      video.autoplay = shouldPlay;
+      if (!onScreen) {
+        clearRecovery(video);
+        recoveryAttempts.delete(video);
         pauseVideo(video);
-      } else if (!navigator.connection?.saveData && !userPaused.has(video) && video.paused) {
-        // Muted, inline playback is accepted by normal browser autoplay policies.
-        // The play control remains available if the browser still declines.
-        video.play().catch(() => {});
+      } else if (shouldPlay && video.paused && !pending.has(video)) {
+        pending.add(video);
+        video.play().then(() => {
+          // A delayed play request must not restart a card after it has left view.
+          if (!isOnScreen(video)) pauseVideo(video);
+        }).catch(() => {
+          // Readiness, page restoration or the next interaction can retry.
+          // Keep the explicit Play control available if autoplay is blocked.
+        }).finally(() => pending.delete(video));
       }
     });
+  }
+
+  function recoverPlayback(video) {
+    if (!isOnScreen(video) || userPaused.has(video) || recoveryTimers.has(video)) return;
+    const attempts = recoveryAttempts.get(video) || 0;
+    if (attempts >= 2) return; // Do not repeatedly fight a browser autoplay policy.
+    recoveryAttempts.set(video, attempts + 1);
+    recoveryTimers.set(video, setTimeout(() => {
+      recoveryTimers.delete(video);
+      updatePlayback();
+    }, 200));
   }
 
   function showFallback(video) {
@@ -52,13 +87,23 @@
     playButton.textContent = "▶";
     container?.append(playButton);
 
-    const keepControlsInteractive = (event) => event.stopPropagation();
+    const keepControlsInteractive = (event) => {
+      controlInput.set(video, performance.now());
+      event.stopPropagation();
+    };
     video.addEventListener("pointerdown", keepControlsInteractive);
     video.addEventListener("pointerup", keepControlsInteractive);
     playButton.addEventListener("pointerdown", keepControlsInteractive);
     playButton.addEventListener("pointerup", keepControlsInteractive);
+    video.addEventListener('keydown', (event) => {
+      if ([' ', 'Enter', 'k', 'K', 'MediaPlayPause'].includes(event.key)) {
+        controlInput.set(video, performance.now());
+      }
+    });
     playButton.addEventListener("click", async (event) => {
       event.stopPropagation();
+      userPaused.delete(video);
+      clearRecovery(video);
       try {
         await video.play();
       } catch (error) {
@@ -70,18 +115,32 @@
     video.addEventListener("error", () => showFallback(video));
     video.addEventListener("play", () => {
       userPaused.delete(video);
-      container?.classList.add("is-playing");
-      playButton.hidden = true;
       if (!video.muted && video.volume > 0) backgroundMusic?.pause();
       videos.forEach((otherVideo) => {
         if (otherVideo !== video) pauseVideo(otherVideo);
       });
     });
+    // 'play' can fire before a single frame is ready; reflect actual playback.
+    video.addEventListener('playing', () => {
+      container?.classList.add('is-playing');
+      playButton.hidden = true;
+    });
     video.addEventListener("pause", () => {
-      if (!managedPauses.delete(video)) userPaused.add(video);
+      const managed = managedPauses.delete(video);
+      const inputTime = controlInput.get(video);
+      controlInput.delete(video);
+      // A browser can pause a hidden/loading video before our observer runs.
+      // Only a pause following an interaction with its controls is user intent.
+      if (!managed && isOnScreen(video) && inputTime !== undefined && performance.now() - inputTime < 1000) {
+        userPaused.add(video);
+        video.autoplay = false;
+      }
       container?.classList.remove("is-playing");
       playButton.hidden = false;
+      if (!managed) recoverPlayback(video);
     });
+    video.addEventListener('loadeddata', updatePlayback);
+    video.addEventListener('canplay', updatePlayback);
     video.addEventListener('volumechange', () => {
       if (!video.paused && !video.muted && video.volume > 0) backgroundMusic?.pause();
     });
@@ -105,4 +164,13 @@
   }, { threshold: [0, .25] });
   videos.forEach(video => viewport.observe(video));
   document.addEventListener("visibilitychange", updatePlayback);
+  window.addEventListener('pageshow', updatePlayback);
+  window.addEventListener('focus', updatePlayback);
+  // Retry within a real gesture if the initial browser play request was denied.
+  ['pointerdown', 'keydown', 'touchstart'].forEach(type => {
+    window.addEventListener(type, event => {
+      if (videos.some(video => video === event.target || video.contains(event.target))) return;
+      updatePlayback();
+    }, { passive: true });
+  });
 })();
