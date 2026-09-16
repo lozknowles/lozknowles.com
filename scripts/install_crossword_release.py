@@ -118,7 +118,7 @@ UMask=0077
 WantedBy=multi-user.target
 '''.encode())
         atomic(route, b'''# Only the public article form is proxied. Documents stay in the browser.
-ProxyPassMatch "^/crossword/api/article$" "http://127.0.0.1:8793/article" connectiontimeout=5 timeout=30
+ProxyPassMatch "^/crossword/api/(article)$" "http://127.0.0.1:8793/$1" connectiontimeout=5 timeout=30
 ProxyPassReverse "/crossword/api/article" "http://127.0.0.1:8793/article"
 <LocationMatch "^/crossword/api/article$">
     LimitRequestBody 4096
