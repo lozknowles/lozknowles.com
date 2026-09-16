@@ -139,13 +139,21 @@
       playButton.hidden = false;
       if (!managed) recoverPlayback(video);
     });
-    video.addEventListener('loadeddata', updatePlayback);
-    video.addEventListener('canplay', updatePlayback);
+    const mediaReady = () => {
+      // Source selection can briefly report NETWORK_NO_SOURCE while loading.
+      // If media recovers, remove any old poster fallback so it can enter view.
+      container?.classList.remove('video-unavailable');
+      container?.querySelector('.video-fallback')?.remove();
+      updatePlayback();
+    };
+    video.addEventListener('loadeddata', mediaReady);
+    video.addEventListener('canplay', mediaReady);
     video.addEventListener('volumechange', () => {
       if (!video.paused && !video.muted && video.volume > 0) backgroundMusic?.pause();
     });
 
-    if (video.networkState === HTMLMediaElement.NETWORK_NO_SOURCE) {
+    // Only a real media error means unavailable; networkState is transitional.
+    if (video.error) {
       showFallback(video);
     }
   });

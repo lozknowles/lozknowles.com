@@ -25,12 +25,14 @@ class Element {
       handler({ target: this, stopPropagation() {}, ...values });
     }
   }
-  append(child) { this.children.push(child); }
+  append(child) { child.parent = this; this.children.push(child); }
+  querySelector(selector) { return this.children.find(child => '.' + child.className === selector); }
+  remove() { this.parent.children = this.parent.children.filter(child => child !== this); }
   setAttribute() {}
   contains(child) { return this === child || this.children.includes(child); }
 }
 
-function setup() {
+function setup({ networkState = 1, error = null } = {}) {
   const document = new Element();
   const window = new Element();
   const timers = new Map();
@@ -42,7 +44,7 @@ function setup() {
     const container = new Element();
     container.closest = () => card;
     const video = new Element();
-    Object.assign(video, { paused: true, volume: 1, networkState: 1, playCalls: 0 });
+    Object.assign(video, { paused: true, volume: 1, networkState, error, playCalls: 0 });
     video.closest = selector => selector === '.project-card' ? card : container;
     video.play = () => {
       video.playCalls++;
@@ -92,6 +94,33 @@ function setup() {
 }
 
 const settled = () => new Promise(resolve => setImmediate(resolve));
+
+test('transient source selection does not replace a healthy video with a still image', async () => {
+  const page = setup({ networkState: 3 });
+  const { video, container } = page.cards[0];
+  assert.equal(container.classList.contains('video-unavailable'), false);
+  video.networkState = 1;
+  video.emit('loadeddata');
+  page.enter();
+  await settled();
+  assert.equal(video.paused, false);
+  assert.equal(container.querySelector('.video-fallback'), undefined);
+});
+
+test('media readiness removes a previous error fallback and restores playback', async () => {
+  const page = setup({ networkState: 3, error: { code: 4 } });
+  const { video, container } = page.cards[0];
+  assert.equal(container.classList.contains('video-unavailable'), true);
+  assert.ok(container.querySelector('.video-fallback'));
+  video.error = null;
+  video.networkState = 1;
+  video.emit('canplay');
+  page.enter();
+  await settled();
+  assert.equal(container.classList.contains('video-unavailable'), false);
+  assert.equal(container.querySelector('.video-fallback'), undefined);
+  assert.equal(video.paused, false);
+});
 
 test('first visible clip starts muted and waits for actual playback before hiding Play', async () => {
   const page = setup();
