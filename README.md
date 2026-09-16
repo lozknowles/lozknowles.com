@@ -23,6 +23,11 @@ while visible. Other cards and hidden tabs pause. Native controls remain
 available; a deliberate pause or data-saving mode
 keeps automatic playback off.
 
+The existing live Cheeky Phone water experiment is preserved from the original
+`a106fb6` implementation, including its water simulation, voice controls and
+recorded audio. The shared header is applied to that newer page; see
+`CHEEKY-PHONE.md` for the original implementation and qualification notes.
+
 - **Arcade** — `/arcade.html`, beside Murmuration in the desktop and mobile navigation. A neon glass cube has six faces: Invaders, Pac-Man, Space Bike, Tempest, Donkey Kong and Centipede. Space Bike shows a muted 60-second recording of Lawrence's C64 game; the other faces run animated simulations. Drag or flick to keep the cube rotating, or choose a face to bring it forward. Play, pause, reset, keyboard controls and full screen apply to the whole cabinet, including the video. Reduced-motion preferences initially pause playback; leaving the viewport or hiding the tab suspends it.
 
   `assets/arcade-scene.html` and `assets/arcade-sequence.css` are the self-contained SVG/CSS export of the existing sequence, with the background brightened for standalone viewing. `arcade.js` synchronizes their animations and the procedural SVG chapter in `arcade-centipede.js`; `arcade.css` supplies the cabinet and story layout. Only these public assets are included by the publication builder. There is no dependency on the protected portal.

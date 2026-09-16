@@ -5,8 +5,13 @@
 <meta name="theme-color" content="#06100f">
 <meta name="description" content="A phone with something to say. Tilt gently and enjoy a little dry humour.">
 <title>Cheeky Phone · Lawrence Knowles</title>
-<link rel="stylesheet" href="/assets/cheeky-phone.css">
-<script defer src="/assets/cheeky-phone.js"></script>
+<link rel="stylesheet" href="/assets/cheeky-phone.css?v=water1">
+<script defer src="/assets/cheeky-water.js?v=water1"></script>
+<script defer src="/assets/cheeky-scene.js?v=water1"></script>
+<script defer src="/assets/cheeky-lines.js?v=water1"></script>
+<script defer src="/assets/cheeky-clips.js?v=water1"></script>
+<script defer src="/assets/cheeky-audio.js?v=water1"></script>
+<script defer src="/assets/cheeky-phone.js?v=water1"></script>
 
     <!-- site-assets:start -->
     <link rel="stylesheet" href="/assets/site-shell.css?v=20260916-3">
@@ -34,22 +39,34 @@
 </header>
 <!-- site-header:end -->
 <main>
-<p class="eyebrow">MOTION / A LITTLE ATTITUDE</p>
+<p class="eyebrow">WATER / A LITTLE ATTITUDE</p>
 <h1>Cheeky <em>Phone.</em></h1>
-<p class="intro">Tilt gently. Put me down. See what I have to say.</p>
+<p class="intro">A glass half full. A phone with reservations.</p>
+<div class="experiment">
+<section class="water-stage" aria-label="Look down into water inside the screen">
+<div class="scene-top"><span id="water-state">STILL WATERS</span><span id="input-state">TOUCH TO RIPPLE</span></div>
+<canvas id="water" tabindex="0" role="img" aria-label="Looking straight down into water inside the screen’s glass rim. Touch or drag to make ripples. Use the tilt sliders below, or arrow keys when focused.">Water inside the screen. Use the tilt controls to play.</canvas>
+<div class="scene-bottom"><span id="scene-caption">A little disturbance is perfectly acceptable.</span><span class="level-indicator"><output id="level-readout" for="level">55</output>% FULL</span></div>
+</section>
+<div class="control-panel">
 <section class="stage" aria-label="Phone commentary">
 <p id="status" role="status">Off · waiting for your invitation</p>
 <blockquote id="remark" aria-live="polite">“I have opinions. Apparently that’s a feature.”</blockquote>
 <p id="pose">Your phone’s angle is a clue, not proof of your posture.</p>
 </section>
 <div class="actions"><button id="start" class="primary">Start the commentary</button><button id="stop" disabled>Stop</button><button id="sample">Try a comment</button></div>
+<div class="water-actions"><button id="preview" aria-pressed="false" disabled>Preview underwater</button><button id="refill">Reset / refill</button></div>
+<div class="water-settings"><label for="level">Water level <input id="level" type="range" min="15" max="85" value="55"></label>
+<details class="tilt-controls" open><summary>Try a tilt <span>no sensors needed</span></summary><label for="tilt-x">Left ↔ right<input id="tilt-x" type="range" min="-65" max="65" value="0"></label><label for="tilt-y">Back ↔ front<input id="tilt-y" type="range" min="-55" max="55" value="0"></label><button id="sensors" class="small">Use phone motion</button></details></div>
 <p id="help" role="status">Tap Start and allow motion access if asked. Keep this page open and your volume up.</p>
 <section class="settings" aria-label="Commentary settings">
-<label>Voice<select id="voice"><option value="">Device default</option></select></label>
+<label>Voice<select id="voice" aria-describedby="voice-note"><option value="">Device default</option></select></label>
 <label>Minimum gap<select id="gap"><option value="15">15 seconds</option><option value="30" selected>30 seconds</option><option value="60">One minute</option></select></label>
 <label class="mute"><input id="mute" type="checkbox"> Quiet mode (text only)</label>
 </section>
-<details><summary>How it works</summary><p>Motion and tilt choose from a collection of written quips. There’s no camera, microphone, account or AI service. This page does not record or upload sensor readings. Your browser provides the speech voices; some may use an online service.</p><p>Commentary pauses when you leave the page or lock the screen. It cannot comment while you read in another app. A downward-facing screen could mean you’re reclining or have put the phone down: the jokes are playful guesses.</p><p>If motion isn’t available, try opening this page directly in Safari or Chrome. The sample button works without sensor permission. There’s no need to shake hard or drop your phone.</p></details>
+<p id="voice-note" class="voice-note">Your selected device voice stays yours.</p>
+</div></div>
+<details class="about"><summary>How it works &amp; privacy</summary><p>Motion and tilt move the water and choose from a collection of written quips. There’s no camera, microphone, account or AI service. This page does not record or upload sensor readings. Your browser provides the device voices; some may use an online service. The optional recorded George voice downloads from this site and plays locally. Its normal and underwater speech use the same recording, with the underwater sound filtered on your device.</p><p>Device voices cannot be filtered by this page. They keep their normal sound with a little bubble accompaniment underwater. Choose “George · recorded, underwater ready” for muffled, gently warbling speech throughout the experiment. Changing voice is always your choice.</p><p>Commentary and animation pause when you leave the page or lock the screen. A fresh, stable pose is needed on return; unfinished remarks are discarded. A downward-facing screen could mean you’re reclining or have put the phone down: the jokes are playful guesses.</p><p>The water is a small surface-wave simulation: it deforms, sloshes and settles, but does not model individual droplets or breaking waves. When tipped over, the bowl empties into a playful underwater view. Returning upright drains that view and discreetly refills the bowl.</p><p>If motion isn’t available, try opening this page directly in Safari or Chrome. The sample, touch and tilt controls work without sensor permission. “Preview underwater” demonstrates the transition after Start. There’s no need to shake hard or drop your phone. Reduced-motion settings calm waves, bubbles and transitions.</p></details>
 <noscript><p>This experiment needs JavaScript enabled to read motion and speak.</p></noscript>
 </main>
 <footer>Lawrence Knowles · Curious things, occasionally outspoken.</footer>
