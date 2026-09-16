@@ -26,7 +26,7 @@ import { createArcadeSimulation } from './arcade-games.js?v=20260915-cube-1';
   cube.rotation.set(.36,-.52,-.06);
   const state={tint:'#a5ddff',glass:'Smoked',glow:1,drift:1,codeOpacity:.32};
   let orbit=!reduced.matches,selected=-1,target=null,drag=null,visible=true,time=0,last=0,raf=0,lastTexture=-1;
-  const labels=['Invaders','Pac-Man','Bomberman','Tempest','Donkey Kong','Centipede'];
+  const labels=['Invaders','Pac-Man','Space Bike','Tempest','Donkey Kong','Centipede'];
   const colors=['#70eaff','#ed85ff','#91ffb7','#ffd077','#a5adff','#ff8ba8'];
   const sceneLights=[new T.AmbientLight(0x93b7ff,1.5),new T.DirectionalLight(0xe0f7ff,4),new T.DirectionalLight(0xe780ff,3)];
   sceneLights[1].position.set(-4,6,5); sceneLights[2].position.set(4,0,-2); sceneLights.forEach(l=>scene.add(l));
@@ -131,12 +131,66 @@ import { createArcadeSimulation } from './arcade-games.js?v=20260915-cube-1';
     for(const a of g.ghosts){const x=ox+(a.x+.5)*cell,y=oy+(a.y+.5)*cell,scared=g.power>0&&a.mode!=='eyes';c.save();c.translate(x,y);c.shadowBlur=3;c.shadowColor=scared?'#516aff':a.color;c.fillStyle=scared?(g.power<2&&Math.floor(g.t*6)%2?'#ecf1ff':'#344ad8'):a.color;if(a.mode!=='eyes'){c.beginPath();c.arc(0,-1,7.5,Math.PI,0);c.lineTo(7.5,7);for(let i=3;i>=0;i--)c.lineTo(-7.5+i*5,Math.sin(i+g.t*12)>0?4:7);c.closePath();c.fill();}c.shadowBlur=0;if(scared){c.fillStyle='#ffeec9';c.fillRect(-4,-2,2,2);c.fillRect(2,-2,2,2);c.strokeStyle='#ffeec9';c.lineWidth=1;line(c,[[-4,4],[-2,2],[0,4],[2,2],[4,4]]);}else{c.fillStyle='#fff';c.beginPath();c.ellipse(-3,-2,2.6,3.4,0,0,Math.PI*2);c.ellipse(3,-2,2.6,3.4,0,0,Math.PI*2);c.fill();c.fillStyle='#234ab4';c.fillRect(-4+a.dx,-3+a.dy,2.5,3);c.fillRect(2+a.dx,-3+a.dy,2.5,3);}c.restore();}
     effects(c,g);waveBanner(c,g);
   }
-  function bomberman(face){const g=arcade.games[2],c=base(face,'BOMBERMAN',g),sz=30,ox=61,oy=86;c.shadowBlur=0;
-    g.grid.forEach((v,k)=>{const x=ox+k%13*sz,y=oy+Math.floor(k/13)*sz;c.fillStyle=(k+Math.floor(k/13))%2?'#112c24':'#10271f';c.fillRect(x,y,sz,sz);if(v===1){c.fillStyle='#557574';c.fillRect(x+1,y+1,28,28);c.fillStyle='#90b5aa';c.fillRect(x+2,y+2,26,3);c.fillStyle='#2c4547';c.fillRect(x+25,y+5,3,23);}else if(v===2){c.fillStyle='#ba9673';c.fillRect(x+2,y+2,26,26);c.strokeStyle='#634e46';c.lineWidth=2;line(c,[[x+2,y+14],[x+28,y+14]]);line(c,[[x+14,y+2],[x+14,y+14]]);line(c,[[x+8,y+14],[x+8,y+28]]);line(c,[[x+23,y+14],[x+23,y+28]]);}});
-    for(const b of g.bombs){const x=ox+(b.cell%13+.5)*sz,y=oy+(Math.floor(b.cell/13)+.5)*sz,r=10+Math.sin(b.age*15)*1.2;c.fillStyle='#0c101a';c.strokeStyle=b.age>1.5?'#ffb171':'#b5c6d2';c.lineWidth=1.5;c.beginPath();c.arc(x,y,r,0,Math.PI*2);c.fill();c.stroke();c.fillStyle='#eff5ff';c.fillRect(x-4,y-5,3,3);c.strokeStyle='#ffc370';line(c,[[x+3,y-10],[x+6,y-15],[x+9,y-12]]);c.fillStyle='#fff496';c.fillRect(x+7,y-15,4,4);}
-    for(const f of g.flames){const x=ox+f.cell%13*sz,y=oy+Math.floor(f.cell/13)*sz;c.globalAlpha=1-f.age/.9;c.shadowColor='#ffb248';c.shadowBlur=15;c.fillStyle='#ffb749';c.fillRect(x+2,y+7,26,16);c.fillRect(x+7,y+2,16,26);c.fillStyle='#fff5b3';c.fillRect(x+8,y+8,14,14);}c.globalAlpha=1;c.shadowBlur=0;
-    for(const e of g.enemies.filter(e=>e.alive)){const x=ox+(e.x+.5)*sz,y=oy+(e.y+.5)*sz;c.fillStyle=e.color;c.beginPath();c.ellipse(x,y,11,12,0,0,Math.PI*2);c.fill();c.fillStyle='#33243a';c.fillRect(x-5,y-4,3,4);c.fillRect(x+3,y-4,3,4);c.fillRect(x-3,y+4,7,2);}
-    if(!g.invuln||Math.floor(g.t*10)%2)pixels(c,pixelSprites.bomber,ox+(g.player.x+.5)*sz-12,oy+(g.player.y+.5)*sz-14,2.4,{P:'#f99be6',W:'#effcff',S:'#ffcdaa',B:'#22223f',V:'#a895ff'});effects(c,g);waveBanner(c,g);
+  const bikeVideo=document.createElement('video');
+  bikeVideo.className='cube-gameplay-source';
+  bikeVideo.muted=true;
+  bikeVideo.defaultMuted=true;
+  bikeVideo.loop=true;
+  bikeVideo.playsInline=true;
+  bikeVideo.preload='metadata';
+  bikeVideo.setAttribute('muted','');
+  bikeVideo.setAttribute('playsinline','');
+  bikeVideo.setAttribute('aria-hidden','true');
+  bikeVideo.tabIndex=-1;
+  bikeVideo.src='/assets/videos/space-bike-gameplay-v1.mp4';
+  stage.appendChild(bikeVideo);
+  const bikePoster=new Image();
+  bikePoster.src='/assets/space-bike-gameplay.jpg';
+  let mediaPending=false,mediaBlocked=false,disposed=false;
+  function refreshMediaFrame(){if(!disposed){lastTexture=-1;start();}}
+  function syncMedia(){
+    const shouldPlay=playing&&visible&&!document.hidden&&!disposed;
+    if(!shouldPlay){bikeVideo.pause();return;}
+    if(!bikeVideo.paused||mediaPending||mediaBlocked||bikeVideo.error)return;
+    mediaPending=true;
+    bikeVideo.play().then(()=>{
+      // A play request can finish after Pause or after the page leaves view.
+      if(!playing||!visible||document.hidden||disposed)bikeVideo.pause();
+    }).catch(error=>{
+      if(error.name!=='AbortError'){
+        mediaBlocked=true;
+        if(selected===2)status.textContent='Press Play to start the Space Bike gameplay.';
+      }
+    }).finally(()=>{
+      mediaPending=false;
+      if(playing&&visible&&!document.hidden&&!disposed&&!mediaBlocked&&!bikeVideo.error&&bikeVideo.paused)syncMedia();
+    });
+  }
+  bikeVideo.addEventListener('loadeddata',refreshMediaFrame);
+  bikeVideo.addEventListener('seeked',refreshMediaFrame);
+  bikeVideo.addEventListener('error',()=>{
+    refreshMediaFrame();
+    if(selected===2)status.textContent='Space Bike video is unavailable. Showing a gameplay still.';
+  });
+  bikePoster.addEventListener('load',refreshMediaFrame);
+  function spaceBike(face){
+    const c=face.ctx;
+    c.globalAlpha=1;c.shadowBlur=0;c.textAlign='left';
+    c.fillStyle='#03080b';c.fillRect(0,0,512,512);
+    c.fillStyle=face.color;c.font='500 21px monospace';c.fillText('SPACE BIKE',24,37);
+    c.textAlign='right';c.font='500 13px monospace';c.fillText('COMMODORE 64',488,35);
+    c.strokeStyle=face.color+'55';c.lineWidth=1;line(c,[[24,55],[488,55]]);
+    const source=bikeVideo.readyState>=2&&!bikeVideo.seeking?bikeVideo:bikePoster;
+    if(source===bikeVideo||bikePoster.naturalWidth){
+      c.imageSmoothingEnabled=false;
+      c.drawImage(source,0,96,512,320);
+      c.imageSmoothingEnabled=true;
+    }
+    c.textAlign='left';c.fillStyle='#d6f5e5';c.font='500 15px monospace';
+    c.fillText('WRITTEN BY LAWRENCE KNOWLES',24,455);
+    c.fillStyle='#9aabc1';c.font='500 12px monospace';
+    c.fillText(bikeVideo.error?'GAMEPLAY STILL':'ORIGINAL GAMEPLAY',24,482);
+    c.textAlign='right';c.fillText('6502 / C64',488,482);c.textAlign='left';
   }
   function tempest(face){const g=arcade.games[3],c=base(face,'TEMPEST',g);c.strokeStyle='#4388ed';c.shadowColor='#3979ff';c.shadowBlur=4;c.lineWidth=1.5;
     for(let layer=0;layer<5;layer++){const depth=layer/4,pts=[];for(let i=0;i<=16;i++){const p=arcade.polar(i-.5,depth);pts.push([p.x,p.y]);}line(c,pts);}for(let i=0;i<16;i++){const a=arcade.polar(i-.5,0),b=arcade.polar(i-.5,1);line(c,[[a.x,a.y],[b.x,b.y]]);}
@@ -157,13 +211,13 @@ import { createArcadeSimulation } from './arcade-games.js?v=20260915-cube-1';
     if(g.spider.alive){const s=g.spider;c.save();c.translate(s.x,s.y);c.strokeStyle='#f9b1e0';c.shadowColor='#f58dd9';c.lineWidth=2;for(let i=0;i<3;i++){const dy=-8+i*8;line(c,[[-3,0],[-13,dy+Math.sin(g.t*15+i)*3],[-20,dy+5]]);line(c,[[3,0],[13,dy-Math.sin(g.t*15+i)*3],[20,dy+5]]);}c.fillStyle='#f6c0ea';c.beginPath();c.ellipse(0,0,8,6,0,0,Math.PI*2);c.fill();c.restore();}
     c.fillStyle='#bafaff';c.shadowColor='#86f4ff';c.shadowBlur=7;g.shots.forEach(b=>c.fillRect(b.x-1,b.y-9,2,12));if(!g.invuln||Math.floor(g.t*10)%2){c.beginPath();c.moveTo(g.player,424);c.lineTo(g.player+13,440);c.lineTo(g.player,435);c.lineTo(g.player-13,440);c.closePath();c.fill();}effects(c,g);waveBanner(c,g);
   }
-  const drawGames=[invaders,pacman,bomberman,tempest,donkeyKong,centipede];
+  const drawGames=[invaders,pacman,spaceBike,tempest,donkeyKong,centipede];
   function renderTextures(){faces.forEach((f,i)=>{drawGames[i](f);f.tex.needsUpdate=true;});}
 
   function sync(){codeMaterials.forEach(m=>m.opacity=state.codeOpacity);glass.color.set(state.tint);glass.transmission=state.glass==='Clear'?.8:.45;glass.roughness=state.glass==='Clear'?.08:.13;edgeMaterials.forEach(m=>m.opacity=Math.min(.9,.56*state.glow));allScreenMaterials.forEach(m=>m.color.setScalar(state.glow));renderer.render(scene,camera);}
   function resize(){const w=stage.clientWidth,h=stage.clientHeight;renderer.setSize(w,h,false);camera.aspect=w/h;camera.position.set(0,0,Math.max(7.8,6.5/camera.aspect));camera.updateProjectionMatrix();renderer.render(scene,camera);}
   const ro=new ResizeObserver(resize);ro.observe(stage);
-  const io=new IntersectionObserver(entries=>{visible=entries[0].isIntersecting;if(visible)start();});io.observe(root);
+  const io=new IntersectionObserver(entries=>{visible=entries[0].isIntersecting;syncMedia();if(visible)start();});io.observe(stage);
   // Release speed is retained until Pause, Reset, or a face selection.
   function releaseVelocity(samples,previous={x:0,y:.22}){
     if(samples.length<2)return {...previous};
@@ -194,13 +248,14 @@ import { createArcadeSimulation } from './arcade-games.js?v=20260915-cube-1';
     screenState.textContent=playing?'DEMO MODE':'PAUSED';
     chapterLabel.textContent=selected<0?'3D / ARCADE CUBE':String(selected+1).padStart(2,'0')+' / '+labels[selected].toUpperCase();
     buttons.forEach((b,i)=>b.setAttribute('aria-pressed',String(i===selected)));
+    syncMedia();
   }
-  function selectFace(i){selected=i;orbit=false;playing=true;target=faces[i].group.quaternion.clone().invert();status.textContent=labels[i]+' · animated demo. Flick the cube to keep it spinning.';if(reduced.matches){cube.quaternion.copy(target);target=null;}updateButtons();start();}
+  function selectFace(i){selected=i;orbit=false;playing=true;target=faces[i].group.quaternion.clone().invert();mediaBlocked=false;status.textContent=(i===2?'Space Bike · original C64 gameplay.':labels[i]+' · animated demo.')+' Flick the cube to keep it spinning.';if(reduced.matches){cube.quaternion.copy(target);target=null;}updateButtons();start();}
   buttons.forEach((b,i)=>b.addEventListener('click',()=>selectFace(i)));
-  function togglePlay(){playing=!playing;if(playing){if(time===0&&selected<0)orbit=true;status.textContent='Six games, six faces. Flick to spin, or choose a game below.';}else status.textContent='Paused. Press Play or Space to continue.';updateButtons();start();}
+  function togglePlay(){mediaBlocked=false;playing=!playing;if(playing){if(time===0&&selected<0)orbit=true;status.textContent='Six games, six faces. Flick to spin, or choose a game below.';}else status.textContent='Paused. Press Play or Space to continue.';updateButtons();start();}
   playButton.addEventListener('click',togglePlay);
   orbitButton.addEventListener('click',()=>{orbit=!(orbit&&playing);target=null;if(orbit){playing=true;selected=-1;status.textContent='Spinning freely. Drag to change direction.';}else status.textContent='Rotation paused. The games keep playing.';updateButtons();start();});
-  function reset(){arcade=createArcadeSimulation();time=0;lastTexture=-1;lastSummary=-1;accumulator=0;spin={x:0,y:.22};cube.rotation.set(.36,-.52,-.06);cube.position.y=0;target=null;selected=-1;orbit=true;playing=true;status.textContent='A fresh start. Six games, six faces.';updateButtons();start();}
+  function reset(){mediaBlocked=false;bikeVideo.currentTime=0;arcade=createArcadeSimulation();time=0;lastTexture=-1;lastSummary=-1;accumulator=0;spin={x:0,y:.22};cube.rotation.set(.36,-.52,-.06);cube.position.y=0;target=null;selected=-1;orbit=true;playing=true;status.textContent='A fresh start. Six games, six faces.';updateButtons();start();}
   resetButton.addEventListener('click',reset);
   fullButton.addEventListener('click',async()=>{try{if(document.fullscreenElement)await document.exitFullscreen();else await root.requestFullscreen();}catch{status.textContent='Full screen is unavailable in this browser.';}});
   document.addEventListener('fullscreenchange',()=>{fullButton.textContent=document.fullscreenElement?'Exit full screen':'Full screen';resize();});
@@ -219,7 +274,7 @@ import { createArcadeSimulation } from './arcade-games.js?v=20260915-cube-1';
     if(target){cube.quaternion.slerp(target,Math.min(1,dt*6));if(cube.quaternion.angleTo(target)<.002){cube.quaternion.copy(target);target=null;}}else if(playing&&orbit&&!drag){rotateBy(spin.x*dt*state.drift,spin.y*dt*state.drift);cube.position.y=Math.sin(time*.8)*.035;}
     codeOrbit.rotation.y=.4-time*.075;
     if(time-lastTexture>1/24||lastTexture<0){renderTextures();lastTexture=time;}
-    if(time-lastSummary>1||lastSummary<0){renderer.domElement.setAttribute('aria-label','Neon glass arcade cube. '+labels.map((name,i)=>name+': score '+arcade.games[i].score).join('. ')+'.');lastSummary=time;}
+    if(time-lastSummary>1||lastSummary<0){renderer.domElement.setAttribute('aria-label','Neon glass arcade cube. '+labels.map((name,i)=>i===2?name+': original C64 gameplay'+(bikeVideo.error?' still':' video'):name+': score '+arcade.games[i].score).join('. ')+'.');lastSummary=time;}
     renderer.render(scene,camera);if(playing||target)raf=requestAnimationFrame(frame);
   }
   function start(){if(!raf&&visible&&!document.hidden){last=performance.now();raf=requestAnimationFrame(frame);}}
@@ -229,8 +284,8 @@ import { createArcadeSimulation } from './arcade-games.js?v=20260915-cube-1';
   document.getElementById('load-message').hidden=true;
   status.textContent=reduced.matches?'Press Play to start the arcade cube.':'Six games, six faces. Flick to spin, or choose a game below.';
 
-  function visibilityChange(){if(!document.hidden)start();}
+  function visibilityChange(){syncMedia();if(!document.hidden)start();}
   reduced.addEventListener('change',motionChange);document.addEventListener('visibilitychange',visibilityChange);
-  function cleanup(){cancelAnimationFrame(raf);ro.disconnect();io.disconnect();reduced.removeEventListener('change',motionChange);document.removeEventListener('visibilitychange',visibilityChange);const gs=new Set(),ms=new Set(),ts=new Set();scene.traverse(o=>{if(o.geometry)gs.add(o.geometry);if(o.material){const mats=Array.isArray(o.material)?o.material:[o.material];mats.forEach(m=>{ms.add(m);if(m.map)ts.add(m.map);});}});gs.forEach(g=>g.dispose());ms.forEach(m=>m.dispose());ts.forEach(t=>t.dispose());envTarget.dispose();renderer.dispose();}
+  function cleanup(){disposed=true;bikeVideo.pause();bikeVideo.removeAttribute('src');bikeVideo.load();bikeVideo.remove();cancelAnimationFrame(raf);ro.disconnect();io.disconnect();reduced.removeEventListener('change',motionChange);document.removeEventListener('visibilitychange',visibilityChange);const gs=new Set(),ms=new Set(),ts=new Set();scene.traverse(o=>{if(o.geometry)gs.add(o.geometry);if(o.material){const mats=Array.isArray(o.material)?o.material:[o.material];mats.forEach(m=>{ms.add(m);if(m.map)ts.add(m.map);});}});gs.forEach(g=>g.dispose());ms.forEach(m=>m.dispose());ts.forEach(t=>t.dispose());envTarget.dispose();renderer.dispose();}
   renderTextures();resize();sync();updateButtons();start();
 })();

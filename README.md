@@ -10,7 +10,7 @@ The profile links to a rotating set of supplied professional references at
 
 ## Interactive experiments
 
-- **Arcade** — `/arcade.html`, beside Murmuration in the desktop and mobile navigation. A public retro page connects the games that sparked an interest in computing with the existing Space Bike story. The standalone arcade sequence runs from Invaders through Pac-Man, Bomberman, the vector tunnel, Tempest, Kong's ramps and a platform-eating Centipede finale. Play, pause, replay, a scrubber, chapter selection and full screen control one shared animation timeline. Device reduced-motion preferences and tab visibility pause playback. The sequence loops after 159 seconds. Area 51 retains its separate protected link and original background.
+- **Arcade** — `/arcade.html`, beside Murmuration in the desktop and mobile navigation. A neon glass cube has six faces: Invaders, Pac-Man, Space Bike, Tempest, Donkey Kong and Centipede. Space Bike shows a muted 60-second recording of Lawrence's C64 game; the other faces run animated simulations. Drag or flick to keep the cube rotating, or choose a face to bring it forward. Play, pause, reset, keyboard controls and full screen apply to the whole cabinet, including the video. Reduced-motion preferences initially pause playback; leaving the viewport or hiding the tab suspends it.
 
   `assets/arcade-scene.html` and `assets/arcade-sequence.css` are the self-contained SVG/CSS export of the existing sequence, with the background brightened for standalone viewing. `arcade.js` synchronizes their animations and the procedural SVG chapter in `arcade-centipede.js`; `arcade.css` supplies the cabinet and story layout. Only these public assets are included by the publication builder. There is no dependency on the protected portal.
 
@@ -78,6 +78,8 @@ verification expectations.
 ## Video assets
 
 Large MP4 files may be kept outside Git and deployed separately to `assets/videos/`, or served from a media origin configured by the operator. The host should support HTTP byte-range requests so browsers can seek efficiently. `assets/project-video.js` pauses inactive videos, prevents overlapping playback, and restores poster images when media is unavailable.
+
+The arcade gameplay edit is recorded in `config/arcade-media.json`, including its source URL, source range (1:30–2:30), expected size and SHA-256. It contains gameplay only and retains the original HUD. Build a complete preview with `python3 scripts/build_publication.py --arcade-media /path/to/space-bike-gameplay-v1.mp4`. The default source-only CI build omits external video binaries. `scripts/deploy-arcade-cube.sh` requires `ARCADE_MEDIA_FILE` and the existing `MEDIA_ORIGIN` directory as well as its static deployment variables; it validates the clip, installs the versioned MP4 through the existing media origin, verifies that public media is available, then publishes seven static files with the page last. The full source recording is hash-checked unchanged. No YouTube player or third-party runtime is needed.
 
 The Agent Control showcase intentionally presents three distinct records: an
 edited narrated tour, a continuous silent live-run recording, and the complete

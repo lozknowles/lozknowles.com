@@ -4,6 +4,8 @@
 from __future__ import annotations
 
 import argparse
+import hashlib
+import json
 import shutil
 import sys
 from pathlib import Path
@@ -62,6 +64,7 @@ ASSET_FILES = (
     "project-video.css",
     "project-video.js",
     "spacebike-_U_Kk2gp.jpg",
+    "space-bike-gameplay.jpg",
     "wisteria-CwTjyfrc.jpg",
     "ww1-BRtzddHk.jpg",
 )
@@ -99,13 +102,30 @@ def prepare_output(output: Path) -> None:
     make_public_directory(output)
 
 
-def build(output: Path) -> None:
+def copy_arcade_media(source: Path, output: Path) -> None:
+    """Include only the reviewed gameplay edit from external media storage."""
+    spec = json.loads((ROOT / "config" / "arcade-media.json").read_text(encoding="utf-8"))
+    relative = Path(spec["path"])
+    if len(relative.parts) != 3 or relative.parts[:2] != ("assets", "videos"):
+        raise ValueError("Unexpected arcade media destination")
+    data = source.read_bytes()
+    if len(data) != spec["bytes"] or hashlib.sha256(data).hexdigest() != spec["sha256"]:
+        raise ValueError("Arcade media does not match the reviewed gameplay edit")
+    target = output / relative
+    make_public_directory(target.parent)
+    target.write_bytes(data)
+    target.chmod(0o644)
+
+
+def build(output: Path, arcade_media: Path | None = None) -> None:
     output = output.resolve()
     prepare_output(output)
     for name in ROOT_FILES:
         copy_file(Path(name), output)
     for name in ASSET_FILES:
         copy_file(Path("assets") / name, output)
+    if arcade_media is not None:
+        copy_arcade_media(arcade_media, output)
     normalise_public_permissions(output)
     findings = scan_artifact(output)
     if findings:
@@ -121,13 +141,14 @@ def build(output: Path) -> None:
 def parse_args() -> argparse.Namespace:
     parser = argparse.ArgumentParser(description=__doc__)
     parser.add_argument("--output", type=Path, default=DEFAULT_OUTPUT)
+    parser.add_argument("--arcade-media", type=Path, help="Reviewed gameplay MP4 from external media storage")
     return parser.parse_args()
 
 
 if __name__ == "__main__":
     args = parse_args()
     try:
-        build(args.output)
+        build(args.output, args.arcade_media)
     except (FileNotFoundError, RuntimeError, ValueError) as error:
         print(error, file=sys.stderr)
         raise SystemExit(1)

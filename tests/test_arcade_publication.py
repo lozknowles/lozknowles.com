@@ -1,8 +1,12 @@
 from pathlib import Path
+import hashlib
+import json
 import re
+import tempfile
 import unittest
+from unittest.mock import patch
 
-from scripts.build_publication import ASSET_FILES
+from scripts.build_publication import ASSET_FILES, copy_arcade_media
 
 ROOT=Path(__file__).resolve().parents[1]
 
@@ -26,10 +30,32 @@ class ArcadePublicationTests(unittest.TestCase):
         script=(ROOT/'scripts/deploy-arcade-cube.sh').read_text(encoding='utf-8')
         files=script.split("<<'FILES'\n",1)[1].split('\nFILES',1)[0].splitlines()
         self.assertEqual(files[-1],'arcade.html')
-        self.assertEqual(len(files),6)
+        self.assertEqual(len(files),7)
+        self.assertIn('assets/space-bike-gameplay.jpg',files)
+        self.assertNotIn('assets/videos/space-bike-gameplay-v1.mp4',files)
+        self.assertIn('MEDIA_ORIGIN',script)
         self.assertNotIn('index.html',files)
         self.assertNotIn('.htaccess',files)
         self.assertIn('BASELINE_ARCADE_SHA256',script)
+
+    def test_release_refuses_changed_or_truncated_gameplay(self):
+        with tempfile.TemporaryDirectory() as directory:
+            root=Path(directory)
+            (root/'config').mkdir()
+            approved=b'reviewed gameplay edit'
+            spec={'path':'assets/videos/space-bike-gameplay-v1.mp4',
+                  'bytes':len(approved),'sha256':hashlib.sha256(approved).hexdigest()}
+            (root/'config/arcade-media.json').write_text(json.dumps(spec))
+            source=root/'source.mp4'
+            with patch('scripts.build_publication.ROOT',root):
+                for changed in (approved[:-1], b'X'+approved[1:]):
+                    source.write_bytes(changed)
+                    with self.assertRaisesRegex(ValueError,'reviewed gameplay edit'):
+                        copy_arcade_media(source,root/'publication')
+                self.assertFalse((root/'publication').exists())
+                source.write_bytes(approved)
+                copy_arcade_media(source,root/'publication')
+                self.assertEqual((root/'publication'/spec['path']).read_bytes(),approved)
 
 if __name__=='__main__':
     unittest.main()

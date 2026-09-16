@@ -1,0 +1,12 @@
+{
+  "path": "assets/videos/space-bike-gameplay-v1.mp4",
+  "sha256": "0058ea0a0efe5951ad4cb87e7cebe5f69c9c902ad33ff364c777e43ac336eda6",
+  "bytes": 5112528,
+  "duration_seconds": 60,
+  "source_url": "https://www.lozknowles.com/assets/videos/space-bike.mp4",
+  "source_sha256": "76e38ccace9a0f8f88df2e122a9633ac584e829e703998151fdeb8732cef6054",
+  "source_start_seconds": 90,
+  "source_end_seconds": 150,
+  "content": "Continuous Space Bike gameplay, without opening menus or credits; original in-game HUD retained.",
+  "video": "H.264, 512x320, 24 fps, no audio; metadata stripped. Binary kept in media storage outside Git."
+}
