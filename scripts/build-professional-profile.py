@@ -197,7 +197,8 @@ def build():
                 textColor=TEAL, spaceAfter=3,
             )),
             Paragraph(
-                '<link href="https://www.lozknowles.com/" color="#0D4542"><b>lozknowles.com</b></link><br/>'
+                '<link href="mailto:lozknowles@mac.com" color="#0D4542"><b>lozknowles@mac.com</b></link><br/>'
+                '<link href="https://www.lozknowles.com/" color="#526463">lozknowles.com</link><br/>'
                 '<link href="https://github.com/lozknowles" color="#526463">github.com/lozknowles</link>',
                 SMALL,
             ),

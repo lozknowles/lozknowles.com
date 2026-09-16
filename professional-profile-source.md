@@ -33,6 +33,8 @@ Alongside advisory work, I explore applied AI, computer vision, local history an
 
 ## Contact
 
+Email: [lozknowles@mac.com](mailto:lozknowles@mac.com)
+
 Website: https://www.lozknowles.com/
 
 GitHub: https://github.com/lozknowles

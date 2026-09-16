@@ -3,10 +3,11 @@
 Static files for [lozknowles.com](https://lozknowles.com), including the site's images, scripts, styles, and optional looping background music.
 
 The public professional profile is generated from `professional-profile-source.md` by
-`scripts/build-professional-profile.py`. It intentionally omits direct contact details,
-precise location, education history, named employer chronology, and community-role detail.
+`scripts/build-professional-profile.py`. The contact panel includes Lawrence's chosen
+public email address, `lozknowles@mac.com`, as a clickable mail link. It omits telephone
+details, precise location, education history, named employer chronology, and community-role detail.
 The profile links to a rotating set of supplied professional references at
-`/references.html`; direct telephone and email details are not published.
+`/references.html`; referees' direct telephone and email details are not published.
 
 ## Interactive experiments
 
