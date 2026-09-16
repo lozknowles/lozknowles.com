@@ -13,9 +13,11 @@ from pathlib import Path
 if __package__:
     from .publication_privacy import scan_artifact, load_allowlist, split_allowed
     from .build_crossword_publication import build_crossword
+    from .site_shell import apply_site_shell
 else:
     from publication_privacy import scan_artifact, load_allowlist, split_allowed
     from build_crossword_publication import build_crossword
+    from site_shell import apply_site_shell
 
 
 ROOT = Path(__file__).resolve().parents[1]
@@ -55,6 +57,8 @@ ASSET_FILES = (
     "arcade-centipede.js",
     "arcade-nav.css",
     "crossword-nav.css",
+    "site-shell.css",
+    "site-shell.js",
     "arcade-sequence.css",
     "arcade-scene.html",
     "cheeky-phone.css",
@@ -130,6 +134,12 @@ def build(output: Path, arcade_media: Path | None = None) -> None:
     if arcade_media is not None:
         copy_arcade_media(arcade_media, output)
     build_crossword(output)
+    apply_site_shell(output)
+    # The embedded header changes the built entry page; record the shipped bytes.
+    manifest_path = ROOT / 'build/crossword-manifest.json'
+    crossword_manifest = json.loads(manifest_path.read_text(encoding='utf-8'))
+    crossword_manifest['files']['crossword/index.html'] = hashlib.sha256((output / 'crossword/index.html').read_bytes()).hexdigest()
+    manifest_path.write_text(json.dumps(crossword_manifest, indent=2) + '\n', encoding='utf-8')
     normalise_public_permissions(output)
     findings, _ = split_allowed(scan_artifact(output), load_allowlist(ROOT / 'config/publication-privacy-allowlist.json'))
     if findings:

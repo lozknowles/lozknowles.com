@@ -53,6 +53,8 @@
   transition: transform 0.2s ease, opacity 0.2s ease;
 }
 
+.project-video .video-play[hidden] { display: none; }
+
 .project-video .video-play:hover {
   transform: translate(-50%, -50%) scale(1.08);
 }

@@ -2,11 +2,26 @@
   const cards = [...document.querySelectorAll(".project-card")];
   const videos = cards.flatMap((card) => [...card.querySelectorAll("video")]);
   const backgroundMusic = document.querySelector("#background-music");
+  const visible = new Set();
+  const userPaused = new Set();
+  const managedPauses = new Set();
 
-  function pauseInactiveVideos() {
-    cards.forEach((card) => {
-      if (card.classList.contains("is-active")) return;
-      card.querySelectorAll("video").forEach((video) => video.pause());
+  function pauseVideo(video) {
+    if (video.paused) return;
+    managedPauses.add(video);
+    video.pause();
+  }
+
+  function updatePlayback() {
+    videos.forEach((video) => {
+      const active = video.closest('.project-card')?.classList.contains('is-active');
+      if (document.hidden || !active || !visible.has(video)) {
+        pauseVideo(video);
+      } else if (!navigator.connection?.saveData && !userPaused.has(video) && video.paused) {
+        // Muted, inline playback is accepted by normal browser autoplay policies.
+        // The play control remains available if the browser still declines.
+        video.play().catch(() => {});
+      }
     });
   }
 
@@ -24,6 +39,10 @@
   }
 
   videos.forEach((video) => {
+    video.muted = true;
+    video.defaultMuted = true;
+    video.playsInline = true;
+    video.loop = true;
     const container = video.closest(".project-video");
     const title = container?.closest(".project-card")?.querySelector("h3")?.textContent;
     const playButton = document.createElement("button");
@@ -50,25 +69,40 @@
 
     video.addEventListener("error", () => showFallback(video));
     video.addEventListener("play", () => {
+      userPaused.delete(video);
       container?.classList.add("is-playing");
-      backgroundMusic?.pause();
+      playButton.hidden = true;
+      if (!video.muted && video.volume > 0) backgroundMusic?.pause();
       videos.forEach((otherVideo) => {
-        if (otherVideo !== video) otherVideo.pause();
+        if (otherVideo !== video) pauseVideo(otherVideo);
       });
     });
-    video.addEventListener("pause", () => container?.classList.remove("is-playing"));
+    video.addEventListener("pause", () => {
+      if (!managedPauses.delete(video)) userPaused.add(video);
+      container?.classList.remove("is-playing");
+      playButton.hidden = false;
+    });
+    video.addEventListener('volumechange', () => {
+      if (!video.paused && !video.muted && video.volume > 0) backgroundMusic?.pause();
+    });
 
     if (video.networkState === HTMLMediaElement.NETWORK_NO_SOURCE) {
       showFallback(video);
     }
   });
 
-  const observer = new MutationObserver(pauseInactiveVideos);
+  const observer = new MutationObserver(updatePlayback);
   cards.forEach((card) => {
     observer.observe(card, { attributes: true, attributeFilter: ["class"] });
   });
 
-  document.addEventListener("visibilitychange", () => {
-    if (document.hidden) videos.forEach((video) => video.pause());
-  });
+  const viewport = new IntersectionObserver(entries => {
+    entries.forEach(entry => {
+      if (entry.isIntersecting && entry.intersectionRatio >= .25) visible.add(entry.target);
+      else visible.delete(entry.target);
+    });
+    updatePlayback();
+  }, { threshold: [0, .25] });
+  videos.forEach(video => viewport.observe(video));
+  document.addEventListener("visibilitychange", updatePlayback);
 })();

@@ -3,24 +3,39 @@
 <head>
   <meta charset="utf-8">
   <meta name="viewport" content="width=device-width, initial-scale=1">
-  <meta name="theme-color" content="#100d1b">
+  <meta name="theme-color" content="#06100f">
   <meta name="description" content="Pixels, vectors and the games that got Lawrence Knowles into computing. A little arcade nostalgia, from Space Invaders to Lawrence’s own Space Bike for the Commodore 64.">
   <title>Insert Coin — Lawrence Knowles' Arcade</title>
   <link rel="stylesheet" href="/assets/arcade.css?v=20260911-centipede-1">
   <link rel="stylesheet" href="/assets/arcade-cube.css?v=20260916-space-bike-2">
   <script type="module" src="/assets/arcade-cube.js?v=20260916-space-bike-2"></script>
+
+    <!-- site-assets:start -->
+    <link rel="stylesheet" href="/assets/site-shell.css?v=20260916-3">
+    <script defer src="/assets/site-shell.js?v=20260916-3"></script>
+    <!-- site-assets:end -->
 </head>
-<body class="arcade-page">
+<body class="arcade-page" data-site-page="arcade">
   <a class="skip-link" href="#arcade">Skip to the arcade</a>
-  <header class="arcade-nav">
-    <a class="home-mark" href="/" aria-label="Lawrence Knowles, home">LK<span>■</span></a>
-    <nav aria-label="Main navigation">
-      <a href="/">Home</a>
-      <a href="/murmuration.html">Murmuration</a>
-      <a href="/arcade.html" aria-current="page">Arcade</a>
-    </nav>
-    <a class="private-link" href="https://files.lozknowles.com/area-51"><svg viewBox="0 0 16 16" aria-hidden="true"><path d="M4.5 7V4.5a3.5 3.5 0 0 1 7 0V7M3 7h10v8H3ZM8 10v2"/></svg>Area 51 <span> / private</span></a>
-  </header>
+  <!-- site-header:start -->
+<header class="site-header" aria-label="Site header">
+  <a class="site-home" href="/" aria-label="Lawrence Knowles, home">LK<span aria-hidden="true">•</span></a>
+  <button class="site-menu-toggle" type="button" aria-expanded="false" aria-controls="site-primary-navigation">Menu <span aria-hidden="true">☰</span></button>
+  <nav id="site-primary-navigation" class="site-navigation" aria-label="Primary navigation">
+    <a href="/#about">About</a>
+    <a href="/#work">Experiments</a>
+    <a href="/murmuration.html">Murmuration</a>
+    <a href="/arcade.html" aria-current="page">Arcade</a>
+    <a href="/crossword/">Crossword Studio</a>
+    <a href="/cheeky-phone.html">Cheeky Phone</a>
+    <a href="/#place">Place</a>
+    <a href="https://files.lozknowles.com">Area 51</a>
+    <a href="/#contact">Contact</a>
+    <a href="/cv.html" class="site-profile">Profile</a>
+    <a href="https://www.youtube.com/@LawrenceKnowles-cr9ml" target="_blank" rel="noreferrer">YouTube <span aria-hidden="true">↗</span></a>
+  </nav>
+</header>
+<!-- site-header:end -->
 
   <main>
     <section class="arcade-intro" aria-labelledby="arcade-title">

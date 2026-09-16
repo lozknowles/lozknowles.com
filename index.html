@@ -8,43 +8,38 @@
     <title>Lawrence Knowles — Systems, time & curious things</title>
     <script type="module" crossorigin src="/assets/index-qfeM6zl_.js"></script>
     <link rel="stylesheet" crossorigin href="/assets/index-BDTMFuqh.css">
-    <link rel="stylesheet" href="/assets/project-video.css">
+    <link rel="stylesheet" href="/assets/project-video.css?v=20260916-3">
     <link rel="stylesheet" href="/assets/music-player.css">
     <link rel="stylesheet" href="/assets/cv.css?v=1fb27ed09044">
-    <link rel="stylesheet" href="/assets/cheeky-nav.css">
-    <link rel="stylesheet" href="/assets/arcade-nav.css?v=20260911-1">
-    <link rel="stylesheet" href="/assets/crossword-nav.css?v=20260916-1">
-  </head>
-  <body>
+
+    <!-- site-assets:start -->
+    <link rel="stylesheet" href="/assets/site-shell.css?v=20260916-3">
+    <script defer src="/assets/site-shell.js?v=20260916-3"></script>
+    <!-- site-assets:end -->
+</head>
+  <body data-site-page="home">
     <canvas id="field" aria-hidden="true"></canvas>
     <div class="grain" aria-hidden="true"></div>
 
-    <header class="nav-shell">
-      <a class="mark" href="#top" aria-label="Lawrence Knowles, home">LK<span>•</span></a>
-      <nav aria-label="Primary navigation">
-        <a href="#about">About</a>
-        <a href="#work">Experiments</a>
-        <a href="/murmuration.html">Murmuration</a>
-        <a href="/arcade.html">Arcade</a>
-        <a href="/crossword/">Crossword Studio</a>
-        <a href="/cheeky-phone.html">Cheeky Phone</a>
-        <a href="#place">Place</a>
-        <a href="https://files.lozknowles.com">Area 51</a>
-        <a href="#contact">Contact</a>
-      </nav>
-      <div class="nav-actions">
-        <a class="mobile-murmuration-link" href="/murmuration.html">Murmuration</a>
-        <a class="mobile-arcade-link" href="/arcade.html">Arcade</a>
-        <a class="mobile-crossword-link" href="/crossword/">Crossword Studio</a>
-        <a class="mobile-cheeky-link" href="/cheeky-phone.html">Cheeky Phone</a>
-        <a class="mobile-area51-link" href="https://files.lozknowles.com">Area 51</a>
-        <a class="mobile-contact-link" href="#contact">Contact</a>
-        <a class="cv-popup-link" href="/cv.html" target="lawrence-profile" data-cv-popup>Profile <span aria-hidden="true">↗</span></a>
-        <a class="signal-link" href="https://www.youtube.com/@LawrenceKnowles-cr9ml" target="_blank" rel="noreferrer">
-          <span class="signal-dot"></span> YouTube
-        </a>
-      </div>
-    </header>
+    <!-- site-header:start -->
+<header class="site-header" aria-label="Site header">
+  <a class="site-home" href="/" aria-label="Lawrence Knowles, home">LK<span aria-hidden="true">•</span></a>
+  <button class="site-menu-toggle" type="button" aria-expanded="false" aria-controls="site-primary-navigation">Menu <span aria-hidden="true">☰</span></button>
+  <nav id="site-primary-navigation" class="site-navigation" aria-label="Primary navigation">
+    <a href="/#about">About</a>
+    <a href="/#work">Experiments</a>
+    <a href="/murmuration.html">Murmuration</a>
+    <a href="/arcade.html">Arcade</a>
+    <a href="/crossword/">Crossword Studio</a>
+    <a href="/cheeky-phone.html">Cheeky Phone</a>
+    <a href="/#place">Place</a>
+    <a href="https://files.lozknowles.com">Area 51</a>
+    <a href="/#contact">Contact</a>
+    <a href="/cv.html" class="site-profile">Profile</a>
+    <a href="https://www.youtube.com/@LawrenceKnowles-cr9ml" target="_blank" rel="noreferrer">YouTube <span aria-hidden="true">↗</span></a>
+  </nav>
+</header>
+<!-- site-header:end -->
 
     <main id="top">
       <section class="hero section-pad">
@@ -87,27 +82,27 @@
           <div class="project-sky" aria-hidden="true"><span></span><span></span><span></span><span></span></div>
           <div class="project-track" id="project-track">
             <article class="project-card is-active" data-index="0">
-              <div class="project-visual project-video"><video controls loop playsinline preload="metadata" poster="/assets/flowers-yU5JYxV5.jpg"><source src="/assets/videos/flower-detection.mp4" type="video/mp4" />Your browser does not support HTML video.</video></div>
+              <div class="project-visual project-video"><video controls muted loop playsinline preload="metadata" poster="/assets/flowers-yU5JYxV5.jpg"><source src="/assets/videos/flower-detection.mp4" type="video/mp4" />Your browser does not support HTML video.</video></div>
               <div class="project-meta"><span>Computer vision · 01</span><h3>Flower Detection</h3><p>Teaching a machine to notice the natural world—and show its working.</p></div>
             </article>
             <article class="project-card" data-index="1">
-              <div class="project-visual project-video"><video controls loop playsinline preload="metadata" poster="/assets/hand-sgfIbAv9.jpg"><source src="/assets/videos/hand-mapping.mp4" type="video/mp4" />Your browser does not support HTML video.</video></div>
+              <div class="project-visual project-video"><video controls muted loop playsinline preload="metadata" poster="/assets/hand-sgfIbAv9.jpg"><source src="/assets/videos/hand-mapping.mp4" type="video/mp4" />Your browser does not support HTML video.</video></div>
               <div class="project-meta"><span>AI vision · 02</span><h3>Hand Mapping</h3><p>Real-time landmark tracking turned into tactile visual feedback.</p></div>
             </article>
             <article class="project-card" data-index="2">
-              <div class="project-visual project-video"><video controls loop playsinline preload="metadata" poster="/assets/cards-DKxM1AoQ.jpg"><source src="/assets/videos/archive-automation.mp4" type="video/mp4" />Your browser does not support HTML video.</video></div>
+              <div class="project-visual project-video"><video controls muted loop playsinline preload="metadata" poster="/assets/cards-DKxM1AoQ.jpg"><source src="/assets/videos/archive-automation.mp4" type="video/mp4" />Your browser does not support HTML video.</video></div>
               <div class="project-meta"><span>AI + OCR · 03</span><h3>Archive Automation</h3><p>Extracting structured records from local history cards to make memory searchable and useful.</p></div>
             </article>
             <article class="project-card" data-index="3">
-              <div class="project-visual project-video"><video controls loop playsinline preload="metadata" poster="/assets/wisteria-CwTjyfrc.jpg"><source src="/assets/videos/wisteria-timelapse.mp4" type="video/mp4" />Your browser does not support HTML video.</video></div>
+              <div class="project-visual project-video"><video controls muted loop playsinline preload="metadata" poster="/assets/wisteria-CwTjyfrc.jpg"><source src="/assets/videos/wisteria-timelapse.mp4" type="video/mp4" />Your browser does not support HTML video.</video></div>
               <div class="project-meta"><span>Python + AI · 04</span><h3>Wisteria Timelapse</h3><p>Compressing a season into a moment without losing its rhythm.</p></div>
             </article>
             <article class="project-card" data-index="4">
-              <div class="project-visual project-video"><video controls loop playsinline preload="metadata" poster="/assets/spacebike-_U_Kk2gp.jpg"><source src="/assets/videos/space-bike.mp4" type="video/mp4" />Your browser does not support HTML video.</video></div>
+              <div class="project-visual project-video"><video controls muted loop playsinline preload="metadata" poster="/assets/spacebike-_U_Kk2gp.jpg"><source src="/assets/videos/space-bike.mp4" type="video/mp4" />Your browser does not support HTML video.</video></div>
               <div class="project-meta"><span>6502 game · 05</span><h3>Space Bike</h3><p>Revisiting the C64 original—a simulator where limited memory makes room for imagination.</p><p>A game I wrote at 17 and had published alongside ten other Imagineered games—four of which reached the Gallup top ten in the same month.</p></div>
             </article>
             <article class="project-card" data-index="5">
-              <div class="project-visual project-video"><video controls loop playsinline preload="metadata" poster="/assets/ww1-BRtzddHk.jpg"><source src="/assets/videos/ww1-village-walk.mp4" type="video/mp4" />Your browser does not support HTML video.</video></div>
+              <div class="project-visual project-video"><video controls muted loop playsinline preload="metadata" poster="/assets/ww1-BRtzddHk.jpg"><source src="/assets/videos/ww1-village-walk.mp4" type="video/mp4" />Your browser does not support HTML video.</video></div>
               <div class="project-meta"><span>Place + motion · 06</span><h3>WW1 Village Walk</h3><p>An animated journey connecting Collingham’s lanes, landmarks and First World War stories.</p></div>
             </article>
             <article class="project-card" data-index="6">
@@ -197,7 +192,7 @@
       <span class="music-toggle__label">Play music</span>
     </button>
     <script src="/assets/music-player.js"></script>
-    <script src="/assets/project-video.js"></script>
+    <script src="/assets/project-video.js?v=20260916-3"></script>
     <script src="/assets/cv-popup.js"></script>
   </body>
 </html>

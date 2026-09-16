@@ -10,6 +10,19 @@ The profile links to a rotating set of supplied professional references at
 
 ## Interactive experiments
 
+The homepage, Arcade, Murmuration, Cheeky Phone, Agent Control, profile,
+references, error page and embedded Crossword Studio share a menu from
+`templates/site-header.html`. Update that template, run
+`python scripts/site_shell.py`, then build the publication. The build renders
+the same menu into the pinned Crossword Studio output as well. Typography,
+responsive navigation and neon-blue hover/current-page states live in
+`assets/site-shell.css` and `assets/site-shell.js`.
+
+The selected video in “Things I’ve sent into orbit” starts muted and loops
+while visible. Other cards and hidden tabs pause. Native controls remain
+available; a deliberate pause or data-saving mode
+keeps automatic playback off.
+
 - **Arcade** — `/arcade.html`, beside Murmuration in the desktop and mobile navigation. A neon glass cube has six faces: Invaders, Pac-Man, Space Bike, Tempest, Donkey Kong and Centipede. Space Bike shows a muted 60-second recording of Lawrence's C64 game; the other faces run animated simulations. Drag or flick to keep the cube rotating, or choose a face to bring it forward. Play, pause, reset, keyboard controls and full screen apply to the whole cabinet, including the video. Reduced-motion preferences initially pause playback; leaving the viewport or hiding the tab suspends it.
 
   `assets/arcade-scene.html` and `assets/arcade-sequence.css` are the self-contained SVG/CSS export of the existing sequence, with the background brightened for standalone viewing. `arcade.js` synchronizes their animations and the procedural SVG chapter in `arcade-centipede.js`; `arcade.css` supplies the cabinet and story layout. Only these public assets are included by the publication builder. There is no dependency on the protected portal.
