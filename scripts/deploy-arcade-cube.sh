@@ -136,7 +136,7 @@ python3 - "$LIVE_URL" "$ROOT/build/publication" "$RELEASE_REV" <<'PY'
 import hashlib,json,sys,urllib.request
 from pathlib import Path
 origin,root,revision=sys.argv[1],Path(sys.argv[2]),sys.argv[3]
-files=['arcade.html','assets/arcade-cube.js','assets/arcade-cube.css','assets/arcade-games.js','assets/three-0.160.0.module.min.js','assets/three-LICENSE.txt','assets/space-bike-gameplay.jpg','assets/videos/space-bike-gameplay-v1.mp4']
+files=['arcade.html','assets/arcade-cube.js','assets/arcade-cube.css','assets/arcade-games.js','assets/three-0.160.0.module.min.js','assets/three-LICENSE.txt','assets/space-bike-gameplay.jpg','assets/videos/space-bike-gameplay-v2.mp4']
 for name in files:
     request=urllib.request.Request(origin.rstrip('/')+'/'+name+'?arcade-release='+revision,headers={'Cache-Control':'no-cache'})
     with urllib.request.urlopen(request,timeout=30) as response:
@@ -148,7 +148,7 @@ for name in files:
             assert "script-src 'self'" in response.headers.get('Content-Security-Policy',''), 'The site CSP must remain enabled'
         if name.endswith('.mp4'):
             assert response.headers.get_content_type()=='video/mp4', 'Gameplay must be served as video'
-request=urllib.request.Request(origin.rstrip('/')+'/assets/videos/space-bike-gameplay-v1.mp4',headers={'Range':'bytes=0-1023'})
+request=urllib.request.Request(origin.rstrip('/')+'/assets/videos/space-bike-gameplay-v2.mp4',headers={'Range':'bytes=0-1023'})
 with urllib.request.urlopen(request,timeout=30) as response:
     assert response.status==206 and len(response.read())==1024, 'Gameplay must support byte ranges'
 print('LIVE_VERIFICATION=passed; eight file hashes match; HTML cache, CSP, and video byte ranges verified')

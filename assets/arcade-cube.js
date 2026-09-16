@@ -142,10 +142,10 @@ import { createArcadeSimulation } from './arcade-games.js?v=20260915-cube-1';
   bikeVideo.setAttribute('playsinline','');
   bikeVideo.setAttribute('aria-hidden','true');
   bikeVideo.tabIndex=-1;
-  bikeVideo.src='/assets/videos/space-bike-gameplay-v1.mp4';
+  bikeVideo.src='/assets/videos/space-bike-gameplay-v2.mp4';
   stage.appendChild(bikeVideo);
   const bikePoster=new Image();
-  bikePoster.src='/assets/space-bike-gameplay.jpg';
+  bikePoster.src='/assets/space-bike-gameplay.jpg?v=2';
   let mediaPending=false,mediaBlocked=false,disposed=false;
   function refreshMediaFrame(){if(!disposed){lastTexture=-1;start();}}
   function syncMedia(){

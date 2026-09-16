@@ -32,7 +32,7 @@ class ArcadePublicationTests(unittest.TestCase):
         self.assertEqual(files[-1],'arcade.html')
         self.assertEqual(len(files),7)
         self.assertIn('assets/space-bike-gameplay.jpg',files)
-        self.assertNotIn('assets/videos/space-bike-gameplay-v1.mp4',files)
+        self.assertNotIn('assets/videos/space-bike-gameplay-v2.mp4',files)
         self.assertIn('MEDIA_ORIGIN',script)
         self.assertNotIn('index.html',files)
         self.assertNotIn('.htaccess',files)
@@ -43,7 +43,7 @@ class ArcadePublicationTests(unittest.TestCase):
             root=Path(directory)
             (root/'config').mkdir()
             approved=b'reviewed gameplay edit'
-            spec={'path':'assets/videos/space-bike-gameplay-v1.mp4',
+            spec={'path':'assets/videos/space-bike-gameplay-v2.mp4',
                   'bytes':len(approved),'sha256':hashlib.sha256(approved).hexdigest()}
             (root/'config/arcade-media.json').write_text(json.dumps(spec))
             source=root/'source.mp4'
