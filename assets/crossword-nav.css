@@ -1,0 +1,12 @@
+.mobile-crossword-link { display: none; }
+@media (min-width: 801px) and (max-width: 1440px) {
+  .nav-shell nav { gap: clamp(.45rem, .85vw, .85rem); }
+}
+@media (max-width: 800px) {
+  .mobile-crossword-link {
+    display: inline-flex; align-items: center; min-height: 2rem;
+    padding: .5rem .7rem; border: 1px solid #bdd9bf; border-radius: 999px;
+    background: #dce8d9; color: #123d35; font-family: monospace;
+    font-size: .7rem; line-height: 1; text-decoration: none; text-transform: uppercase;
+  }
+}

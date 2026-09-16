@@ -114,3 +114,30 @@ These checks are not physical sensor/audio qualification. After deployment,
 open the page on a phone, tap Start, allow motion, check the volume and hold the
 screen face down for two seconds after the selected minimum gap. Confirm the
 exact response, voice choice, quiet mode, Stop and return from another app.
+## Crossword Studio
+
+The homepage links to `/crossword/`, including **Loz’s world**, a prepared puzzle
+about arcade games, nature, technology and bird flight. The studio accepts local
+PDF, DOCX and text files or public article URLs, offers online solving with saved
+progress, and downloads A4 PDFs with optional answer keys.
+
+Canonical source: [lozknowles/crossword-studio](https://github.com/lozknowles/crossword-studio).
+`config/crossword-studio.json` pins the exact source commit. The normal publication
+build clones that revision into its build cache and packages only the browser
+runtime. Requires Node 22.18+ and pnpm 11.19.0. Set `CROSSWORD_BUILDER_REPO` to a
+clean checkout at the pinned revision, and `PNPM` to an executable path if needed.
+Existing checkouts are never reset. Build provenance stays outside the web root.
+
+The separately installed, loopback-only Python article reader has no API key and
+never receives uploaded documents. It validates public DNS addresses and every
+redirect, pins connections, limits fetch size/time/concurrency and rate-limits
+article requests. The Apache route overwrites its client-address header.
+
+`scripts/install_crossword_release.py` is the scoped first-install procedure. It
+requires a reviewed release manifest, exact baseline file and virtual-host hashes,
+explicit host paths, and a new backup directory outside the web root. It refuses
+an existing installation. It tests Apache configuration, checks reader health,
+publishes assets before the page, and restores the previous files/configuration
+on failure. Later upgrades need their own reviewed release procedure. Verify
+public bytes, article import, local documents, PDF output and mobile layout
+before describing a release as live-verified.

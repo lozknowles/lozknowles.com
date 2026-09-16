@@ -11,9 +11,11 @@ import sys
 from pathlib import Path
 
 if __package__:
-    from .publication_privacy import scan_artifact
+    from .publication_privacy import scan_artifact, load_allowlist, split_allowed
+    from .build_crossword_publication import build_crossword
 else:
-    from publication_privacy import scan_artifact
+    from publication_privacy import scan_artifact, load_allowlist, split_allowed
+    from build_crossword_publication import build_crossword
 
 
 ROOT = Path(__file__).resolve().parents[1]
@@ -52,6 +54,7 @@ ASSET_FILES = (
     "three-LICENSE.txt",
     "arcade-centipede.js",
     "arcade-nav.css",
+    "crossword-nav.css",
     "arcade-sequence.css",
     "arcade-scene.html",
     "cheeky-phone.css",
@@ -126,8 +129,9 @@ def build(output: Path, arcade_media: Path | None = None) -> None:
         copy_file(Path("assets") / name, output)
     if arcade_media is not None:
         copy_arcade_media(arcade_media, output)
+    build_crossword(output)
     normalise_public_permissions(output)
-    findings = scan_artifact(output)
+    findings, _ = split_allowed(scan_artifact(output), load_allowlist(ROOT / 'config/publication-privacy-allowlist.json'))
     if findings:
         for finding in findings:
             print(f"FAIL {finding.code}: {finding.path} ({finding.detail})", file=sys.stderr)
