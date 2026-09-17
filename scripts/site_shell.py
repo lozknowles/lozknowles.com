@@ -14,7 +14,8 @@ PAGES = {
 }
 CURRENT = {'arcade': '/arcade.html', 'murmuration': '/murmuration.html',
            'cheeky': '/cheeky-phone.html', 'crossword': '/crossword/',
-           'profile': '/cv.html', 'references': '/cv.html', 'agent': '/#work', 'village': '/#place'}
+           'profile': '/cv.html', 'references': '/cv.html', 'agent': '/#work', 'village': '/#place',
+           'monocular': '/#work'}
 
 
 def render_page(text: str, page: str) -> str:

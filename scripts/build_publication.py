@@ -13,10 +13,12 @@ from pathlib import Path
 if __package__:
     from .publication_privacy import scan_artifact, load_allowlist, split_allowed
     from .build_crossword_publication import build_crossword
+    from .build_monocular_publication import build_monocular
     from .site_shell import apply_site_shell
 else:
     from publication_privacy import scan_artifact, load_allowlist, split_allowed
     from build_crossword_publication import build_crossword
+    from build_monocular_publication import build_monocular
     from site_shell import apply_site_shell
 
 
@@ -152,6 +154,7 @@ def build(output: Path, arcade_media: Path | None = None) -> None:
         copy_file(relative, output)
     build_crossword(output)
     apply_site_shell(output)
+    build_monocular(output)
     # The embedded header changes the built entry page; record the shipped bytes.
     manifest_path = ROOT / 'build/crossword-manifest.json'
     crossword_manifest = json.loads(manifest_path.read_text(encoding='utf-8'))

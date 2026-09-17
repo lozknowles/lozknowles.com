@@ -11,6 +11,24 @@ The profile links to a rotating set of supplied professional references at
 
 ## Interactive experiments
 
+Monocular Light Fairy is linked from the homepage workbench at `/monocular/`.
+Visitors can use the sample photograph, choose a photo from their device, or
+explicitly start the device camera. The model estimates relative depth and
+animates a light over the scene; this is an artistic effect, not a measurement
+of distance. Images and camera frames are processed locally in the browser.
+Camera use requires browser permission and ends with **Stop camera** or
+**Change source**. WebGPU support is required; unsupported devices show the
+sample photograph with an explanation.
+
+`config/monocular-demo.json` pins the public
+[source repository](https://github.com/lozknowles/monocular-light-fairy),
+photograph and model hashes. The publication build requires Node 24 and pnpm,
+and downloads the pinned models. Set `MONOCULAR_REPO` to a clean matching
+checkout to reuse a local clone. The build applies the shared site menu and
+publishes the original notices under `/monocular/credits/`. A route-local
+`.htaccess` enables the browser's camera permission request only for this
+demo; microphone and location remain disabled.
+
 Cartoon Collingham is linked from the homepage workbench and Place section at
 `/cartoon-collingham.html`. Its scene-only presentation keeps the 3D village,
 rotation, pan and zoom, with no HUD, menus or first-person mode. The source pin,

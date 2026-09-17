@@ -1,0 +1,9 @@
+{
+  "repository": "https://github.com/lozknowles/monocular-light-fairy.git",
+  "commit": "222ff2e01517783cb1ab08380f646a8af8d8a59f",
+  "models": {
+    "depthart-relative-s-448-balanced.depthart": "e6d7b65bd2888771790d3cc3ad827133f0b014f05010347b6fc6fc891ff9e19c",
+    "depthart-relative-s-448-f32.depthart": "adc5352f2fc83d1fd7e740ed32b8a0bd7862cef463a430d23d6071990e822aef"
+  },
+  "photo_sha256": "5715ffefb4f7056a8c15c00b849856116d488b2a8303b22d4886995bc9d8403e"
+}

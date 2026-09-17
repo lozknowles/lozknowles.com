@@ -2,6 +2,16 @@
   "version": 1,
   "entries": [
     {
+      "code": "image-metadata",
+      "path": "monocular/demo.jpg",
+      "reason": "The hash-pinned, already public demonstration photo has no EXIF, XMP or IPTC data. Its Photoshop APP13 marker contains only an empty IPTC resource; retain the original image bytes."
+    },
+    {
+      "code": "git-revision",
+      "path": "monocular/index.html",
+      "reason": "The optional model diagnostics identify the public upstream model revision. This is model provenance, not a website deployment revision or private infrastructure identifier."
+    },
+    {
       "code": "ai-provider-kokoro",
       "path": "cartoon-view/assets/index-D2ZZdF8d.js",
       "reason": "Pinned derivative of the already public Cartoon Collingham runtime. Retained speech-provider labels are inactive in the scene-only presentation; no credentials or private service addresses are included."
