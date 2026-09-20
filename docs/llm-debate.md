@@ -9,7 +9,7 @@ open `/llm-debate/audio.html` without a login.
 
 - Repository: https://github.com/lozknowles/llm-fight-club
 - Branch: `feature/public-llm-debate-20260920`
-- Release revision: `5756bc845e4e57613b3ecd1f9e0d3d0215eaec02`
+- Release revision: `b985a9ffc2a89d642b2b7217de70bcadc80dee4a`
 - Server entry: `server-spoken.mjs`, with `FIGHT_CLUB_PUBLIC=1` and
   `FIGHT_CLUB_CSM_MENU_ENABLED=1`.
 - Public deployment and visitor isolation: `docs/PUBLIC-DEBATE.md` in that repo.
@@ -45,7 +45,15 @@ public visitor isolation, cross-origin rejection, fixed CSM voice identities,
 saved replay and the audio-export restriction. The website's publication tests,
 JavaScript checks and artefact privacy scan are required before publication.
 
-Live release checks must cover a real CSM conversation, saved-audio replay and
-pause/resume, the homepage link, iframe layout at desktop and narrow widths, and
-anonymous access to both public pages. A browser viewport check does not qualify
+Live checks on 20 September 2026 covered the homepage link, anonymous access to
+both public pages, and a completed two-turn CSM conversation using Fighter A and
+Fighter B. Both saved turns replayed, and application pause/resume controls worked.
+The public saved-debate button reopens within the embedded studio, avoiding a
+new-tab popup. All four formats selected CSM voices by default; the optional
+referee selected Mallow.
+
+Desktop and 390-by-844 browser layouts had no horizontal overflow. An independent
+browser session had an empty conversation list and could not access the test
+conversation. Voice Lab remained unavailable from the public route, and the old
+Voice Clone endpoint retained its login. A browser viewport check does not qualify
 audio behavior on a physical phone or Safari.
