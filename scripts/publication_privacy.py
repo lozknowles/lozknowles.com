@@ -434,6 +434,9 @@ def scan_artifact(root: Path) -> list[Finding]:
         findings.extend(scan_binary(rel, data))
 
     virtual_prefixes = ("assets/videos/",)
+    # This exact entry is served by the separately qualified debate application.
+    # Do not exempt the whole prefix: accidental links still need to fail.
+    virtual_files = {"llm-debate/audio.html"}
     for rel, (text, content_type) in text_files.items():
         if content_type == "text/plain":
             continue
@@ -455,7 +458,7 @@ def scan_artifact(root: Path) -> list[Finding]:
                 target = "index.html"
             if target.endswith("/"):
                 target += "index.html"
-            if target in published_files or f"{target}/index.html" in published_files:
+            if target in published_files or target in virtual_files or f"{target}/index.html" in published_files:
                 continue
             if any(target.startswith(prefix) for prefix in virtual_prefixes):
                 continue

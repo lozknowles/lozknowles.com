@@ -36,6 +36,7 @@ ROOT_FILES = (
     "cheeky-phone.html",
     "agent-control.html",
     "cartoon-collingham.html",
+    "llm-debate.html",
     "LawrenceKnowlesProfessionalProfile.pdf",
 )
 ASSET_FILES = (
@@ -45,6 +46,8 @@ ASSET_FILES = (
     "cv.css",
     "agent-control.css",
     "cartoon-view.css",
+    "llm-debate.css",
+    "llm-debate.js",
     "references-page.js",
     "flowers-yU5JYxV5.jpg",
     "hand-sgfIbAv9.jpg",

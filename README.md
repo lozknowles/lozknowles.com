@@ -11,6 +11,15 @@ The profile links to a rotating set of supplied professional references at
 
 ## Interactive experiments
 
+LLM Fight Club has a featured homepage card and a public page at `/llm-debate.html`.
+The embedded studio runs under `/llm-debate/` as a separate instance of
+[LLM Fight Club](https://github.com/lozknowles/llm-fight-club), with anonymous
+browser sessions, local models and CSM synthetic voices. Every conversation format
+defaults to Fighter A and Fighter B, with Mallow for a host or referee. Visitors choose a topic,
+listen to opposing arguments, read the transcript and replay their own debates
+for 24 hours. The private Area 51 deployment remains independently managed.
+The source revision and release checks are recorded in `docs/llm-debate.md`.
+
 Monocular Light Fairy is linked from the homepage workbench at `/monocular/`.
 Visitors can use the sample photograph, choose a photo from their device, or
 explicitly start the device camera. The model estimates relative depth and

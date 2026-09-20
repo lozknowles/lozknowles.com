@@ -48,14 +48,15 @@ class PublicationPrivacyTests(unittest.TestCase):
         self.assertIn("references.html", ROOT_FILES)
         self.assertIn("references-page.js", ASSET_FILES)
 
-    def test_homepage_links_password_beta_as_voice_clone(self) -> None:
+    def test_homepage_links_public_fight_club(self) -> None:
         homepage = (Path(__file__).parents[1] / "index.html").read_text(
             encoding="utf-8"
         )
         self.assertIn(
-            'href="https://www.lozknowles.com/voice-clone/"', homepage
+            'href="/llm-debate.html">LLM Fight Club', homepage
         )
-        self.assertIn("Voice Clone", homepage)
+        self.assertNotIn('href="https://www.lozknowles.com/voice-clone/"', homepage)
+        self.assertNotIn("Voice Clone", homepage)
 
     def test_agent_control_showcase_exposes_three_reviewed_videos(self) -> None:
         showcase = (Path(__file__).parents[1] / "agent-control.html").read_text(
@@ -139,6 +140,14 @@ class PublicationPrivacyTests(unittest.TestCase):
             (root / "index.html").write_text('<script src="/assets/missing.js"></script>', encoding="utf-8")
             codes = {finding.code for finding in scan_artifact(root)}
             self.assertIn("broken-artifact-link", codes)
+
+    def test_managed_debate_entry_does_not_hide_missing_assets(self) -> None:
+        with tempfile.TemporaryDirectory() as directory:
+            root = Path(directory)
+            (root / "index.html").write_text('<iframe src="/llm-debate/audio.html"></iframe><script src="/llm-debate/missing.js"></script>', encoding="utf-8")
+            broken = [finding for finding in scan_artifact(root) if finding.code == "broken-artifact-link"]
+            self.assertEqual(len(broken), 1)
+            self.assertIn("missing.js", broken[0].detail)
 
     def test_reviewed_allowance_is_path_and_rule_specific(self) -> None:
         findings = [Finding("experiment/assets/site.js", "ai-provider-kokoro", "provider")]
