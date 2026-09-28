@@ -1,0 +1,428 @@
+<!doctype html>
+<html lang="en"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1">
+<title>When AI takes on real work, who remains responsible? | Lawrence Knowles</title><meta name="description" content="An AI agent can complete a task and still create an operational failure.">
+<link rel="canonical" href="https://lozknowles.com/blog/who-remains-responsible/"><meta property="og:title" content="When AI takes on real work, who remains responsible?">
+<meta property="og:description" content="An AI agent can complete a task and still create an operational failure."><meta property="og:url" content="https://lozknowles.com/blog/who-remains-responsible/">
+<meta property="og:type" content="article"><meta name="theme-color" content="#06100f">
+<link rel="alternate" type="application/rss+xml" title="Lawrence Knowles — Blog" href="/blog/feed.xml">
+<link rel="stylesheet" href="/blog/blog.css">
+    <!-- site-assets:start -->
+    <link rel="stylesheet" href="/assets/site-shell.css?v=20260916-3">
+    <script defer src="/assets/site-shell.js?v=20260916-3"></script>
+    <!-- site-assets:end -->
+</head><body data-site-page="blog">
+<!-- site-header:start -->
+<header class="site-header" aria-label="Site header">
+  <a class="site-home" href="/" aria-label="Lawrence Knowles, home">LK<span aria-hidden="true">•</span></a>
+  <button class="site-menu-toggle" type="button" aria-expanded="false" aria-controls="site-primary-navigation">Menu <span aria-hidden="true">☰</span></button>
+  <nav id="site-primary-navigation" class="site-navigation" aria-label="Primary navigation">
+    <a href="/blog/" aria-current="page">Blog</a>
+    <a href="/#about">About</a>
+    <a href="/#work">Experiments</a>
+    <a href="/murmuration.html">Murmuration</a>
+    <a href="/arcade.html">Arcade</a>
+    <a href="/crossword/">Crossword Studio</a>
+    <a href="/cheeky-phone.html">Cheeky Phone</a>
+    <a href="/#place">Place</a>
+    <a href="https://files.lozknowles.com">Area 51</a>
+    <a href="/#contact">Contact</a>
+    <a href="/cv.html" class="site-profile">Profile</a>
+    <a href="https://www.youtube.com/@LawrenceKnowles-cr9ml" target="_blank" rel="noreferrer">YouTube <span aria-hidden="true">↗</span></a>
+  </nav>
+</header>
+<!-- site-header:end -->
+<a class="skip" href="#main">Skip to content</a><main id="main"><article><header class="article-head"><a class="back" href="/blog/">← All articles</a><div class="meta"><span>Governance</span><time datetime="2026-09-25">25 September 2026</time><span>4 min read</span></div><h1>When AI takes on real work, who remains responsible?</h1><p class="byline">By Lawrence Knowles</p></header><div class="prose"><p>
+      An AI agent can complete a task and still create an operational failure.
+    </p>
+
+
+
+
+
+
+
+
+
+
+    <p>
+      Imagine asking an agent to update a customer record. It finds a record, changes the requested field and reports success. Every tool call works. The change is recorded in a log.
+    </p>
+
+
+
+
+
+
+
+
+
+
+    <p>
+      But it has updated the wrong customer.
+    </p>
+
+
+
+
+
+
+
+
+
+
+    <p>
+      The important question is whether the surrounding system checked which record the agent was authorised to change, prevented it from crossing that boundary, and verified the intended outcome.
+    </p>
+
+
+
+
+
+
+
+
+
+
+    <p>
+      That is why I believe systems like Tsunora could become important as organisations delegate more work to AI.
+    </p>
+
+
+
+
+
+
+
+
+
+
+    <h3>
+      Capability needs an operating framework
+    </h3>
+
+
+
+
+
+
+
+
+
+
+    <p>
+      A useful way to think about an agent is as a capability to which we can delegate a bounded task. Calling it a “digital worker” does not give it human judgement, legal responsibility or an unrestricted mandate.
+    </p>
+
+
+
+
+
+
+
+
+
+
+    <p>
+      Before delegating, an organisation should be able to answer some ordinary operational questions:
+    </p>
+
+
+
+
+
+
+
+
+
+
+    <p>
+            <ul><li>What exactly is the work, and what counts as successful completion?</li><li>Which systems and records may be accessed or changed?</li><li>Who owns the outcome and approves consequential actions?</li><li>What is the spending limit, including retries and review?</li><li>What happens if the worker fails, becomes unavailable or exceeds its authority?</li></ul>
+
+    </p>
+
+
+
+
+
+
+
+
+
+
+    <p>
+      These questions should have answers that the system can enforce. Putting them in a prompt is useful, but a prompt alone is not an access boundary.
+    </p>
+
+
+
+
+
+
+
+
+
+
+    <p>
+      My interest in this comes from HR, payroll and workforce technology. Assigning work has always involved more than finding someone capable of doing it. It also involves scope, permissions, supervision, handovers and accountability. Those disciplines remain relevant when software performs part of the work.
+    </p>
+
+
+
+
+
+
+
+
+
+
+    <h3>
+      Completion needs evidence
+    </h3>
+
+
+
+
+
+
+
+
+
+
+    <p>
+      An agent saying “done” is a claim to assess.
+    </p>
+
+
+
+
+
+
+
+
+
+
+    <p>
+      For the customer-record example, completion could require confirming the intended customer&#x27;s identity, checking that only the authorised field changed, and retaining evidence of the final state. A successful tool response would be one piece of evidence, not the whole conclusion.
+    </p>
+
+
+
+
+
+
+
+
+
+
+    <p>
+      The checks also need protection. If the same agent can freely rewrite its acceptance criteria, passing them tells us less than it appears to. Independent checking can help, but a second model is not automatically an independent or reliable judge. The verifier itself needs appropriate tests and limits.
+    </p>
+
+
+
+
+
+
+
+
+
+
+    <p>
+      Oversight must be usable, too. A system that asks a person to approve every minor step could simply move the workload into an approval queue. I would want routine, bounded work to proceed within tested limits, with meaningful decisions escalated to someone who has the context to make them.
+    </p>
+
+
+
+
+
+
+
+
+
+
+    <h3>
+      The economics must include the difficult parts
+    </h3>
+
+
+
+
+
+
+
+
+
+
+    <p>
+      The cost of digital work is more than the price of a model call.
+    </p>
+
+
+
+
+
+
+
+
+
+
+    <p>
+      It includes unsuccessful attempts, verification, human review, integration, recovery and ongoing maintenance. A cheap attempt can produce an expensive outcome if somebody has to reconstruct what happened and repair it.
+    </p>
+
+
+
+
+
+
+
+
+
+
+    <p>
+      For me, a more useful question is: what does an accepted outcome cost, at the quality and level of risk the organisation requires?
+    </p>
+
+
+
+
+
+
+
+
+
+
+    <p>
+      Answering that requires records connecting the task, the worker, the resources consumed and the result. Even then, lower cost is something to demonstrate against a fair baseline. It should not be assumed from the presence of automation.
+    </p>
+
+
+
+
+
+
+
+
+
+
+    <h3>
+      Where Tsunora fits
+    </h3>
+
+
+
+
+
+
+
+
+
+
+    <p>
+      Tsunora is my experimental exploration of a governed operating environment for digital work, derived from Agent Control. Its public design connects scoped work with digital-worker capability, bounded authority, verification, evidence and internal accounting. <a href="https://github.com/lozknowles/tsunora">Tsunora source and documentation</a>
+    </p>
+
+
+
+
+
+
+
+
+
+
+    <p>
+      The status matters. The current workforce prototype is research software, and its physical demonstration uses deterministic workers. Production authentication, enterprise integrations and model-backed workforce execution remain separately unqualified. That evidence does not establish readiness for production HR or payroll operations. <a href="https://github.com/lozknowles/tsunora#tsunora">Current qualification boundaries</a>
+    </p>
+
+
+
+
+
+
+
+
+
+
+    <p>
+      The larger proposition is that organisations will need these operating capabilities as delegation expands. They might be supplied by existing platforms, specialist systems or a combination. A separate product is not inevitable; the requirement for clear responsibility is the part I expect to endure.
+    </p>
+
+
+
+
+
+
+
+
+
+
+    <h3>
+      Why this matters beyond the technology team
+    </h3>
+
+
+
+
+
+
+
+
+
+
+    <p>
+      If digital work becomes a material part of an organisation&#x27;s capacity, its effects will concern finance, HR, operations and leadership as well as IT.
+    </p>
+
+
+
+
+
+
+
+
+
+
+    <p>
+      What work was actually completed? What did it cost? How much human intervention remained? Did it improve service, reduce errors, or merely increase activity?
+    </p>
+
+
+
+
+
+
+
+
+
+
+    <p>
+      Credible answers would also improve the wider debate about productivity, employment and who benefits from AI. Operational records cannot settle questions of tax or distribution, but they can help distinguish measured outcomes from promotional claims.
+    </p>
+
+
+
+
+
+
+
+
+
+
+    <p>
+      That is the future I want to explore through Tsunora: organisations able to delegate useful work with clear boundaries, retain evidence, and intervene when needed.
+    </p>
+
+
+
+
+
+
+
+
+
+
+    <p>
+      <strong>Before an AI agent is allowed to act on your organisation&#x27;s behalf, what evidence would you need to trust the arrangement?</strong>
+    </p><p class="original">Also published on <a href="https://www.linkedin.com/pulse/when-ai-takes-real-work-who-remains-responsible-lawrence-knowles-0z03e/">LinkedIn ↗</a>.</p><p class="date-note">This article reflects the evidence and development status at its original publication date.</p></div></article><aside class="next"><span class="eyebrow">Continue reading</span><a href="/blog/ai-value-and-return/">AI Can Create Value. The Return Still Has to Be Proved. ↗</a></aside></main>
+<footer class="blog-footer"><a href="/">Lawrence Knowles</a><span>Independent writing on work, AI and responsibility.</span><a href="/blog/feed.xml">RSS feed ↗</a></footer></body></html>

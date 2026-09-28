@@ -1,0 +1,23 @@
+<p>Building agents has repeatedly brought us back to the engineering around execution: stopping work, protecting resources, coordinating jobs and establishing what actually happened.</p>
+<p>These are five useful examples from our recorded development and qualification work. They describe specific implementations and bounded tests, not a claim that every deployment or failure mode has been solved.</p>
+<h2>1. A timeout needed to stop the underlying work</h2>
+<p>A job reaching its deadline is only part of the problem. Its subprocesses may still be running, and its worker slot or resource locks may remain occupied.</p>
+<p>We introduced explicit ownership of the processes started by a job, bounded cleanup of those processes, a recorded timed-out outcome, and release of the worker and locks. Cleanup targets the job&#x27;s own process tree rather than every process with a matching name.</p>
+<p>The focused runtime checks included reuse of a capacity-one worker slot after a timeout. The practical lesson was that cancellation needs a verified end state, not merely a change of status.</p>
+<h2>2. An earlier safety check could become stale</h2>
+<p>A machine can be available when a job is planned and busy with protected work by the time an action executes. An earlier successful check cannot establish that a disruptive operation is still safe.</p>
+<p>We added a fresh protected-workload check immediately before managed-node operations that could make changes. If protected work had appeared, the operation was rejected and the reason retained in the job and step evidence.</p>
+<p>This addressed the tested protected-workload boundary. It is not proof that every possible authorization race has been eliminated. The lesson is to place a check close to the action whose safety depends on it.</p>
+<h2>3. More workers did not automatically mean concurrent work</h2>
+<p>The scheduler awaited jobs one at a time, limiting useful concurrency. Simply starting everything together would have created a different problem: overlapping work competing for the same resources.</p>
+<p>We introduced bounded dispatch based on healthy worker capacity, while preserving dependencies, resource locks, explicit no-overlap rules and failure isolation.</p>
+<p>In the controlled scheduler checks, two independent jobs overlapped, jobs marked no-overlap did not, and active work stayed within the configured capacity. This established the scheduling behavior tested; it was not a throughput benchmark for a production workload.</p>
+<h2>4. A computer action being acknowledged did not prove success</h2>
+<p>A provider can report that it clicked or typed without establishing that the intended result appeared. Switching providers also creates a risk that evidence from an earlier failed attempt contaminates the next attempt.</p>
+<p>We introduced a common provider contract with authority checks, fresh observations, explicit verification and separate outcomes for completion, blocking and verification failure. We also fixed a concrete fallback defect: the second provider inherited the first provider&#x27;s failure reason. Clearing that transient reason corrected the focused test failure.</p>
+<p>Eight focused tests and a local headless Chromium integration passed. Native desktop, Blender and wider release qualification remained incomplete in that record.</p>
+<h2>5. Cheap attempts could conceal expensive or unfinished work</h2>
+<p>A comparison that counts only successful model calls leaves out failed attempts, verification, retries and reassignment. It can make a strategy look efficient while it delivers fewer accepted outcomes.</p>
+<p>We kept those activities in the accounting and compared routing strategies against verified outcomes. In a bounded experiment with three real local AI workers, brokered routing and the cheapest routing strategy each verified nine of twelve outcomes; fixed routing verified eight.</p>
+<p>The monetary-savings conclusion remained inconclusive. What we improved was the measurement: unfinished work and recovery costs remained visible rather than disappearing from the comparison.</p>
+<p>Across these examples, the recurring engineering question was simple: what evidence would let us trust the state the system is reporting?</p>

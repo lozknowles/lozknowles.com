@@ -15,11 +15,13 @@ if __package__:
     from .build_crossword_publication import build_crossword
     from .build_monocular_publication import build_monocular
     from .site_shell import apply_site_shell
+    from .build_blog import build_blog
 else:
     from publication_privacy import scan_artifact, load_allowlist, split_allowed
     from build_crossword_publication import build_crossword
     from build_monocular_publication import build_monocular
     from site_shell import apply_site_shell
+    from build_blog import build_blog
 
 
 ROOT = Path(__file__).resolve().parents[1]
@@ -155,6 +157,7 @@ def build(output: Path, arcade_media: Path | None = None) -> None:
         if hashlib.sha256((ROOT / relative).read_bytes()).hexdigest() != expected:
             raise ValueError(f'Cartoon Collingham artifact changed: {name}')
         copy_file(relative, output)
+    build_blog(output)
     build_crossword(output)
     apply_site_shell(output)
     build_monocular(output)

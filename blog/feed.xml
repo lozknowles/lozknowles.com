@@ -1,0 +1,50 @@
+<?xml version='1.0' encoding='utf-8'?>
+<rss version="2.0">
+  <channel>
+    <title>Lawrence Knowles — Blog</title>
+    <link>https://lozknowles.com/blog/</link>
+    <description>Work, intelligence and responsibility.</description>
+    <item>
+      <title>AI Can Create Value. The Return Still Has to Be Proved.</title>
+      <link>https://lozknowles.com/blog/ai-value-and-return/</link>
+      <guid>https://lozknowles.com/blog/ai-value-and-return/</guid>
+      <description>Infrastructure spending, model capability and customer profit are different measures. What does one accepted outcome cost?</description>
+      <pubDate>Mon, 28 Sep 2026 00:00:00 +0000</pubDate>
+    </item>
+    <item>
+      <title>The Work AI Leaves Behind</title>
+      <link>https://lozknowles.com/blog/the-work-ai-leaves-behind/</link>
+      <guid>https://lozknowles.com/blog/the-work-ai-leaves-behind/</guid>
+      <description>An agent can finish its part of a task while leaving the organisation with more work to do.</description>
+      <pubDate>Mon, 28 Sep 2026 00:00:00 +0000</pubDate>
+    </item>
+    <item>
+      <title>Five Technical Problems We Had to Address in Agent Control</title>
+      <link>https://lozknowles.com/blog/five-technical-problems/</link>
+      <guid>https://lozknowles.com/blog/five-technical-problems/</guid>
+      <description>Timeouts, fresh evidence, bounded concurrency, verification and the complete cost of a job.</description>
+      <pubDate>Mon, 28 Sep 2026 00:00:00 +0000</pubDate>
+    </item>
+    <item>
+      <title>The Agent Is Cheap. The Dependency May Not Be.</title>
+      <link>https://lozknowles.com/blog/the-agent-is-cheap/</link>
+      <guid>https://lozknowles.com/blog/the-agent-is-cheap/</guid>
+      <description>The economics of agents extend beyond the price of a model call.</description>
+      <pubDate>Sun, 27 Sep 2026 00:00:00 +0000</pubDate>
+    </item>
+    <item>
+      <title>When AI Does the Work, What Happens to Us?</title>
+      <link>https://lozknowles.com/blog/when-ai-does-the-work/</link>
+      <guid>https://lozknowles.com/blog/when-ai-does-the-work/</guid>
+      <description>Jobs, responsibility and who benefits from greater productivity.</description>
+      <pubDate>Fri, 25 Sep 2026 00:00:00 +0000</pubDate>
+    </item>
+    <item>
+      <title>When AI takes on real work, who remains responsible?</title>
+      <link>https://lozknowles.com/blog/who-remains-responsible/</link>
+      <guid>https://lozknowles.com/blog/who-remains-responsible/</guid>
+      <description>An AI agent can complete a task and still create an operational failure.</description>
+      <pubDate>Fri, 25 Sep 2026 00:00:00 +0000</pubDate>
+    </item>
+  </channel>
+</rss>

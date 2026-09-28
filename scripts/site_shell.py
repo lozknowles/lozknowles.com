@@ -13,7 +13,7 @@ PAGES = {
     'cartoon-collingham.html': 'village',
     'llm-debate.html': 'debate',
 }
-CURRENT = {'arcade': '/arcade.html', 'murmuration': '/murmuration.html',
+CURRENT = {'blog': '/blog/', 'arcade': '/arcade.html', 'murmuration': '/murmuration.html',
            'cheeky': '/cheeky-phone.html', 'crossword': '/crossword/',
            'profile': '/cv.html', 'references': '/cv.html', 'agent': '/#work', 'village': '/#place',
            'monocular': '/#work', 'debate': '/#work'}

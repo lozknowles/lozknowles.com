@@ -1,0 +1,50 @@
+[
+  {
+    "slug": "ai-value-and-return",
+    "title": "AI Can Create Value. The Return Still Has to Be Proved.",
+    "date": "2026-09-28",
+    "category": "Economics",
+    "summary": "Infrastructure spending, model capability and customer profit are different measures. What does one accepted outcome cost?",
+    "original": "https://medium.com/@knowleslawrence1/ai-can-create-value-the-return-still-has-to-be-proved-9b5996260551"
+  },
+  {
+    "slug": "the-work-ai-leaves-behind",
+    "title": "The Work AI Leaves Behind",
+    "date": "2026-09-28",
+    "category": "Work & responsibility",
+    "summary": "An agent can finish its part of a task while leaving the organisation with more work to do.",
+    "original": "https://medium.com/@knowleslawrence1/the-work-ai-leaves-behind-84bac23a87c2"
+  },
+  {
+    "slug": "five-technical-problems",
+    "title": "Five Technical Problems We Had to Address in Agent Control",
+    "date": "2026-09-28",
+    "category": "Engineering",
+    "summary": "Timeouts, fresh evidence, bounded concurrency, verification and the complete cost of a job.",
+    "original": ""
+  },
+  {
+    "slug": "the-agent-is-cheap",
+    "title": "The Agent Is Cheap. The Dependency May Not Be.",
+    "date": "2026-09-27",
+    "category": "Economics",
+    "summary": "The economics of agents extend beyond the price of a model call.",
+    "original": "https://medium.com/@knowleslawrence1/the-agent-is-cheap-the-dependency-may-not-be-66eb8df3c078"
+  },
+  {
+    "slug": "when-ai-does-the-work",
+    "title": "When AI Does the Work, What Happens to Us?",
+    "date": "2026-09-25",
+    "category": "People & learning",
+    "summary": "Jobs, responsibility and who benefits from greater productivity.",
+    "original": "https://medium.com/@knowleslawrence1/when-ai-does-the-work-what-happens-to-us-ebf8a1bc4ed2"
+  },
+  {
+    "slug": "who-remains-responsible",
+    "title": "When AI takes on real work, who remains responsible?",
+    "date": "2026-09-25",
+    "category": "Governance",
+    "summary": "An AI agent can complete a task and still create an operational failure.",
+    "original": "https://www.linkedin.com/pulse/when-ai-takes-real-work-who-remains-responsible-lawrence-knowles-0z03e/"
+  }
+]
