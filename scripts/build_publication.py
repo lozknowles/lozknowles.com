@@ -37,6 +37,7 @@ ROOT_FILES = (
     "agent-control.html",
     "cartoon-collingham.html",
     "llm-debate.html",
+    "wopr-light-display.html",
     "LawrenceKnowlesProfessionalProfile.pdf",
 )
 ASSET_FILES = (

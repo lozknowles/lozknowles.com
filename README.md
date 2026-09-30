@@ -20,6 +20,8 @@ listen to opposing arguments, read the transcript and replay their own debates
 for 24 hours. The private Area 51 deployment remains independently managed.
 The source revision and release checks are recorded in `docs/llm-debate.md`.
 
+WOPR Indicator Array is linked from the homepage workbench at `/wopr-light-display.html`. It is a full-screen, animated six-row red/amber/green-white light panel designed for a display behind rack mesh. The pause, pattern, rate and fullscreen controls fade away after a short idle period.
+
 Monocular Light Fairy is linked from the homepage workbench at `/monocular/`.
 Visitors can use the sample photograph, choose a photo from their device, or
 explicitly start the device camera. The model estimates relative depth and

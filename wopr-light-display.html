@@ -1,0 +1,154 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1">
+<meta name="theme-color" content="#08090a">
+<title>WOPR — Indicator Array</title>
+<style>
+:root{color-scheme:dark;--black:#08090a;--panel:#171819}
+*{box-sizing:border-box}
+html,body{width:100%;height:100%;margin:0;overflow:hidden;background:var(--black)}
+body{display:grid;place-items:center}
+.panel{
+  position:relative;
+  width:100vw;height:100vh;
+  display:grid;place-items:center;overflow:hidden;
+  background:
+    radial-gradient(ellipse at 50% 50%,#211610 0%,#11100f 47%,#08090a 78%),
+    #08090a;
+}
+.panel:before{
+  content:"";position:absolute;inset:0;pointer-events:none;
+  background:linear-gradient(180deg,#ffffff05,transparent 12%,transparent 88%,#0006),
+             radial-gradient(ellipse at center,transparent 44%,#0008 100%);
+  z-index:2;
+}
+.array{
+  width:min(94vw, calc(94vh * 4.1));
+  aspect-ratio:4.1/1;
+  display:grid;
+  grid-template-columns:repeat(32,minmax(0,1fr));
+  grid-template-rows:repeat(6,minmax(0,1fr));
+  gap:clamp(4px,1.1vw,15px);
+  padding:clamp(12px,2vw,26px) clamp(13px,2.7vw,34px);
+  position:relative;
+  background:linear-gradient(100deg,#241d19 0%,#101112 8%,#191919 50%,#111213 92%,#2a1b15 100%);
+  border:1px solid #302721;
+  box-shadow:
+    0 0 0 1px #000,
+    inset 0 0 22px 7px #000,
+    0 0 55px 13px #e54b1414,
+    0 18px 45px #000a;
+}
+.array:before{
+  content:"";position:absolute;inset:5px;pointer-events:none;
+  border:1px solid #ffffff08;
+  background:linear-gradient(90deg,#0009,transparent 10%,transparent 90%,#0009);
+}
+.led{
+  position:relative;z-index:1;aspect-ratio:1;border-radius:50%;
+  align-self:center;justify-self:center;width:100%;max-width:clamp(7px,2.15vw,27px);
+  background:radial-gradient(circle at 38% 34%,#55402e 0 10%,#34271f 38%,#171412 72%);
+  box-shadow:inset 0 2px 4px #000c,0 0 0 1px #0008;
+  transition:background .16s,box-shadow .16s,opacity .16s;
+}
+.led.on{
+  background:radial-gradient(circle at 34% 30%,#fff9d8 0 7%,color-mix(in srgb,var(--glow) 72%,white) 20%,var(--glow) 61%,color-mix(in srgb,var(--glow) 63%,#200a03) 100%);
+  box-shadow:0 0 5px 1px var(--glow),0 0 13px 3px color-mix(in srgb,var(--glow) 60%,transparent),0 0 27px 6px color-mix(in srgb,var(--glow) 24%,transparent),inset 0 1px 3px #fff9;
+}
+.controls{
+  position:fixed;z-index:5;left:50%;bottom:12px;transform:translate(-50%,12px);
+  display:flex;align-items:center;gap:10px;padding:8px 12px;
+  background:#090b0de8;border:1px solid #303334;border-radius:4px;
+  opacity:0;transition:opacity .3s,transform .3s;
+  font:10px ui-monospace,SFMono-Regular,Consolas,monospace;color:#abb1b1;
+}
+body:hover .controls,body:focus-within .controls,.controls.show{opacity:.92;transform:translate(-50%,0)}
+button{background:#171b1d;border:1px solid #4b5051;color:#d8dddd;border-radius:2px;padding:7px 10px;font:inherit;letter-spacing:.08em;text-transform:uppercase;cursor:pointer}
+button:hover{background:#262b2d}
+.speed{display:flex;align-items:center;gap:7px;letter-spacing:.08em}
+input{width:85px;accent-color:#ed7140}
+@media(max-width:600px){
+ .array{width:97vw;aspect-ratio:2.1/1;grid-template-columns:repeat(22,minmax(0,1fr));grid-template-rows:repeat(6,minmax(0,1fr));gap:4px;padding:10px}
+ .led{max-width:22px}
+ .controls{bottom:7px;gap:6px;padding:6px 7px;font-size:9px}
+ button{padding:6px 7px}
+ input{width:55px}
+}
+@media(prefers-reduced-motion:reduce){.led{transition:none}}
+</style>
+</head>
+<body>
+<main class="panel" aria-label="Full-screen WOPR-inspired indicator light panel">
+  <div class="array" id="array" role="img" aria-label="Rows of glowing red, orange, amber, pale yellow and green indicator lights"></div>
+</main>
+<div class="controls" id="controls" aria-label="Display controls">
+  <button id="toggle" type="button">Pause</button>
+  <button id="next" type="button">Pattern</button>
+  <label class="speed">RATE <input id="speed" type="range" min="70" max="600" value="210" aria-label="Flashing speed"></label>
+  <button id="full" type="button">Full screen</button>
+</div>
+<script>
+(()=>{
+ const array=document.getElementById('array');
+ let cols=innerWidth<600?22:32, rows=6, leds=[],tick=0,pattern=0,running=true,timer=null,rate=210;
+ const hues=[
+  {hex:'#ff341c',weight:38},{hex:'#ff5121',weight:20},{hex:'#ff7928',weight:17},
+  {hex:'#ffc13e',weight:12},{hex:'#ffe96b',weight:7},{hex:'#efffc2',weight:4},{hex:'#b6ef84',weight:2}
+ ];
+ const pick=()=>{let n=Math.random()*100;for(const c of hues){n-=c.weight;if(n<0)return c}return hues[0]};
+ function makeGrid(){
+   cols=innerWidth<600?22:32;array.replaceChildren();leds=[];
+   array.style.gridTemplateColumns='repeat('+cols+',minmax(0,1fr))';
+   for(let i=0;i<cols*rows;i++){const el=document.createElement('i');el.className='led';el.setAttribute('aria-hidden','true');array.appendChild(el);leds.push(el)}
+ }
+ function set(i,on,color){
+   const el=leds[i];if(!el)return;
+   if(on){el.classList.add('on');el.style.setProperty('--glow',color.hex)}
+   else{el.classList.remove('on');el.style.removeProperty('--glow')}
+ }
+ function draw(){
+   tick++;
+   const phase=tick;
+   for(let i=0;i<leds.length;i++){
+     const row=Math.floor(i/cols),col=i%cols;
+     let on,color=pick();
+     const chance=[.72,.61,.65,.57,.68,.54][row]||.6;
+     if(pattern===0){
+       on=Math.random()<chance;
+       if((col+phase*(row%2?2:1))%11<2)on=true;
+     }else if(pattern===1){
+       const sweep=(phase*2+row*4)%cols;
+       on=Math.random()<.24||Math.abs(col-sweep)<2;
+       if(Math.abs(col-sweep)<2)color=hues[(row+phase)%4];
+     }else if(pattern===2){
+       on=Math.random()<.36;
+       if(Math.random()<.12)on=true;
+     }else{
+       const band=(col+Math.floor(phase/2)+row*3)%17;
+       on=Math.random()<.35||band<3;
+       if(band<3)color=hues[(row+Math.floor(phase/3))%5];
+     }
+     if(on&&Math.random()<.08)color=hues[4+Math.floor(Math.random()*3)];
+     set(i,on,color);
+   }
+ }
+ function start(){clearInterval(timer);timer=setInterval(draw,rate);draw()}
+ document.getElementById('toggle').addEventListener('click',e=>{
+   running=!running;e.currentTarget.textContent=running?'Pause':'Resume';
+   if(running)start();else clearInterval(timer);
+ });
+ document.getElementById('next').addEventListener('click',()=>{pattern=(pattern+1)%4;if(running)draw()});
+ document.getElementById('speed').addEventListener('input',e=>{rate=Number(e.target.value);if(running)start()});
+ document.getElementById('full').addEventListener('click',async()=>{
+   try{if(!document.fullscreenElement)await document.documentElement.requestFullscreen();else await document.exitFullscreen()}catch{}
+ });
+ let hideTimer;
+ addEventListener('pointermove',()=>{const c=document.getElementById('controls');c.classList.add('show');clearTimeout(hideTimer);hideTimer=setTimeout(()=>c.classList.remove('show'),2600)});
+ addEventListener('resize',()=>{const old=cols;makeGrid();if(old!==cols)draw()});
+ makeGrid();start();
+})();
+</script>
+</body>
+</html>
