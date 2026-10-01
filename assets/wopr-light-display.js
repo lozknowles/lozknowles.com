@@ -5,9 +5,18 @@
  let cycleMs=0,lastFrame=performance.now(),health=null,healthPoll=null,fetching=false;
  const status=document.getElementById('health-status');
  const metricNames=['CPU','RAM','Swap','Root disk','Data disk','GPU'];
- const healthPhase=()=>serverMode&&cycleMs%70000>=30000;
+ const segments=[{id:'H',start:40000,end:69000},{id:'S',start:69000,end:89000},{id:'C',start:89000,end:99000}];
+ const letters={H:['10001','10001','11111','10001','10001','10001'],S:['01111','10000','01110','00001','00001','11110'],C:['01111','10000','10000','10000','10000','01111']};
+ const currentSegment=()=>serverMode?segments.find(s=>cycleMs%99000>=s.start&&cycleMs%99000<s.end):null;
+ function drawLetter(segment){
+   status.hidden=true;array.dataset.phase=segment.id+'-letter';array.setAttribute('aria-label',segment.id+' server identifier');
+   const left=Math.floor((cols-5)/2);
+   for(let row=0;row<rows;row++)for(let col=0;col<cols;col++)set(row*cols+col,col>=left&&col<left+5&&letters[segment.id][row][col-left]==='1',{hex:'#ffc13e'});
+ }
+ function validSample(data){return data&&Number.isFinite(data.sampled_at)&&Array.isArray(data.values)&&data.values.length===6&&data.values.every(v=>v===null||(Number.isFinite(v)&&v>=0&&v<=100));}
+
  function validHealth(data){
-   return data&&data.version===1&&Number.isFinite(data.sampled_at)&&Array.isArray(data.values)&&data.values.length===6&&data.values.every(v=>v===null||(Number.isFinite(v)&&v>=0&&v<=100));
+   return data&&data.version===1&&validSample(data)&&(!data.servers||['H','S','C'].every(id=>data.servers[id]===null||validSample(data.servers[id])));
  }
  async function fetchHealth(){
    if(fetching)return;fetching=true;
@@ -23,12 +32,14 @@
    clearInterval(healthPoll);healthPoll=null;
    if(serverMode){fetchHealth();healthPoll=setInterval(fetchHealth,10000);}
  }
- function drawHealth(){
-   const age=health?Date.now()/1000-health.sampled_at:Infinity;
+ function drawHealth(segment){
+   array.dataset.phase=segment.id+'-bars';
+   const sample=health?.servers?health.servers[segment.id]:(segment.id==='H'?health:null);
+   const age=sample?Date.now()/1000-sample.sampled_at:Infinity;
    const fresh=age>=-5&&age<=35;
    status.hidden=false;
-   const values=fresh?health.values:Array(6).fill(null);
-   status.textContent=fresh?metricNames.map((name,i)=>name+': '+(values[i]===null?'unavailable':Math.round(values[i])+'%')).join(' · '):'Server data unavailable or stale';
+   const values=fresh?sample.values:Array(6).fill(null);
+   status.textContent=segment.id+' · '+(fresh?metricNames.map((name,i)=>name+': '+(values[i]===null?'unavailable':Math.round(values[i])+'%')).join(' · '):'Server data unavailable or stale');
    array.setAttribute('aria-label',status.textContent);
    for(let row=0;row<rows;row++){
      const value=values[row],filled=value===null?0:Math.round(cols*value/100);
@@ -53,7 +64,9 @@
  }
  function draw(){
    const now=performance.now();if(running)cycleMs+=now-lastFrame;lastFrame=now;
-   if(healthPhase()){drawHealth();return;}
+   const segment=currentSegment();
+   if(segment){if(cycleMs%99000-segment.start<2000)drawLetter(segment);else drawHealth(segment);return;}
+   array.dataset.phase='wopr';
    status.hidden=true;
    array.setAttribute('aria-label','Animated WOPR indicator lights');
    tick++;
