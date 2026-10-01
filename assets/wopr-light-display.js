@@ -7,6 +7,16 @@
  const metricNames=['CPU','RAM','Swap','Root disk','Data disk','GPU'];
  const machines=[['H','hpubuntu'],['S','Sentinel'],['C','cottageserver'],['A','macomarchy'],['M','MSI']];
  const rack=document.getElementById('machines');
+ let touchDetails=false;
+ array.addEventListener('pointerover',e=>{if(e.pointerType!=='touch'&&e.target.closest('.led'))rack.classList.add('open');});
+ array.addEventListener('pointerout',e=>{if(!touchDetails&&document.activeElement!==array&&!e.relatedTarget?.closest?.('.led'))rack.classList.remove('open');});
+ array.addEventListener('focus',()=>rack.classList.add('open'));
+ array.addEventListener('blur',()=>{if(!touchDetails)rack.classList.remove('open');});
+ document.addEventListener('pointerdown',e=>{
+   if(e.pointerType==='touch'&&e.target.closest('.led')){touchDetails=!touchDetails;rack.classList.toggle('open',touchDetails);}
+   else if(!array.contains(e.target)){touchDetails=false;rack.classList.remove('open');}
+ });
+ document.addEventListener('keydown',e=>{if(e.key==='Escape'){touchDetails=false;rack.classList.remove('open');}});
  const machineRows=machines.map(([id,name])=>{
    const row=document.createElement('div');row.className='machine';
    const lamp=document.createElement('i');lamp.className='machine-lamp';lamp.setAttribute('aria-hidden','true');
