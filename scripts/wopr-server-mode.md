@@ -1,6 +1,8 @@
 # WOPR server display
 
-The Server button (or `?mode=server`) enables a repeating 30-second WOPR animation, 10-second H segment, 10-second S segment and 10-second C segment. Each server segment starts with a two-second dotted identifier, included in that segment, then shows that server's utilisation bars. The default remains the original WOPR animation. Pause freezes both drawing and the cycle; Rate affects drawing, not the 60-second cycle.
+The default repeats a 25-second loop: WOPR lights for five seconds, hpubuntu for five, Sentinel for five, WOPR lights for five, cottageserver for five. Server segments retain the dotted identifier and labelled utilisation bars for their entire five seconds. The WOPR button (or `?mode=lights`) selects continuous lights. Pause freezes drawing and the cycle; Rate affects drawing, not the cycle.
+
+A persistent rack strip identifies hpubuntu, Sentinel, cottageserver, macomarchy and MSI throughout the loop. Status polling runs in both modes. The current collector provides H/S/C only; macomarchy and MSI explicitly show unavailable/unknown rather than inferred state. A fresh sample means telemetry is available, not that every service is healthy. Missing individual metrics show N/A. Failed or invalid fetches clear the prior sample; data older than 35 seconds is unknown. The script URL is versioned to avoid reusing a cached pre-fix asset.
 
 Rows, top to bottom: CPU, available-memory-based RAM use, swap use, system disk, data disk, GPU utilisation. Green is below 75 percent, amber is 75–89 percent and red is 90 percent or above. These are utilisation bands, not a service-availability diagnosis. Null and snapshots older than 35 seconds produce flashing red with an unavailable/stale status. No simulated telemetry is used.
 

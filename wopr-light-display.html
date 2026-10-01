@@ -59,6 +59,18 @@ body{display:grid;place-items:center}
 }
 .array.server-view{column-gap:clamp(2px,.5vw,7px);row-gap:4px;aspect-ratio:3.2/1}
 .array.server-view .led{max-width:17px}
+.rack{position:relative;width:min(94vw, calc(94vh * 4.1));display:grid;gap:5px;padding:12px 24px;border:1px solid #302721;background:linear-gradient(100deg,#241d19,#101112 8%,#191919 50%,#111213 92%,#2a1b15);box-shadow:inset 0 0 18px #000;z-index:3;font:clamp(12px,1vw,16px) ui-monospace,Consolas,monospace;color:#d2c3aa}
+.display{display:grid;justify-items:center;gap:14px;max-height:94vh}
+.machine{display:grid;grid-template-columns:12px 140px 215px 1fr;align-items:center;gap:14px;min-height:26px}
+.machine strong{color:#ffe0a2;font-weight:normal;letter-spacing:.04em}
+.machine-state{color:#ffc13e;font-size:.85em}
+.machine[data-state=live] .machine-state{color:#b6ef84}
+.machine-readings{font-size:.85em;line-height:1.5}
+.machine-lamp{width:9px;height:9px;border-radius:50%;background:#ffc13e;box-shadow:0 0 9px #ffc13e}
+.machine[data-state=live] .machine-lamp{background:#b6ef84;box-shadow:0 0 9px #b6ef84}
+@media(max-width:1100px){.machine{grid-template-columns:10px 125px 190px 1fr;gap:8px}.machine-readings{font-size:11px}}
+@media(max-width:600px){.rack{width:97vw;padding:10px}.display{gap:10px}.machine{grid-template-columns:10px 1fr 1.5fr;gap:6px}.machine-readings{grid-column:2 / -1}.machine-state{font-size:10px}}
+@media(max-height:550px) and (min-width:601px){.display{gap:6px}.array{width:min(94vw,calc(45vh * 4.1))}.array.server-view{width:min(94vw,calc(45vh * 3.2))}.rack{padding:5px 14px;gap:0}.machine{min-height:22px}}
 .metric-label{z-index:3;align-self:center;font:clamp(10px,1vw,14px) ui-monospace,monospace;color:#c3c7c7;letter-spacing:.04em}
 .controls{
   position:fixed;z-index:5;left:50%;bottom:12px;transform:translate(-50%,12px);
@@ -87,7 +99,10 @@ input{width:85px;accent-color:#ed7140}
 </head>
 <body>
 <main class="panel" aria-label="Full-screen WOPR-inspired indicator light panel">
+ <div class="display">
   <div class="array" id="array" role="img" aria-label="Rows of glowing red, orange, amber, pale yellow and green indicator lights"></div>
+  <section class="rack" id="machines" aria-label="Machine telemetry"></section>
+ </div>
 </main>
 <div class="controls" id="controls" aria-label="Display controls">
   <button id="toggle" type="button">Pause</button>
@@ -97,6 +112,6 @@ input{width:85px;accent-color:#ed7140}
   <button id="full" type="button">Full screen</button>
 </div>
 <div id="health-status" role="status" style="position:fixed;top:12px;left:0;right:0;text-align:center;color:#abb1b1;font:12px ui-monospace,monospace;pointer-events:none" hidden></div>
-<script src="/assets/wopr-light-display.js"></script>
+<script src="/assets/wopr-light-display.js?v=20261001-rack"></script>
 </body>
 </html>

@@ -1,13 +1,34 @@
 (()=>{
  const array=document.getElementById('array');
  let cols=innerWidth<600?22:32, rows=6, leds=[],tick=0,pattern=0,running=true,timer=null,rate=210,metricLabels=[];
- let serverMode=new URLSearchParams(location.search).get('mode')==='server';
+ let serverMode=new URLSearchParams(location.search).get('mode')!=='lights';
  let cycleMs=0,lastFrame=performance.now(),health=null,healthPoll=null,fetching=false;
  const status=document.getElementById('health-status');
  const metricNames=['CPU','RAM','Swap','Root disk','Data disk','GPU'];
- const segments=[{id:'H',start:30000,end:40000},{id:'S',start:40000,end:50000},{id:'C',start:50000,end:60000}];
+ const machines=[['H','hpubuntu'],['S','Sentinel'],['C','cottageserver'],['A','macomarchy'],['M','MSI']];
+ const rack=document.getElementById('machines');
+ const machineRows=machines.map(([id,name])=>{
+   const row=document.createElement('div');row.className='machine';
+   const lamp=document.createElement('i');lamp.className='machine-lamp';lamp.setAttribute('aria-hidden','true');
+   const label=document.createElement('strong');label.textContent=name;
+   const state=document.createElement('span');state.className='machine-state';
+   const readings=document.createElement('span');readings.className='machine-readings';
+   row.append(lamp,label,state,readings);rack.append(row);return {id,row,state,readings};
+ });
+ function machineSample(id){return health?.servers?health.servers[id]:(id==='H'?health:null);}
+ function drawMachines(){
+   machineRows.forEach(({id,row,state,readings})=>{
+     const sample=machineSample(id),age=sample?Date.now()/1000-sample.sampled_at:Infinity;
+     const fresh=age>=-5&&age<=35;
+     const available=fresh&&sample.values.some(v=>v!==null);
+     row.dataset.state=available?'live':'unknown';
+     state.textContent=available?'LIVE SAMPLE':sample&&!fresh?'STALE / UNKNOWN':'UNAVAILABLE / UNKNOWN';
+     readings.textContent=available?metricNames.map((name,i)=>name+' '+(sample.values[i]===null?'N/A':sample.values[i].toFixed(1)+'%')).join(' · '):'No current telemetry';
+   });
+ }
+ const segments=[{id:'H',start:5000,end:10000},{id:'S',start:10000,end:15000},{id:'C',start:20000,end:25000}];
  const letters={H:['10001','10001','11111','10001','10001','10001'],S:['01111','10000','01110','00001','00001','11110'],C:['01111','10000','10000','10000','10000','01111']};
- const currentSegment=()=>serverMode?segments.find(s=>cycleMs%60000>=s.start&&cycleMs%60000<s.end):null;
+ const currentSegment=()=>serverMode?segments.find(s=>cycleMs%25000>=s.start&&cycleMs%25000<s.end):null;
  function drawLetter(segment){
    status.hidden=true;array.dataset.phase=segment.id+'-letter';array.setAttribute('aria-label',segment.id+' server identifier');
    metricLabels.forEach(el=>el.hidden=true);
@@ -25,22 +46,22 @@
      const response=await fetch('/wopr-health.json',{cache:'no-store',signal:AbortSignal.timeout(5000)});
      if(!response.ok)throw new Error('unavailable');
      const data=await response.json();if(!validHealth(data))throw new Error('invalid');health=data;
-   }catch{}finally{fetching=false;}
+   }catch{health=null;}finally{fetching=false;drawMachines();}
  }
  function configureMode(){
    document.getElementById('mode').textContent=serverMode?'WOPR':'Server';
    document.getElementById('mode').setAttribute('aria-pressed',String(serverMode));
    clearInterval(healthPoll);healthPoll=null;
-   if(serverMode){fetchHealth();healthPoll=setInterval(fetchHealth,10000);}
+   fetchHealth();healthPoll=setInterval(fetchHealth,10000);
  }
  function drawHealth(segment){
    array.dataset.phase=segment.id+'-bars';
-   const sample=health?.servers?health.servers[segment.id]:(segment.id==='H'?health:null);
+   const sample=machineSample(segment.id);
    const age=sample?Date.now()/1000-sample.sampled_at:Infinity;
    const fresh=age>=-5&&age<=35;
    status.hidden=false;
    const values=fresh?sample.values:Array(6).fill(null);
-   status.textContent=segment.id+' · '+(fresh?'Live readings':'Server data unavailable or stale');
+   status.textContent=machines.find(([id])=>id===segment.id)[1]+' · '+(fresh?'Live readings':'Server data unavailable or stale');
    const descriptions=metricNames.map((name,i)=>name+': '+(values[i]===null?'unavailable':values[i].toFixed(1)+'%'));
    array.setAttribute('aria-label',segment.id+' · '+descriptions.join(' · '));
    metricLabels.forEach((el,i)=>{el.hidden=false;el.textContent=descriptions[i];});
@@ -83,11 +104,12 @@
    else{el.classList.remove('on');el.style.removeProperty('--glow')}
  }
  function draw(){
+   drawMachines();
    const now=performance.now();if(running)cycleMs+=now-lastFrame;lastFrame=now;
    const segment=currentSegment();
    const expected=innerWidth<600?(segment?32:22):(segment?48:32);
    if(cols!==expected)makeGrid();
-   if(segment){if(cycleMs%60000-segment.start<2000)drawLetter(segment);else drawHealth(segment);return;}
+   if(segment){drawHealth(segment);return;}
    array.dataset.phase='wopr';
    status.hidden=true;
    array.setAttribute('aria-label','Animated WOPR indicator lights');
@@ -129,6 +151,6 @@
  });
  let hideTimer;
  addEventListener('pointermove',()=>{const c=document.getElementById('controls');c.classList.add('show');clearTimeout(hideTimer);hideTimer=setTimeout(()=>c.classList.remove('show'),2600)});
- addEventListener('resize',()=>{const old=cols;makeGrid();if(old!==cols)draw()});
+ addEventListener('resize',()=>{makeGrid();draw()});
  configureMode();makeGrid();start();
 })();
