@@ -55,6 +55,21 @@
       "code": "ai-provider-llama",
       "path": "assets/videos/agent-control-live-run-transcript.html",
       "reason": "Intentional local-provider attribution in the complete Agent Control execution transcript. It preserves the naturally generated source route; no credential material or private host path is disclosed."
+    },
+    {
+      "code": "git-revision",
+      "path": "monocular/",
+      "reason": "Directory URL alias of the already reviewed monocular/index.html public upstream model provenance; not a deployment revision."
+    },
+    {
+      "code": "ai-provider-openai",
+      "path": "blog/ai-value-and-return/",
+      "reason": "Intentional provider names in the public article discussing AI economics and citing primary sources; no credentials or internal implementation details."
+    },
+    {
+      "code": "ai-provider-anthropic",
+      "path": "blog/ai-value-and-return/",
+      "reason": "Intentional provider names and source links in the public article discussing AI economics; no credentials or internal implementation details."
     }
   ]
 }
