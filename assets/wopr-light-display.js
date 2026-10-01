@@ -1,6 +1,6 @@
 (()=>{
  const array=document.getElementById('array');
- let cols=innerWidth<600?22:32, rows=6, leds=[],tick=0,pattern=0,running=true,timer=null,rate=210;
+ let cols=innerWidth<600?22:32, rows=6, leds=[],tick=0,pattern=0,running=true,timer=null,rate=210,metricLabels=[];
  let serverMode=new URLSearchParams(location.search).get('mode')==='server';
  let cycleMs=0,lastFrame=performance.now(),health=null,healthPoll=null,fetching=false;
  const status=document.getElementById('health-status');
@@ -10,8 +10,9 @@
  const currentSegment=()=>serverMode?segments.find(s=>cycleMs%60000>=s.start&&cycleMs%60000<s.end):null;
  function drawLetter(segment){
    status.hidden=true;array.dataset.phase=segment.id+'-letter';array.setAttribute('aria-label',segment.id+' server identifier');
-   const left=Math.floor((cols-5)/2);
-   for(let row=0;row<rows;row++)for(let col=0;col<cols;col++)set(row*cols+col,col>=left&&col<left+5&&letters[segment.id][row][col-left]==='1',{hex:'#ffc13e'});
+   metricLabels.forEach(el=>el.hidden=true);
+   const left=0;
+   for(let row=0;row<rows;row++)for(let col=0;col<cols;col++)set(row*cols+col,col>=left&&col<left+10&&letters[segment.id][Math.floor(row/2)][Math.floor((col-left)/2)]==='1',{hex:'#ffc13e'});
  }
  function validSample(data){return data&&Number.isFinite(data.sampled_at)&&Array.isArray(data.values)&&data.values.length===6&&data.values.every(v=>v===null||(Number.isFinite(v)&&v>=0&&v<=100));}
 
@@ -39,12 +40,18 @@
    const fresh=age>=-5&&age<=35;
    status.hidden=false;
    const values=fresh?sample.values:Array(6).fill(null);
-   status.textContent=segment.id+' · '+(fresh?metricNames.map((name,i)=>name+': '+(values[i]===null?'unavailable':Math.round(values[i])+'%')).join(' · '):'Server data unavailable or stale');
-   array.setAttribute('aria-label',status.textContent);
+   status.textContent=segment.id+' · '+(fresh?'Live readings':'Server data unavailable or stale');
+   const descriptions=metricNames.map((name,i)=>name+': '+(values[i]===null?'unavailable':values[i].toFixed(1)+'%'));
+   array.setAttribute('aria-label',segment.id+' · '+descriptions.join(' · '));
+   metricLabels.forEach((el,i)=>{el.hidden=false;el.textContent=descriptions[i];});
    for(let row=0;row<rows;row++){
-     const value=values[row],filled=value===null?0:Math.round(cols*value/100);
-     const color=value===null?'#ffc13e':value>=90?'#ff341c':value>=75?'#ffc13e':'#b6ef84';
-     for(let col=0;col<cols;col++)set(row*cols+col,value===null?Math.floor(cycleMs/700)%2===0:col<filled,{hex:color});
+     const value=values[Math.floor(row/2)],filled=value===null?0:Math.round((cols-12)*value/100);
+     const color=value===null?'#ff341c':value>=90?'#ff341c':value>=75?'#ffc13e':'#b6ef84';
+     for(let col=0;col<cols;col++){
+       if(col<10)set(row*cols+col,letters[segment.id][Math.floor(row/2)][Math.floor(col/2)]==='1',{hex:'#ffc13e'});
+       else if(col<12)set(row*cols+col,false,{hex:color});
+       else set(row*cols+col,row%2===1&&(value===null?Math.floor(cycleMs/700)%2===0:col-12<filled),{hex:color});
+     }
    }
  }
  const hues=[
@@ -53,9 +60,22 @@
  ];
  const pick=()=>{let n=Math.random()*100;for(const c of hues){n-=c.weight;if(n<0)return c}return hues[0]};
  function makeGrid(){
-   cols=innerWidth<600?22:32;array.replaceChildren();leds=[];
+   const server=!!currentSegment();
+   cols=innerWidth<600?(server?32:22):(server?48:32);
+   rows=server?12:6;
+   array.classList.toggle('server-view',server);array.replaceChildren();leds=[];metricLabels=[];
    array.style.gridTemplateColumns='repeat('+cols+',minmax(0,1fr))';
-   for(let i=0;i<cols*rows;i++){const el=document.createElement('i');el.className='led';el.setAttribute('aria-hidden','true');array.appendChild(el);leds.push(el)}
+   array.style.gridTemplateRows='repeat('+rows+',minmax(0,1fr))';
+   for(let i=0;i<cols*rows;i++){
+     const row=Math.floor(i/cols),col=i%cols,el=document.createElement('i');el.className='led';el.setAttribute('aria-hidden','true');
+     el.style.gridRow=String(row+1);el.style.gridColumn=String(col+1);
+     if(server&&col>=12&&row%2===0)el.style.visibility='hidden';
+     array.appendChild(el);leds.push(el);
+   }
+   if(server)metricNames.forEach((name,i)=>{
+     const label=document.createElement('div');label.className='metric-label';label.hidden=true;label.setAttribute('aria-hidden','true');
+     label.style.gridRow=String(i*2+1);label.style.gridColumn='13 / -1';array.appendChild(label);metricLabels.push(label);
+   });
  }
  function set(i,on,color){
    const el=leds[i];if(!el)return;
@@ -65,6 +85,8 @@
  function draw(){
    const now=performance.now();if(running)cycleMs+=now-lastFrame;lastFrame=now;
    const segment=currentSegment();
+   const expected=innerWidth<600?(segment?32:22):(segment?48:32);
+   if(cols!==expected)makeGrid();
    if(segment){if(cycleMs%60000-segment.start<2000)drawLetter(segment);else drawHealth(segment);return;}
    array.dataset.phase='wopr';
    status.hidden=true;
