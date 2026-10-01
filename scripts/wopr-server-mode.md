@@ -1,6 +1,6 @@
 # WOPR server display
 
-The Server button (or `?mode=server`) enables a repeating 40-second WOPR animation, 29-second H segment, 20-second S segment and 10-second C segment. Each server segment starts with a two-second dotted identifier, included in that segment, then shows that server's utilisation bars. The default remains the original WOPR animation. Pause freezes both drawing and the cycle; Rate affects drawing, not the 99-second cycle.
+The Server button (or `?mode=server`) enables a repeating 30-second WOPR animation, 10-second H segment, 10-second S segment and 10-second C segment. Each server segment starts with a two-second dotted identifier, included in that segment, then shows that server's utilisation bars. The default remains the original WOPR animation. Pause freezes both drawing and the cycle; Rate affects drawing, not the 60-second cycle.
 
 Rows, top to bottom: CPU, available-memory-based RAM use, swap use, system disk, data disk, GPU utilisation. Green is below 75 percent, amber is 75–89 percent and red is 90 percent or above. These are utilisation bands, not a service-availability diagnosis. Null and snapshots older than 35 seconds produce flashing amber with an unavailable/stale status. No simulated telemetry is used.
 

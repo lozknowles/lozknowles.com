@@ -5,9 +5,9 @@
  let cycleMs=0,lastFrame=performance.now(),health=null,healthPoll=null,fetching=false;
  const status=document.getElementById('health-status');
  const metricNames=['CPU','RAM','Swap','Root disk','Data disk','GPU'];
- const segments=[{id:'H',start:40000,end:69000},{id:'S',start:69000,end:89000},{id:'C',start:89000,end:99000}];
+ const segments=[{id:'H',start:30000,end:40000},{id:'S',start:40000,end:50000},{id:'C',start:50000,end:60000}];
  const letters={H:['10001','10001','11111','10001','10001','10001'],S:['01111','10000','01110','00001','00001','11110'],C:['01111','10000','10000','10000','10000','01111']};
- const currentSegment=()=>serverMode?segments.find(s=>cycleMs%99000>=s.start&&cycleMs%99000<s.end):null;
+ const currentSegment=()=>serverMode?segments.find(s=>cycleMs%60000>=s.start&&cycleMs%60000<s.end):null;
  function drawLetter(segment){
    status.hidden=true;array.dataset.phase=segment.id+'-letter';array.setAttribute('aria-label',segment.id+' server identifier');
    const left=Math.floor((cols-5)/2);
@@ -65,7 +65,7 @@
  function draw(){
    const now=performance.now();if(running)cycleMs+=now-lastFrame;lastFrame=now;
    const segment=currentSegment();
-   if(segment){if(cycleMs%99000-segment.start<2000)drawLetter(segment);else drawHealth(segment);return;}
+   if(segment){if(cycleMs%60000-segment.start<2000)drawLetter(segment);else drawHealth(segment);return;}
    array.dataset.phase='wopr';
    status.hidden=true;
    array.setAttribute('aria-label','Animated WOPR indicator lights');
