@@ -1,0 +1,7 @@
+[Unit]
+Description=Publish read-only WOPR utilisation snapshot
+[Service]
+Type=oneshot
+ExecStart=/usr/bin/python3 /home/loz/bin/wopr-health-collect.py
+TimeoutStartSec=20
+NoNewPrivileges=true

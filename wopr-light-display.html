@@ -72,8 +72,8 @@ input{width:85px;accent-color:#ed7140}
 @media(max-width:600px){
  .array{width:97vw;aspect-ratio:2.1/1;grid-template-columns:repeat(22,minmax(0,1fr));grid-template-rows:repeat(6,minmax(0,1fr));gap:4px;padding:10px}
  .led{max-width:22px}
- .controls{bottom:7px;gap:6px;padding:6px 7px;font-size:9px}
- button{padding:6px 7px}
+ .controls{bottom:7px;gap:4px;padding:6px 5px;font-size:9px}
+ button{padding:6px 5px}
  input{width:55px}
 }
 @media(prefers-reduced-motion:reduce){.led{transition:none}}
@@ -85,10 +85,12 @@ input{width:85px;accent-color:#ed7140}
 </main>
 <div class="controls" id="controls" aria-label="Display controls">
   <button id="toggle" type="button">Pause</button>
+  <button id="mode" type="button" aria-pressed="false">Server</button>
   <button id="next" type="button">Pattern</button>
   <label class="speed">RATE <input id="speed" type="range" min="70" max="600" value="210" aria-label="Flashing speed"></label>
   <button id="full" type="button">Full screen</button>
 </div>
+<div id="health-status" role="status" style="position:fixed;top:12px;left:0;right:0;text-align:center;color:#abb1b1;font:12px ui-monospace,monospace;pointer-events:none" hidden></div>
 <script src="/assets/wopr-light-display.js"></script>
 </body>
 </html>
