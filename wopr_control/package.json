@@ -1,0 +1,1 @@
+{"name":"wopr-control-private","private":true,"version":"1.0.0","scripts":{"vendor":"node vendor.cjs","test":"node --test tests/*.test.cjs"},"dependencies":{"@xterm/xterm":"5.5.0","@xterm/addon-fit":"0.10.0"}}

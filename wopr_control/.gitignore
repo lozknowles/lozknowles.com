@@ -1,0 +1,6 @@
+node_modules/
+web/vendor/
+.venv/
+state/
+config.local.json
+__pycache__/

@@ -1,0 +1,19 @@
+<!doctype html><html lang="en"><head>
+<meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1,viewport-fit=cover">
+<meta name="theme-color" content="#08090a"><meta name="apple-mobile-web-app-capable" content="yes"><meta name="apple-mobile-web-app-status-bar-style" content="black-translucent"><meta name="apple-mobile-web-app-title" content="WOPR Control">
+<title>WOPR Control</title><link rel="manifest" href="/manifest.webmanifest"><link rel="icon" href="/icon.svg"><link rel="apple-touch-icon" href="/icon.png">
+<link rel="stylesheet" href="/vendor/xterm.css"><link rel="stylesheet" href="/control.css">
+</head><body>
+<header><div class="brand"><i></i>WOPR <span>CONTROL / 01</span></div><output id="connection" role="status">CONNECTING</output><button id="keyboard" type="button">KEYBOARD</button></header>
+<main>
+ <section id="idle" class="screen"><iframe data-src="/wopr-light-display.html" title="Preserved WOPR animated indicator array" tabindex="-1"></iframe><button id="wake" aria-label="Reveal WOPR machine controls"><span>TOUCH TO REVEAL CONTROL CONSOLE</span></button></section>
+ <section id="machines" class="screen" hidden><div class="section-title"><h1>MACHINE ARRAY</h1><span>SELECT A NODE / AUTHENTICATED TELEMETRY</span></div><div id="tiles"></div></section>
+ <section id="detail" class="screen" hidden><div class="section-title"><h1 id="detail-name"></h1><button id="back">ALL MACHINES</button></div><div id="detail-summary"></div><div id="detail-actions"></div><pre id="detail-output" tabindex="0"></pre></section>
+ <section id="console" class="screen" hidden><div class="workspace-bar"><h1>TERMINAL ARRAY</h1><button id="grid">2 × 2 VIEW</button><label>RESUME <select id="resume"><option value="">Select session</option></select></label></div><div id="panes"></div></section>
+ <section id="status" class="screen" hidden><div class="section-title"><h1>ESTATE STATUS</h1><span>UNKNOWN IS NOT ONLINE</span></div><div id="status-list"></div></section>
+</main>
+<nav aria-label="Primary modes"><button data-mode="idle" aria-current="page">WOPR</button><button data-mode="machines">MACHINES</button><button data-mode="console">CONSOLE <span id="session-count">0 / 4</span></button><button data-mode="status">STATUS</button></nav>
+<div id="message" role="status" hidden></div>
+<dialog id="confirm"><h2>TERMINATE THIS SHELL?</h2><p>Running work in this WOPR session will end. Detaching keeps it alive.</p><div><button id="cancel">KEEP SESSION</button><button id="terminate-confirm" class="danger">TERMINATE SESSION</button></div></dialog>
+<script src="/vendor/xterm.js"></script><script src="/vendor/fit.js"></script><script src="/state.js"></script><script src="/control.js"></script>
+</body></html>

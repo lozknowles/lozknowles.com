@@ -58,7 +58,7 @@ SOURCE_ONLY_NAMES = {
     "tsconfig.json",
     "yarn.lock",
 }
-SOURCE_ONLY_PARTS = {".git", ".github", "config", "node_modules", "scripts", "src", "tests"}
+SOURCE_ONLY_PARTS = {".git", ".github", "config", "node_modules", "scripts", "src", "tests", "wopr_control"}
 BACKUP_PART = re.compile(r"(?i)(?:^|[-_.])(?:backup|pre|rollback)(?:[-_.]|$)")
 MANIFEST_NAME = re.compile(r"(?i)(?:^|[-_.])(?:asset[-_]?|build[-_]?)?manifest(?:\.|$)")
 IPV4 = re.compile(r"(?<![\w.])(?:\d{1,3}\.){3}\d{1,3}(?![\w.])")

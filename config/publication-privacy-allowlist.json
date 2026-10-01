@@ -2,6 +2,11 @@
   "version": 1,
   "entries": [
     {
+      "code": "internal-hostname",
+      "path": "assets/wopr-light-display.js",
+      "reason": "The existing public WOPR display intentionally names the five operator-requested machines. These are display labels only; private addresses, SSH credentials and management endpoints remain excluded."
+    },
+    {
       "code": "image-metadata",
       "path": "monocular/demo.jpg",
       "reason": "The hash-pinned, already public demonstration photo has no EXIF, XMP or IPTC data. Its Photoshop APP13 marker contains only an empty IPTC resource; retain the original image bytes."

@@ -1,0 +1,1 @@
+{"bind":"127.0.0.1","port":18892,"origin":"https://controller.your-tailnet.ts.net:8445","allowed_users":["owner@example.com"],"inventory":"inventory.example.json","state_dir":"state","idle_seconds":120,"session_seconds":28800,"telemetry_seconds":15}

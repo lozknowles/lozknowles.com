@@ -1,0 +1,4 @@
+const {test}=require('node:test'),assert=require('node:assert/strict'),S=require('../web/state.js');
+test('four panes are selectable without changing other sessions',()=>{let p=[null,null,null,null];for(let i=0;i<4;i++)p=S.place(p,i,{id:'session-'+i});assert.equal(S.nextFree(p),-1);const q=S.place(p,2,{id:'MSI'});assert.equal(q[0],p[0]);assert.equal(q[3],p[3]);assert.equal(q[2].id,'MSI');assert.throws(()=>S.place(p,4,{}));});
+test('idle timer respects configured duration and disabled idle',()=>{assert.equal(S.idleDue(1000,120999,120),false);assert.equal(S.idleDue(1000,121000,120),true);assert.equal(S.idleDue(0,999999,0),false);});
+test('destructive action requires affirmative confirmation',()=>{for(const v of [undefined,false,'yes',1])assert.equal(S.canTerminate(v),false);assert.equal(S.canTerminate(true),true);});

@@ -1,0 +1,12 @@
+[Unit]
+Description=WOPR persistent controller-host tmux server
+
+[Service]
+Type=forking
+UMask=0077
+ExecStart=/usr/bin/tmux -S /fast/wopr-control/state/tmux.sock new-session -d -s wopr-keeper
+ExecStop=/usr/bin/tmux -S /fast/wopr-control/state/tmux.sock kill-server
+Restart=on-failure
+
+[Install]
+WantedBy=default.target

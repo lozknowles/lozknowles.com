@@ -1,0 +1,19 @@
+[Unit]
+Description=Private WOPR Control console
+After=network-online.target wopr-tmux.service
+Wants=network-online.target wopr-tmux.service
+
+[Service]
+WorkingDirectory=/fast/wopr-control/current
+ExecStart=/fast/wopr-control/venv/bin/python -m wopr_control.server --config /fast/wopr-control/config/config.json
+Restart=on-failure
+RestartSec=3
+UMask=0077
+NoNewPrivileges=true
+PrivateTmp=true
+TimeoutStopSec=20
+MemoryMax=256M
+TasksMax=96
+
+[Install]
+WantedBy=default.target

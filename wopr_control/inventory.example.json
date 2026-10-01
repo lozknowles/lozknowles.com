@@ -1,0 +1,10 @@
+{
+ "version":1,
+ "machines":[
+  {"id":"hpubuntu","name":"hpubuntu","hostname":"hpubuntu","os":"Ubuntu Linux","role":"Controller / compute","connection":"local","ssh_port":2222,"telemetry":["cpu","ram","storage","gpu","network","temperature"],"gpu":true,"icon":"compute","capabilities":["terminal","status","processes","services","gpu","logs"],"description":"Local controller shell; no loopback SSH credential required."},
+  {"id":"sentinel","name":"Sentinel","hostname":"sentinel","os":"Linux","role":"GPU / compute","connection":"ssh","ssh_target":"sentinel","ssh_port":2222,"telemetry":["cpu","ram","storage","gpu","network","temperature"],"gpu":true,"icon":"gpu","capabilities":["terminal","status","processes","services","gpu","logs"]},
+  {"id":"cottageserver","name":"cottageserver","hostname":"cottageserver","os":"Linux","role":"Web / storage","connection":"ssh","ssh_target":"cottageserver","ssh_port":2222,"telemetry":["cpu","ram","storage","network"],"gpu":false,"icon":"storage","capabilities":["terminal","status","processes","services","logs"]},
+  {"id":"macomarchy","name":"macomarchy","hostname":"macomarchy","os":"Omarchy / Arch Linux","role":"Workstation","connection":"ssh","ssh_target":"macomarchy","ssh_port":22,"telemetry":["cpu","ram","storage","gpu","network","temperature"],"gpu":true,"icon":"workstation","capabilities":["terminal","status","processes","services","gpu","logs"]},
+  {"id":"msi","name":"MSI","hostname":"msi","os":"Windows","role":"Windows workstation","connection":"unavailable","ssh_port":22,"telemetry":[],"gpu":true,"icon":"windows","capabilities":["status"],"description":"OpenSSH is running. Controller host-key trust and authentication are not established; control remains disabled."}
+ ]
+}
