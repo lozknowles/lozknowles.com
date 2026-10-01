@@ -41,6 +41,7 @@ ROOT_FILES = (
     "LawrenceKnowlesProfessionalProfile.pdf",
 )
 ASSET_FILES = (
+    "wopr-light-display.js",
     "cards-DKxM1AoQ.jpg",
     "cv-page.js",
     "cv-popup.js",
