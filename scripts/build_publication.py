@@ -146,7 +146,7 @@ def copy_documentary_media(source: Path, output: Path) -> None:
     """Publish only the reviewed film; production media remains outside Git."""
     spec = json.loads((ROOT / "config" / "documentary-media.json").read_text(encoding="utf-8"))
     relative = Path(spec["path"])
-    if relative.as_posix() != "assets/videos/reading-the-landscape-v2.mp4":
+    if relative.as_posix() != "assets/videos/reading-the-landscape-v3.mp4":
         raise ValueError("Unexpected documentary media destination")
     data = source.read_bytes()
     if len(data) != spec["bytes"] or hashlib.sha256(data).hexdigest() != spec["sha256"]:

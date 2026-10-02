@@ -6,7 +6,11 @@ links use one column. The film uses native, inline, full-screen-capable controls
 it loads only when requested. Starting narration pauses the homepage music.
 
 The film is the corrected 5:49 documentary, including the revised physical page
-turns and visible English subtitles. The public description preserves research
+turns and visible English subtitles. Revision 3 removes a duplicated research
+note in the closing sequence: the montage now starts with a clean title plate,
+and the animated sequence draws its own caption once. The earlier picture
+before 5:12.5 and the full encoded narration remain unchanged. The final
+28 seconds and their transition are checked in exported browser frames. The public description preserves research
 uncertainty. Only the finished film and its poster are public; the private map
 application, source scans, production files and research data are not published.
 
@@ -22,7 +26,7 @@ match the approved master; this is a metadata-only publication derivative.
 ```sh
 python3 -m unittest discover -s tests -p 'test_*.py'
 node --test tests/*.test.cjs tests/*.test.mjs
-python3 scripts/build_publication.py --documentary-media /path/to/reading-the-landscape-v2.mp4
+python3 scripts/build_publication.py --documentary-media /path/to/reading-the-landscape-v3.mp4
 ```
 
 The normal source-only build omits external MP4 binaries, matching the existing
@@ -35,7 +39,7 @@ Publish only these five files, preserving all other live content:
 - `assets/workbench.css`
 - `assets/workbench.js`
 - `assets/reading-the-landscape-poster.jpg`
-- `assets/videos/reading-the-landscape-v2.mp4` (existing media origin)
+- `assets/videos/reading-the-landscape-v3.mp4` (existing media origin)
 - `index.html` (last)
 
 Retain the previous homepage outside the document root and guard its hash before

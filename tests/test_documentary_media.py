@@ -16,7 +16,7 @@ class DocumentaryMediaTests(unittest.TestCase):
             film = root / 'approved.mp4'
             film.write_bytes(b'reviewed media fixture')
             spec = {
-                'path': 'assets/videos/reading-the-landscape-v2.mp4',
+                'path': 'assets/videos/reading-the-landscape-v3.mp4',
                 'bytes': film.stat().st_size,
                 'sha256': hashlib.sha256(film.read_bytes()).hexdigest(),
             }
