@@ -41,6 +41,9 @@ ROOT_FILES = (
     "LawrenceKnowlesProfessionalProfile.pdf",
 )
 ASSET_FILES = (
+    "workbench.css",
+    "workbench.js",
+    "reading-the-landscape-poster.jpg",
     "wopr-light-display.js",
     "cards-DKxM1AoQ.jpg",
     "cv-page.js",
@@ -139,7 +142,22 @@ def copy_arcade_media(source: Path, output: Path) -> None:
     target.chmod(0o644)
 
 
-def build(output: Path, arcade_media: Path | None = None) -> None:
+def copy_documentary_media(source: Path, output: Path) -> None:
+    """Publish only the reviewed film; production media remains outside Git."""
+    spec = json.loads((ROOT / "config" / "documentary-media.json").read_text(encoding="utf-8"))
+    relative = Path(spec["path"])
+    if relative.as_posix() != "assets/videos/reading-the-landscape-v2.mp4":
+        raise ValueError("Unexpected documentary media destination")
+    data = source.read_bytes()
+    if len(data) != spec["bytes"] or hashlib.sha256(data).hexdigest() != spec["sha256"]:
+        raise ValueError("Documentary media does not match the reviewed film")
+    target = output / relative
+    make_public_directory(target.parent)
+    target.write_bytes(data)
+    target.chmod(0o644)
+
+
+def build(output: Path, arcade_media: Path | None = None, documentary_media: Path | None = None) -> None:
     output = output.resolve()
     prepare_output(output)
     for name in ROOT_FILES:
@@ -148,6 +166,8 @@ def build(output: Path, arcade_media: Path | None = None) -> None:
         copy_file(Path("assets") / name, output)
     if arcade_media is not None:
         copy_arcade_media(arcade_media, output)
+    if documentary_media is not None:
+        copy_documentary_media(documentary_media, output)
     # The reviewed scene-only derivative is pinned independently of the full app.
     cartoon = json.loads((ROOT / 'config/cartoon-view.json').read_text(encoding='utf-8'))
     for name, expected in cartoon['files'].items():
@@ -181,13 +201,14 @@ def parse_args() -> argparse.Namespace:
     parser = argparse.ArgumentParser(description=__doc__)
     parser.add_argument("--output", type=Path, default=DEFAULT_OUTPUT)
     parser.add_argument("--arcade-media", type=Path, help="Reviewed gameplay MP4 from external media storage")
+    parser.add_argument("--documentary-media", type=Path, help="Reviewed Reading the Landscape MP4 from external media storage")
     return parser.parse_args()
 
 
 if __name__ == "__main__":
     args = parse_args()
     try:
-        build(args.output, args.arcade_media)
+        build(args.output, args.arcade_media, args.documentary_media)
     except (FileNotFoundError, RuntimeError, ValueError) as error:
         print(error, file=sys.stderr)
         raise SystemExit(1)

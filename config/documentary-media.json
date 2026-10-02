@@ -1,0 +1,9 @@
+{
+  "path": "assets/videos/reading-the-landscape-v2.mp4",
+  "sha256": "f4cff928911a9a509bcf8e7295f019f6990aac15cf55b463e227363433eec29c",
+  "bytes": 75563384,
+  "duration_seconds": 349.458333,
+  "source_sha256": "dbf29a25c0f7ac8e78a9acfcd37d1ccfd50688c0aa8fc9d5633f9eb4cb5a358d",
+  "content": "Corrected documentary with original archival scans, authorised Loz narration and English subtitles burned into the picture. Probable research findings remain labelled.",
+  "video": "H.264/AAC, 1920x1080, 24 fps. Public derivative removes encoder metadata and selectable duplicate subtitles. Video and audio decoded content verified against the approved master. Binary kept outside Git."
+}

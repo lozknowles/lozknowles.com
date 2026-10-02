@@ -1,0 +1,26 @@
+.workbench { margin-top: 5rem; scroll-margin-top: 7rem; }
+.workbench > h3 { margin: 0 0 1.5rem; color: var(--aqua); font: 400 .8rem/1.5 "DM Mono", monospace; letter-spacing: .08em; text-transform: uppercase; }
+.workbench .more-work { grid-template-columns: repeat(2, minmax(0, 1fr)); gap: 0 3rem; margin-top: 0; }
+.workbench .more-work a { align-items: center; gap: 1rem; min-width: 0; min-height: 88px; padding: 1.5rem 0; line-height: 1.35; }
+.workbench .more-work a span { flex: 0 0 auto; }
+.workbench a:focus-visible, .workbench video:focus-visible { outline: 2px solid var(--acid); outline-offset: 5px; }
+.workbench-film { display: grid; grid-template-columns: repeat(2, minmax(0, 1fr)); align-items: center; gap: 3rem; padding-top: 3rem; margin-top: 3rem; border-top: 1px solid var(--line); scroll-margin-top: 7rem; }
+.workbench-film-player { min-width: 0; background: #fafaf9; }
+.workbench-film video { display: block; width: 100%; height: auto; aspect-ratio: 16 / 9; background: #101216; }
+.workbench-film-copy { min-width: 0; }
+.workbench-film-copy .eyebrow { margin: 0 0 1rem; }
+.workbench-film h4 { margin: 0 0 1rem; font-size: clamp(2rem, 3.5vw, 4rem); line-height: 1.05; font-weight: 400; letter-spacing: -.045em; }
+.workbench-film-copy > p { color: #c2cdc5; line-height: 1.65; }
+.workbench-film-copy .workbench-film-deck { color: var(--paper); font-size: 1.15rem; }
+.workbench-film-copy .workbench-film-note { font-size: .8rem; color: #a1b2a8; }
+.workbench-film-download { display: inline-flex; flex-wrap: wrap; align-items: center; gap: .6rem 1.2rem; min-height: 48px; padding: .6rem 0; color: var(--acid); text-decoration-thickness: 1px; text-underline-offset: .3rem; }
+.workbench-film-download span { font: .7rem/1.5 "DM Mono", monospace; }
+@media (max-width: 800px) {
+  .workbench .more-work { gap: 0 1.5rem; }
+  .workbench .more-work a { font-size: 1.1rem; }
+  .workbench-film { grid-template-columns: 1fr; gap: 1.75rem; }
+}
+@media (max-width: 560px) {
+  .workbench .more-work { grid-template-columns: 1fr; }
+  .workbench .more-work a { min-height: 68px; padding: 1.1rem 0; }
+}

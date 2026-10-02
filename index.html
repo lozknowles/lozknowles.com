@@ -12,6 +12,8 @@
     <link rel="stylesheet" href="/assets/music-player.css">
     <link rel="stylesheet" href="/assets/llm-debate.css">
     <link rel="stylesheet" href="/assets/cv.css?v=1fb27ed09044">
+    <link rel="stylesheet" href="/assets/workbench.css?v=20261002-1">
+    <script defer src="/assets/workbench.js?v=20261002-1"></script>
 
     <!-- site-assets:start -->
     <link rel="stylesheet" href="/assets/site-shell.css?v=20260916-3">
@@ -123,8 +125,9 @@
           <div><small>LLM Fight Club · No login needed</small><strong>Two minds. Several strong opinions.</strong><p>Give two AI personalities a topic. Hear the arguments in CSM voices, follow the transcript, and throw in a curve ball.</p></div>
           <span class="debate-feature-arrow" aria-hidden="true">↗</span>
         </a>
-        <div class="more-work reveal">
-          <p>More from the workbench</p>
+        <section class="workbench reveal" id="workbench" aria-labelledby="workbench-heading">
+          <h3 id="workbench-heading">More from the workbench</h3>
+          <div class="more-work">
           <a href="/monocular/">Monocular Light Fairy <span>↗</span></a>
           <a href="/cartoon-collingham.html">Cartoon Collingham <span>↗</span></a>
           <a href="/cheeky-phone.html">Cheeky Phone <span>↗</span></a>
@@ -133,7 +136,25 @@
           <a href="/crossword/">Crossword Studio <span>↗</span></a>
           <a href="/wopr-light-display.html">WOPR light array <span>↗</span></a>
           <a href="https://github.com/lozknowles" target="_blank" rel="noreferrer">GitHub field notes <span>↗</span></a>
-        </div>
+          </div>
+          <article class="workbench-film" id="reading-the-landscape" aria-labelledby="landscape-title">
+            <div class="workbench-film-player">
+              <video id="landscape-film" controls playsinline preload="none" width="1920" height="1080" poster="/assets/reading-the-landscape-poster.jpg" aria-label="Reading the Landscape documentary" aria-describedby="landscape-access">
+                <source src="/assets/videos/reading-the-landscape-v2.mp4" type="video/mp4">
+                <p><a href="/assets/videos/reading-the-landscape-v2.mp4">Watch Reading the Landscape</a>.</p>
+              </video>
+            </div>
+            <div class="workbench-film-copy">
+              <p class="eyebrow">Local history · A short documentary</p>
+              <h4 id="landscape-title">Reading the landscape.</h4>
+              <p class="workbench-film-deck">The Act. The Award. The Map.</p>
+              <p>Tracing North Collingham’s enclosure history through original maps and handwritten records. Follow the painstaking work of finding parcels, reading old spellings and connecting the evidence—from early prototypes to a digital research workflow.</p>
+              <p class="workbench-film-note" id="landscape-access">5 min 49 sec · Narrated by Loz using authorised voice synthesis · English subtitles included</p>
+              <p class="workbench-film-note">An investigation in progress: probable locations and confirmed evidence remain distinct.</p>
+              <a class="workbench-film-download" href="/assets/videos/reading-the-landscape-v2.mp4" download="Reading-the-Landscape.mp4">Download the film <span>MP4 · 76 MB ↓</span></a>
+            </div>
+          </article>
+        </section>
       </section>
 
       <section id="place" class="place section-pad">

@@ -131,6 +131,13 @@ verification expectations.
 
 ## Video assets
 
+**Reading the Landscape** is the documentary feature under the homepage
+Workbench, at `/#reading-the-landscape`. Its corrected film, original-source
+poster, subtitles and narration introduce North Collingham's enclosure research.
+The link grid uses equal desktop columns and stacks on phones. See
+`docs/reading-the-landscape-publication.md` for the pinned external film, build,
+scoped publication and rollback procedure.
+
 Large MP4 files may be kept outside Git and deployed separately to `assets/videos/`, or served from a media origin configured by the operator. The host should support HTTP byte-range requests so browsers can seek efficiently. `assets/project-video.js` pauses inactive videos, prevents overlapping playback, and restores poster images when media is unavailable.
 
 The arcade gameplay edit is recorded in `config/arcade-media.json`, including its source URL, source range (1:40–2:40), expected size and SHA-256. It contains gameplay only and retains the original HUD. Build a complete preview with `python3 scripts/build_publication.py --arcade-media /path/to/space-bike-gameplay-v2.mp4`. The default source-only CI build omits external video binaries. `scripts/deploy-arcade-cube.sh` requires `ARCADE_MEDIA_FILE` and the existing `MEDIA_ORIGIN` directory as well as its static deployment variables; it validates the clip, installs the versioned MP4 through the existing media origin, verifies that public media is available, then publishes seven static files with the page last. The full source recording is hash-checked unchanged. No YouTube player or third-party runtime is needed.
