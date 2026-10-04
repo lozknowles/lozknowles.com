@@ -1,0 +1,29 @@
+{
+  "database": "/var/lib/reach-growth/portal.sqlite",
+  "reports_dir": "/home/loz/server_reports",
+  "port": 18196,
+  "proxy_token": "REPLACE_WITH_PRIVATE_RANDOM_TOKEN_AT_INSTALLATION",
+  "domains": {
+    "lozknowles.com": {
+      "logs": [
+        "/var/log/apache2/lozknowles.com-access.log",
+        "/var/log/apache2/lozknowles.com-access.log.[0-9]*"
+      ],
+      "search_console": {
+        "property": "sc-domain:lozknowles.com",
+        "credential_file": ""
+      }
+    },
+    "collingham.org": {
+      "logs": [
+        "/var/log/apache2/collingham.org-access.log",
+        "/var/log/apache2/collingham.org-access.log.[0-9]*"
+      ],
+      "search_console": {
+        "property": "sc-domain:collingham.org",
+        "credential_file": ""
+      }
+    }
+  },
+  "audit_origin": "127.0.0.1"
+}
