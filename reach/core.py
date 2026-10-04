@@ -15,7 +15,7 @@ from zoneinfo import ZoneInfo
 DOMAINS = ("lozknowles.com", "collingham.org")
 TZ = ZoneInfo("Europe/London")
 LINE = re.compile(r'^(\S+) \S+ \S+ \[([^\]]+)\] "([A-Z]+) (\S+)(?: HTTP/[^"]*)?" (\d{3}) \S+ "([^"]*)" "([^"]*)"')
-BOT = re.compile(r"bot|spider|crawl|slurp|preview|python-requests|go-http-client|curl|wget|aiohttp|httpclient|headless|uptimerobot|pingdom|statuscake|healthcheck|monitor|zabbix|nagios", re.I)
+BOT = re.compile(r"bot|spider|crawl|slurp|preview|python-requests|go-http-client|curl|wget|aiohttp|httpclient|headless|uptimerobot|pingdom|statuscake|healthcheck|monitor|zabbix|nagios|reachtechnicalaudit", re.I)
 STATIC = re.compile(r"\.(?:avif|bmp|css|csv|geojson|gif|gpx|ico|jpe?g|js|json|kml|map|mp3|mp4|ogg|otf|pdf|png|svg|ttf|txt|wav|webm|webmanifest|webp|woff2?|xml)$", re.I)
 SENSITIVE = re.compile(r"\.env|wp-admin|wp-login|phpmyadmin|\.git|cgi-bin|xmlrpc|\.php|[0-9a-f]{24,}|[0-9]{5,}|@|%40", re.I)
 FIELD = re.compile(r"^[a-z0-9][a-z0-9_-]{0,47}$")
@@ -23,7 +23,7 @@ EVENTS = {"walk_start", "ask_use", "narration_play"}
 DEFINITIONS = [
     "Page views: successful GET requests for public document paths, excluding known bots, monitors, assets, APIs, private routes, redirects and sensitive/dynamic paths. SPA view changes and cached/CDN-served visits may be absent.",
     "Estimated sessions: same IP and user agent in memory, split after 30 minutes inactivity and at local midnight. No IP, user agent or visitor/session identifier is stored. Estimates are not unique people; VPNs, NAT, bot evasion and missing CDN traffic affect counts.",
-    "Combined sessions are a sum of independent domain estimates, not deduplicated people. Referrals use hostname only; all arbitrary query parameters are discarded.",
+    "Combined sessions are a sum of independent domain estimates, not deduplicated people. Referrals use hostname only; identifier-like hostnames and all arbitrary query parameters are discarded. Known bot signatures are incomplete and referral spam may remain.",
     "Coverage: Europe/London calendar days. First observed day and current day are partial. Interior days are only provisionally complete within accessible continuous logs; missing dates are unknown, never zero. Raw-log loss retains prior aggregates.",
     "UTM arrivals are validated tagged page requests, not unique arrivals or conversions. Repeated tagged reloads count again. Generic printed QR links cannot be retrospectively assigned to a flyer.",
     "Actions count accepted occurrences, not people. Same-tab campaign context expires after 30 minutes and supports association only; it does not establish causal conversion. Collection starts only after instrumentation is installed.",
@@ -155,7 +155,7 @@ def aggregate(streams, today=None):
             # Store hostname only; never URL, query or credentials from referrers.
             try:
                 host=urlsplit(ref).hostname
-                if host and re.fullmatch(r"[a-z0-9.-]{1,100}",host) and not re.fullmatch(r"[0-9.]+",host):
+                if host and re.fullmatch(r"[a-z0-9.-]{1,100}",host) and not re.fullmatch(r"[0-9.]+",host) and not re.search(r"[0-9a-f]{8}-[0-9a-f]{4}-|[0-9a-f]{24,}|[0-9]{5,}",host) and all(len(label)<=32 for label in host.split(".")):
                     d["referrals"][host]+=1
                 elif ref=="-":
                     d["referrals"]["direct-or-unknown"]+=1

@@ -38,6 +38,14 @@ class Aggregates(unittest.TestCase):
         output=json.dumps(d)
         for private in ("secret","192.0.2.12","Mozilla","search?q"): self.assertNotIn(private,output)
         self.assertTrue(d["partial"])
+    def test_audit_and_identifier_referral_privacy(self):
+        device="device-1d5f5dd7-a3e9-401d-be75-d983b8008a8b.remotewd.com"
+        self.write(line().replace("www.google.com",device)+line(agent="ReachTechnicalAudit/1.0"))
+        ingest(self.db,DOMAINS[0],[str(self.log)])
+        day=overview(self.db)["domains"][DOMAINS[0]]["days"][0]
+        self.assertEqual(day["page_views"],1)
+        self.assertNotIn(device,json.dumps(day))
+        self.assertEqual(day["referrals"],{})
     def test_consecutive_identical_legitimate_lines(self):
         self.write(line()+line())
         ingest(self.db,DOMAINS[0],[str(self.log)])
