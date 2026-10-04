@@ -48,3 +48,5 @@ NO-PROGRESS: local sandbox credential failures were resolved through approved es
 Scope correction: user prohibited changes to either site, then allowed only lozknowles.com portal accommodation while preserving the existing user-visible site. No Collingham instrumentation or full-site build is deployed.
 
 COMPLETION: recorded after architect review and live deployment evidence. Any unavailable criteria are disclosed explicitly rather than presented as passed.
+
+Deployment permission gate: both services initially failed 200/CHDIR. namei proved new root-owned release parents inherited0750. Primary fixes only /opt/reach-growth release-directory traversal to0755, preserving private data/config permissions; Apache was restored before retry.

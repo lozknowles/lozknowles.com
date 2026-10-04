@@ -148,10 +148,10 @@ def aggregate(streams, today=None):
                 excluded["filtered_requests"]+=1
                 continue
             day=when.date().isoformat()
-            d=days.setdefault(day,{"date":day,"page_views":0,"sessions":0,"pages":collections.Counter(),"referrals":collections.Counter(),"campaigns":collections.Counter(),"first_seen":when.isoformat(),"last_seen":when.isoformat()})
+            d=days.setdefault(day,{"date":day,"page_views":0,"sessions":0,"pages":collections.Counter(),"referrals":collections.Counter(),"campaigns":collections.Counter(),"first_seen":when.astimezone(dt.timezone.utc).isoformat(),"last_seen":when.astimezone(dt.timezone.utc).isoformat()})
             d["page_views"]+=1
-            d["first_seen"]=min(d["first_seen"],when.isoformat())
-            d["last_seen"]=max(d["last_seen"],when.isoformat())
+            d["first_seen"]=min(d["first_seen"],when.astimezone(dt.timezone.utc).isoformat())
+            d["last_seen"]=max(d["last_seen"],when.astimezone(dt.timezone.utc).isoformat())
             # Store hostname only; never URL, query or credentials from referrers.
             try:
                 host=urlsplit(ref).hostname
@@ -169,7 +169,7 @@ def aggregate(streams, today=None):
             if tag:
                 d["campaigns"][tag]+=1
             key=hashlib.blake2b((ip+"\0"+agent).encode(),key=salt,digest_size=16).digest()
-            clients[(day,key)].append(when)
+            clients[(day,key)].append(when.astimezone(dt.timezone.utc))
     for (day,_),times in clients.items():
         times.sort()
         days[day]["sessions"]+=sum(i==0 or (t-times[i-1]).total_seconds()>1800 for i,t in enumerate(times))
@@ -201,7 +201,7 @@ def ingest(db,domain,patterns,today=None):
                 if old:
                     previous=json.loads(old[0])
                     # Do not shrink a day when earlier rotated observations disappear.
-                    if value["page_views"]<previous["page_views"] or value["first_seen"]>previous["first_seen"] or value["last_seen"]<previous["last_seen"]:
+                    if value["page_views"]<previous["page_views"] or dt.datetime.fromisoformat(value["first_seen"]).timestamp()>dt.datetime.fromisoformat(previous["first_seen"]).timestamp() or dt.datetime.fromisoformat(value["last_seen"]).timestamp()<dt.datetime.fromisoformat(previous["last_seen"]).timestamp():
                         retained.append(date)
                         continue
                     if not previous.get('partial',True) and date!=dt.datetime.now(TZ).date().isoformat(): value['partial']=False
@@ -258,4 +258,7 @@ def overview(db):
             "seo":documents.get("seo",{"status":"not_connected","findings":[],"performance":{"status":"not_measured"}}),
             "actions":{"status":"collecting" if since else "not_instrumented","since":since[0] if since else None,"days":[{"date":date,**counts} for date,counts in sorted(action_days.items())]}
         }
+    for domain in DOMAINS:
+        row=db.execute("SELECT payload FROM document WHERE domain=? AND name='performance'",(domain,)).fetchone()
+        if row: result["domains"][domain]["seo"]["performance"]=json.loads(row[0])
     return result

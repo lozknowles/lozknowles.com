@@ -49,7 +49,9 @@ def main():
     installed=Path("/opt/reach-growth/releases")/args.revision
     installed.parent.mkdir(parents=True,exist_ok=True)
     if installed.exists():raise SystemExit("Release already installed")
+    for directory in (installed.parent.parent,installed.parent): directory.chmod(0o755)
     installed.mkdir()
+    installed.chmod(0o755)
     shutil.copytree(release/"reach",installed/"reach",ignore=shutil.ignore_patterns("__pycache__","*.sqlite*","config.json","evidence"))
     for file in installed.rglob("*"):file.chmod(0o755 if file.is_dir() else 0o644)
     current=Path("/opt/reach-growth/current")
@@ -124,6 +126,7 @@ WantedBy=timers.target
         run("systemctl","reload","apache2")
         run("systemctl","is-active","--quiet","apache2","reach-growth.service")
     except Exception:
+        subprocess.run(['systemctl','disable','--now','reach-growth-refresh.timer','reach-growth.service'])
         shutil.copy2(backup/"lozknowles.com.conf.before",vhost)
         subprocess.run(["apache2ctl","configtest"])
         subprocess.run(["systemctl","reload","apache2"])

@@ -25,7 +25,7 @@ class OriginHTTPSConnection(http.client.HTTPSConnection):
 
 class OriginHTTPSHandler(HTTPSHandler):
     def https_open(self,req):
-        return self.do_open(OriginHTTPSConnection,req,context=self._context,check_hostname=self._check_hostname)
+        return self.do_open(OriginHTTPSConnection,req,context=self._context)
 
 def fetch(url,method="GET",data=None,headers=None):
     req=Request(url,data=data,method=method,headers={"User-Agent":"ReachTechnicalAudit/1.0",**(headers or {})})
@@ -196,5 +196,11 @@ if __name__=="__main__":
     parser=argparse.ArgumentParser();parser.add_argument("--config",required=True)
     args=parser.parse_args()
     config=json.loads(Path(args.config).read_text())
-    print(json.dumps(refresh(config)))
+    import fcntl
+    with open(config["database"]+".refresh.lock","a") as lock:
+        try: fcntl.flock(lock,fcntl.LOCK_EX|fcntl.LOCK_NB)
+        except BlockingIOError: raise SystemExit("Another aggregate refresh is running; data retained")
+        results=refresh(config)
+        print(json.dumps(results))
+        if any(value.get("apache") is False for value in results.values()): raise SystemExit(1)
 
