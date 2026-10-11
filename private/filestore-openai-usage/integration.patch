@@ -1,0 +1,127 @@
+diff --git a/.env.example b/.env.example
+index 2e8d40c..1812b87 100644
+--- a/.env.example
++++ b/.env.example
+@@ -13,3 +13,5 @@ FILESTORE_LOG_FILE=.private\logs\filestore.log
+ FILESTORE_TRUSTED_HOSTS=127.0.0.1,localhost
+ FILESTORE_SPOKEN_STUDIO_UPSTREAM=
+ FILESTORE_SPOKEN_STUDIO_PATH=spoken-studio-7f3c91d8a42e
++# Optional OpenAI dashboard configuration. Keep the JSON and admin keys in .private.
++FILESTORE_OPENAI_USAGE_ACCOUNTS_FILE=.private\openai-usage.json
+diff --git a/app/config.py b/app/config.py
+index 5e545ae..fc71bd1 100644
+--- a/app/config.py
++++ b/app/config.py
+@@ -79,6 +79,7 @@ class Settings:
+     spoken_studio_upstream: str | None = None
+     spoken_studio_path: str = "/spoken-studio-7f3c91d8a42e"
+     session_idle_seconds: int = 1800
++    openai_usage_accounts_file: Path | None = None
+ 
+     def __post_init__(self):
+         if self.session_ttl_seconds <= 0 or self.session_idle_seconds <= 0:
+@@ -128,4 +129,8 @@ def load_settings() -> Settings:
+                 "FILESTORE_SPOKEN_STUDIO_PATH", "spoken-studio-7f3c91d8a42e"
+             ).strip("/")
+         ),
++        openai_usage_accounts_file=_path_setting(
++            "FILESTORE_OPENAI_USAGE_ACCOUNTS_FILE",
++            PROJECT_ROOT / ".private" / "openai-usage.json",
++        ),
+     )
+diff --git a/app/main.py b/app/main.py
+index 7dbcc78..5055866 100644
+--- a/app/main.py
++++ b/app/main.py
+@@ -38,6 +38,7 @@ from .auth import (
+ )
+ from .config import PROJECT_ROOT, Settings, load_settings
+ from .mfa import CHALLENGE_TTL, PENDING_COOKIE, MFAError, MFAManager
++from .openai_usage import OpenAIUsageCollector, load_accounts
+ from .request_limits import RequestBodyLimitMiddleware
+ from .security import (
+     TEMP_PREFIX,
+@@ -107,6 +108,15 @@ def create_app(settings: Settings | None = None) -> FastAPI:
+     app.state.login_limiter = limiter
+     app.state.spoken_studio_upstream = settings.spoken_studio_upstream
+     app.state.spoken_proxy_transport = None
++    try:
++        usage_accounts = load_accounts(settings.openai_usage_accounts_file)
++        usage_config_error = False
++    except (OSError, ValueError, TypeError):
++        audit.warning('openai_usage_configuration_unavailable')
++        usage_accounts = ()
++        usage_config_error = True
++    usage = OpenAIUsageCollector(usage_accounts, configuration_error=usage_config_error)
++    app.state.openai_usage = usage
+     app.add_middleware(RequestBodyLimitMiddleware, upload_limit=settings.max_upload_bytes)
+     app.add_middleware(
+         TrustedHostMiddleware, allowed_hosts=list(settings.trusted_hosts)
+@@ -153,6 +163,9 @@ def create_app(settings: Settings | None = None) -> FastAPI:
+             )
+         else:
+             response.headers["Content-Security-Policy"] = (
++                "default-src 'none'; style-src 'self'; script-src 'self'; connect-src 'self'; "
++                "form-action 'self'; base-uri 'none'; frame-ancestors 'none'"
++                if request.url.path == '/openai-usage' else
+                 "default-src 'none'; style-src 'self'; form-action 'self'; base-uri 'none'; frame-ancestors 'none'"
+             )
+         response.headers["X-Content-Type-Options"] = "nosniff"
+@@ -372,6 +385,33 @@ def create_app(settings: Settings | None = None) -> FastAPI:
+             },
+         )
+ 
++    @app.get('/openai-usage', response_class=HTMLResponse)
++    async def openai_usage_page(request: Request):
++        _, session = authenticated(request)
++        return templates.TemplateResponse(request, 'openai-usage.html', {'csrf': session.csrf})
++
++    @app.get('/assets/openai-usage.js')
++    async def openai_usage_script(request: Request):
++        authenticated(request)
++        return FileResponse(PROJECT_ROOT / 'app' / 'static' / 'openai-usage.js', media_type='text/javascript')
++
++    @app.get('/assets/openai-usage.css')
++    async def openai_usage_styles(request: Request):
++        authenticated(request)
++        return FileResponse(PROJECT_ROOT / 'app' / 'static' / 'openai-usage.css', media_type='text/css')
++
++    @app.get('/api/openai-usage')
++    async def openai_usage_data(request: Request):
++        authenticated(request)
++        return JSONResponse(await usage.snapshot())
++
++    @app.post('/api/openai-usage/refresh')
++    async def openai_usage_refresh(request: Request):
++        authenticated(request)
++        if not csrf_ok(request, request.headers.get('X-CSRF-Token', '')):
++            raise HTTPException(status_code=403, detail='CSRF check failed')
++        return JSONResponse(await usage.snapshot(force=True))
++
+     @app.get("/files", response_class=HTMLResponse)
+     async def listing(request: Request, path: str = "", uploaded: str = ""):
+         _, session = authenticated(request)
+diff --git a/app/static/style.css b/app/static/style.css
+index c7ccfa1..da370cb 100644
+--- a/app/static/style.css
++++ b/app/static/style.css
+@@ -261,6 +261,7 @@ body.portal-page { margin: 0; min-height: 100vh; padding: 0 32px; background: #0
+ .portal-page .portal-connection i { width: 5px; height: 5px; border-radius: 50%; background: #9ccab0; box-shadow: 0 0 10px #80edaf44; }
+ .portal-page .portal-logout { background: transparent; border: 1px solid #363b4d; color: #bfc8d8; font: inherit; letter-spacing: 1px; border-radius: 4px; padding: 9px 14px; }
+ .portal-page .portal-logout:hover { border-color: #b6c3d3; }
++.portal-page .usage-nav-link { color: #aee8db; text-decoration: none; font: 10px/1.5 Consolas, monospace; letter-spacing: 1px; }
+ .portal-page .portal-intro { padding: 43px 0 10px; }
+ .portal-page .portal-eyebrow { color: #91a0b6; font: 9px/1.7 Consolas, monospace; letter-spacing: 2.2px; margin: 0 0 12px; }
+ .portal-page h1 { font-family: "Bahnschrift", "Segoe UI", sans-serif; font-size: clamp(34px, 4.6vw, 57px); font-weight: 650; line-height: 1.13; letter-spacing: -2px; margin: 0; }
+diff --git a/app/templates/hub.html b/app/templates/hub.html
+index 74d8d1b..9766923 100644
+--- a/app/templates/hub.html
++++ b/app/templates/hub.html
+@@ -15,6 +15,7 @@
+   <main class="portal-main">
+     <header class="portal-nav">
+       <a class="portal-brand" href="/{{ motion_query }}">LOZ <span>/ PRIVATE SPACE</span></a>
++      <a class="usage-nav-link" href="/openai-usage">OPENAI USAGE ↗</a>
+       <span class="portal-connection"><i aria-hidden="true"></i> MEMBERS OF ONE</span>
+       <form method="post" action="/logout">
+         <input type="hidden" name="csrf" value="{{ csrf }}">

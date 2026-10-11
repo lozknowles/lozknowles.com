@@ -1,0 +1,31 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width,initial-scale=1">
+  <meta name="theme-color" content="#090c16">
+  <meta name="robots" content="noindex,nofollow">
+  <meta name="csrf-token" content="{{ csrf }}">
+  <title>OpenAI Usage · Loz Private Hub</title>
+  <link rel="stylesheet" href="/assets/style.css">
+  <link rel="stylesheet" href="/assets/openai-usage.css">
+</head>
+<body class="openai-usage-page">
+  <main class="usage-main">
+    <header class="usage-header">
+      <a href="/">← PRIVATE HUB</a>
+      <span>LOZ / PRIVATE SPACE</span>
+      <form method="post" action="/logout"><input type="hidden" name="csrf" value="{{ csrf }}"><button type="submit">LOGOUT ↗</button></form>
+    </header>
+    <section class="usage-intro">
+      <p class="usage-eyebrow">PRIVATE ACCOUNT TELEMETRY / 01</p>
+      <div class="usage-heading"><div><h1>OpenAI <em>usage.</em></h1><p>Four accounts, one read-only view.</p></div><button id="usage-refresh" type="button">REFRESH ↻</button></div>
+      <p id="usage-status" role="status">Loading usage…</p>
+    </section>
+    <section class="usage-total" aria-labelledby="usage-total-title"><div><p class="usage-eyebrow">ALL API ORGANIZATIONS · MONTH TO DATE</p><h2 id="usage-total-title">Combined API spend</h2></div><strong id="usage-total-value">Unavailable</strong><small id="usage-total-note">Waiting for data</small></section>
+    <section id="usage-accounts" class="usage-grid" aria-label="OpenAI accounts"></section>
+    <p class="usage-footnote">API spend and completion tokens come from organization reports when an admin key is configured. Subscription labels are configured locally or read from a matched Codex profile. Codex allowance uses the signed-in Codex app-server when available. ChatGPT allowances and prepaid API credit balances show “Unavailable” without a supported source. API tokens cover completions only.</p>
+  </main>
+  <script src="/assets/openai-usage.js" defer></script>
+</body>
+</html>
