@@ -75,6 +75,26 @@
       "code": "ai-provider-anthropic",
       "path": "blog/ai-value-and-return/",
       "reason": "Intentional provider names and source links in the public article discussing AI economics; no credentials or internal implementation details."
+    },
+    {
+      "code": "ai-provider-openai",
+      "path": "blog/ai-value-and-return/index.html",
+      "reason": "Intentional provider attribution and primary-source citations preserved from the already published article. No credentials or private infrastructure are disclosed."
+    },
+    {
+      "code": "ai-provider-anthropic",
+      "path": "blog/ai-value-and-return/index.html",
+      "reason": "Intentional provider attribution and primary-source citations preserved from the already published article. No credentials or private infrastructure are disclosed."
+    },
+    {
+      "code": "ai-provider-anthropic",
+      "path": "blog/the-hidden-danger-isnt-a-rogue-ai/index.html",
+      "reason": "Intentional provider attribution and primary-source citations preserved from the already published article. No credentials or private infrastructure are disclosed."
+    },
+    {
+      "code": "ai-provider-anthropic",
+      "path": "blog/the-hidden-danger-isnt-a-rogue-ai/",
+      "reason": "Intentional provider attribution and primary-source citations preserved from the already published article. No credentials or private infrastructure are disclosed."
     }
   ]
 }

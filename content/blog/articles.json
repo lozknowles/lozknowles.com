@@ -1,0 +1,106 @@
+[
+  {
+    "slug": "the-hidden-danger-isnt-a-rogue-ai",
+    "title": "The Hidden Danger Isn’t a Rogue AI",
+    "date": "2026-10-09",
+    "category": "Governance",
+    "summary": "When technologies converge, dependency can grow faster than our ability to understand, afford and govern it.",
+    "original": "https://medium.com/@knowleslawrence1/the-hidden-danger-isnt-a-rogue-ai-dd265443d5dd",
+    "image": {
+      "file": "the-hidden-danger-isnt-a-rogue-ai.png",
+      "alt": "A woman works at a desk above a vast network of servers, cables, gears and paper records, with a cracked supporting pillar.",
+      "width": 1672,
+      "height": 941
+    }
+  },
+  {
+    "slug": "more-work-less-understanding",
+    "title": "More Work. Less Understanding. Who Is Still in Control?",
+    "date": "2026-10-06",
+    "category": "Work & responsibility",
+    "summary": "More automated work requires the capacity to explain, maintain, challenge and stop it.",
+    "original": "https://medium.com/@knowleslawrence1/more-work-less-understanding-who-is-still-in-control-adb79cbb1c75",
+    "image": {
+      "file": "more-work-less-understanding.png",
+      "alt": "A woman supervises a cable-built hydra bearing AI provider logos, connected to five controls.",
+      "width": 1672,
+      "height": 941
+    }
+  },
+  {
+    "slug": "when-ai-develops-a-gut-feeling",
+    "title": "When AI Develops a Gut Feeling, Who Knows When to Doubt It?",
+    "date": "2026-10-01",
+    "category": "People & learning",
+    "summary": "Human intuition and machine confidence both need evidence, judgement and the ability to pause.",
+    "original": "https://medium.com/@knowleslawrence1/when-ai-develops-a-gut-feeling-who-knows-when-to-doubt-it-76fb4e1a7dc0",
+    "image": {
+      "file": "when-ai-develops-a-gut-feeling.png",
+      "alt": "A human hand traces a winding path and a mechanical hand traces a decision tree; both meet at a pause button.",
+      "width": 1672,
+      "height": 941
+    }
+  },
+  {
+    "slug": "the-times-are-changing",
+    "title": "The Times Are Changing. Memory Has Never Mattered More.",
+    "date": "2026-09-29",
+    "category": "Governance",
+    "summary": "When AI does the work, “done” needs evidence, a date and a memory.",
+    "original": "https://medium.com/@knowleslawrence1/the-times-are-changing-memory-has-never-mattered-more-814c46d4427a",
+    "image": {
+      "file": "the-times-are-changing.png",
+      "alt": "A thread links old photographs, letters and landscapes across a clock to a check mark.",
+      "width": 1774,
+      "height": 887
+    }
+  },
+  {
+    "slug": "ai-value-and-return",
+    "title": "AI Can Create Value. The Return Still Has to Be Proved.",
+    "date": "2026-09-28",
+    "category": "Economics",
+    "summary": "Infrastructure spending, model capability and customer profit are different measures. What does one accepted outcome cost?",
+    "original": "https://medium.com/@knowleslawrence1/ai-can-create-value-the-return-still-has-to-be-proved-9b5996260551"
+  },
+  {
+    "slug": "the-work-ai-leaves-behind",
+    "title": "The Work AI Leaves Behind",
+    "date": "2026-09-28",
+    "category": "Work & responsibility",
+    "summary": "An agent can finish its part of a task while leaving the organisation with more work to do.",
+    "original": "https://medium.com/@knowleslawrence1/the-work-ai-leaves-behind-84bac23a87c2"
+  },
+  {
+    "slug": "five-technical-problems",
+    "title": "Five Technical Problems We Had to Address in Agent Control",
+    "date": "2026-09-28",
+    "category": "Engineering",
+    "summary": "Timeouts, fresh evidence, bounded concurrency, verification and the complete cost of a job.",
+    "original": ""
+  },
+  {
+    "slug": "the-agent-is-cheap",
+    "title": "The Agent Is Cheap. The Dependency May Not Be.",
+    "date": "2026-09-27",
+    "category": "Economics",
+    "summary": "The economics of agents extend beyond the price of a model call.",
+    "original": "https://medium.com/@knowleslawrence1/the-agent-is-cheap-the-dependency-may-not-be-66eb8df3c078"
+  },
+  {
+    "slug": "when-ai-does-the-work",
+    "title": "When AI Does the Work, What Happens to Us?",
+    "date": "2026-09-25",
+    "category": "People & learning",
+    "summary": "Jobs, responsibility and who benefits from greater productivity.",
+    "original": "https://medium.com/@knowleslawrence1/when-ai-does-the-work-what-happens-to-us-ebf8a1bc4ed2"
+  },
+  {
+    "slug": "who-remains-responsible",
+    "title": "When AI takes on real work, who remains responsible?",
+    "date": "2026-09-25",
+    "category": "Governance",
+    "summary": "An AI agent can complete a task and still create an operational failure.",
+    "original": "https://www.linkedin.com/pulse/when-ai-takes-real-work-who-remains-responsible-lawrence-knowles-0z03e/"
+  }
+]
