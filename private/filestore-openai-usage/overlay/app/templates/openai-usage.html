@@ -22,6 +22,14 @@
       <div class="usage-heading"><div><h1>OpenAI <em>usage.</em></h1><p>Four accounts, one read-only view.</p></div><button id="usage-refresh" type="button">REFRESH ↻</button></div>
       <p id="usage-status" role="status">Loading usage…</p>
     </section>
+    <section id="usage-recommendation" class="usage-recommendation" aria-labelledby="usage-recommendation-title">
+      <p class="usage-eyebrow">CODEX / WHAT TO USE NEXT</p>
+      <h2 id="usage-recommendation-title">Suggested account</h2>
+      <strong id="usage-recommendation-name">Checking allowances…</strong>
+      <p id="usage-recommendation-reason">Waiting for current Codex limits.</p>
+      <small>Based on reported allowance percentages and the next reset. Absolute credit capacity differs by plan and is unavailable here.</small>
+    </section>
+    <p class="usage-legend" aria-label="Allowance colour key"><span class="usage-legend-high">High remaining · 70–100%</span><span class="usage-legend-medium">Moderate · 30–69%</span><span class="usage-legend-low">Low · below 30%</span><span class="usage-legend-unavailable">Unavailable · no data</span></p>
     <section class="usage-total" aria-labelledby="usage-total-title"><div><p class="usage-eyebrow">ALL API ORGANIZATIONS · MONTH TO DATE</p><h2 id="usage-total-title">Combined API spend</h2></div><strong id="usage-total-value">Unavailable</strong><small id="usage-total-note">Waiting for data</small></section>
     <section id="usage-accounts" class="usage-grid" aria-label="OpenAI accounts"></section>
     <p class="usage-footnote">API spend and completion tokens come from organization reports when an admin key is configured. Subscription labels are configured locally or read from a matched Codex profile. Codex allowance uses the signed-in Codex app-server when available. ChatGPT allowances and prepaid API credit balances show “Unavailable” without a supported source. API tokens cover completions only.</p>
