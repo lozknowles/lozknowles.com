@@ -58,8 +58,11 @@ class BlogTests(unittest.TestCase):
         for post in self.posts:
             slug = post['slug']
             bodyfile = ROOT / 'content/blog' / f'{slug}.html'
-            self.assertEqual(hashlib.sha256(bodyfile.read_bytes()).hexdigest(), hashes[slug])
-            body = bodyfile.read_text(encoding='utf-8').rstrip()
+            reviewed_body = bodyfile.read_text(encoding='utf-8')
+            # Git normalises checkout newlines; preserve the reviewed text on
+            # both Windows (CRLF) and Linux (LF), including all markup and links.
+            self.assertEqual(hashlib.sha256(reviewed_body.encode('utf-8')).hexdigest(), hashes[slug])
+            body = reviewed_body.rstrip()
             page = (self.blog / slug / 'index.html').read_text(encoding='utf-8')
             self.assertIn('<div class="prose">' + body, page)
             blocked, _ = split_allowed(scan_text(f'blog/{slug}/index.html', page), load_allowlist(ROOT / 'config/publication-privacy-allowlist.json'))

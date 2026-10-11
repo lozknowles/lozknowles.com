@@ -43,11 +43,20 @@
     }
   ],
   "existing_body_sha256": {
+    "ai-value-and-return": "1071c413e07f45a33a389bf182c9de2d9cb761e4e4231e69886aa1a0f71ba618",
+    "five-technical-problems": "02c31899cfe5862a74b906f6a6f1ab93fb6ac85f61eb2c4f0eaa9a66910e1f17",
+    "the-agent-is-cheap": "7232414dcbe4255d2eebc15de2d28f418edda00b60fcdec450437cb9f43f7791",
+    "the-work-ai-leaves-behind": "3cfb4bda11528ceddccf5e83489853047d28a567361f376054f82fe0e6ab897a",
+    "when-ai-does-the-work": "6e6f35ad7b0164754cd5326f54729aa41a775bc94b16513bbf6dcc7ce43ee18f",
+    "who-remains-responsible": "5b7ebe927493f627864346282129e4dbda5875330df30db72b550ed4475dd5ef"
+  },
+  "existing_source_body_sha256": {
     "ai-value-and-return": "b00a9c18853d45b291f22a53be587c4837919714367280b34a2d3eba9e534b54",
     "five-technical-problems": "0ab07fe3f9994656b1e3e98d37ce542f0ca36709abae53fb1c8d3da9417c9f4f",
     "the-agent-is-cheap": "2a6c72e3922742af98428c5d36f224c981f1649c2abfbc6fc854240db394cc0e",
     "the-work-ai-leaves-behind": "3cfb4bda11528ceddccf5e83489853047d28a567361f376054f82fe0e6ab897a",
     "when-ai-does-the-work": "f58bd4ab8b8d9a07d048b75f8b203c9e447aadfdc8f8fdbd83264c4b00e34048",
     "who-remains-responsible": "66ada4ebb5861d33c318b7db0ca088cc18078b6e62a7e68d3715e7e0bde1524d"
-  }
+  },
+  "body_hash_normalization": "Reviewed body hashes use UTF-8 text with LF newlines so Git checkouts are portable; original source byte hashes are retained separately. Image hashes always identify original bytes."
 }
