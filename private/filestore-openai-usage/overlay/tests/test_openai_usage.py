@@ -148,12 +148,31 @@ def test_codex_window_parser_uses_documented_durations_and_account_binding():
     parsed = parse_codex_response(account, limits, 'expected-id')
     assert parsed['value']['five_hour']['remaining_percent'] == 75
     assert parsed['value']['weekly']['remaining_percent'] == 50
+    assert parsed['value']['other_windows'] == []
     with pytest.raises(ValueError):
         parse_codex_response(account, limits, 'different-id')
     mixed = {**limits, 'rateLimitsByLimitId': {'other-model': limits['rateLimitsByLimitId']['codex']},
              'rateLimits': limits['rateLimitsByLimitId']['codex']}
     with pytest.raises(TypeError):
         parse_codex_response(account, mixed, 'expected-id')
+
+
+def test_codex_nonstandard_window_is_available_without_inventing_five_hour_or_weekly():
+    account = {'account': {'type': 'chatgpt', 'planType': 'free'}}
+    limits = {'accountId': 'free-id', 'rateLimitsByLimitId': {'codex': {
+        'primary': {'usedPercent': 100, 'windowDurationMins': 43200, 'resetsAt': 1792296958},
+        'secondary': {'usedPercent': 25, 'windowDurationMins': True, 'resetsAt': 1792296958},
+    }}}
+    parsed = parse_codex_response(account, limits, 'free-id')
+    assert parsed['status'] == 'current'
+    assert parsed['value']['five_hour'] is None
+    assert parsed['value']['weekly'] is None
+    assert parsed['value']['other_windows'] == [{
+        'duration_minutes': 43200, 'remaining_percent': 0,
+        'resets_at': '2026-10-18T04:15:58+00:00',
+    }]
+    with pytest.raises(ValueError):
+        parse_codex_response(account, limits, 'wrong-id')
 
 
 def test_combined_spend_counts_same_organization_once(monkeypatch):

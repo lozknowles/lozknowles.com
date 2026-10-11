@@ -34,6 +34,13 @@
       const windowText = value => `${value.remaining_percent}% remaining · resets ${new Date(value.resets_at).toLocaleString()}`;
       metric(card, 'Codex five-hour allowance', codexWindow('five_hour'), windowText);
       metric(card, 'Codex weekly allowance', codexWindow('weekly'), windowText);
+      const durationText = minutes => minutes % 1440 === 0 ? `${minutes / 1440}-day` :
+        (minutes % 60 === 0 ? `${minutes / 60}-hour` : `${minutes}-minute`);
+      for (const window of account.codex?.value?.other_windows || []) {
+        if (Number.isInteger(window.duration_minutes) && window.duration_minutes > 0) {
+          metric(card, `Codex ${durationText(window.duration_minutes)} allowance`, {value: window}, windowText);
+        }
+      }
       metric(card, 'ChatGPT allowance', account.chatgpt, value => String(value));
       metric(card, 'API credits remaining', account.api_credits_usd, money);
       metric(card, 'API spend · month to date', account.api_spend_usd, money);

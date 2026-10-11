@@ -10,22 +10,24 @@ from datetime import UTC, datetime
 from pathlib import Path
 
 
-def _window(bucket: dict, minutes: int) -> dict | None:
-    for item in (bucket.get('primary'), bucket.get('secondary')):
-        if not isinstance(item, dict) or item.get('windowDurationMins') != minutes:
-            continue
-        used = item.get('usedPercent')
-        reset = item.get('resetsAt')
-        if not isinstance(used, (int, float)) or isinstance(used, bool) or not 0 <= used <= 100:
-            continue
-        if not isinstance(reset, (int, float)) or isinstance(reset, bool) or reset <= 0:
-            continue
-        try:
-            reset_at = datetime.fromtimestamp(reset, UTC).isoformat()
-        except (OverflowError, OSError, ValueError):
-            continue
-        return {'remaining_percent': round(100 - used, 1), 'resets_at': reset_at}
-    return None
+def _window(item: object) -> dict | None:
+    if not isinstance(item, dict):
+        return None
+    minutes = item.get('windowDurationMins')
+    used = item.get('usedPercent')
+    reset = item.get('resetsAt')
+    if not isinstance(minutes, int) or isinstance(minutes, bool) or minutes <= 0:
+        return None
+    if not isinstance(used, (int, float)) or isinstance(used, bool) or not 0 <= used <= 100:
+        return None
+    if not isinstance(reset, (int, float)) or isinstance(reset, bool) or reset <= 0:
+        return None
+    try:
+        reset_at = datetime.fromtimestamp(reset, UTC).isoformat()
+    except (OverflowError, OSError, ValueError):
+        return None
+    return {'duration_minutes': minutes, 'remaining_percent': round(100 - used, 1),
+            'resets_at': reset_at}
 
 
 def parse_codex_response(account: dict, limits: dict, expected_id: str) -> dict:
@@ -43,12 +45,20 @@ def parse_codex_response(account: dict, limits: dict, expected_id: str) -> dict:
             bucket = None
     if not isinstance(bucket, dict):
         raise TypeError('Codex rate limit unavailable')
-    five_hour = _window(bucket, 300)
-    weekly = _window(bucket, 10080)
-    if five_hour is None and weekly is None:
+    windows = {}
+    for item in (bucket.get('primary'), bucket.get('secondary')):
+        window = _window(item)
+        if window is not None:
+            windows.setdefault(window['duration_minutes'], window)
+    if not windows:
         raise ValueError('Codex quota windows unavailable')
+    five_hour = windows.get(300)
+    weekly = windows.get(10080)
+    other_windows = [window for duration, window in sorted(windows.items())
+                     if duration not in (300, 10080)]
     plan = info.get('planType')
-    return {'value': {'five_hour': five_hour, 'weekly': weekly}, 'status': 'current',
+    return {'value': {'five_hour': five_hour, 'weekly': weekly,
+                      'other_windows': other_windows}, 'status': 'current',
             'source': 'Codex app-server', 'plan': plan if isinstance(plan, str) else None}
 
 
