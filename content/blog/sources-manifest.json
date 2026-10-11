@@ -1,0 +1,53 @@
+{
+  "existing_articles": "Original six article sources copied without changes from blog branch commit 9ddacf4.",
+  "new_articles": [
+    {
+      "slug": "the-hidden-danger-isnt-a-rogue-ai",
+      "body_source": "outputs/hidden-danger-2026-10-09/article.html",
+      "publication_source": "outputs/hidden-danger-2026-10-09/publication.json",
+      "image_source": "outputs/hidden-danger-2026-10-09/cover.png",
+      "source_body_sha256": "96f5ac945c2655c59165fe8bc0f498196641d3039138869f4dffd18420ae3418",
+      "body_sha256": "721c06b2187c2fe146098783ef456b10453d21e3c713bc5ec8175bb592dfa325",
+      "image_sha256": "7d6595014659e59c9f044dbede0eada52fa5f9c23717e7f11c4374d4c63eea6a",
+      "transformation": "Remove leading duplicate h1 only; preserve all remaining body text, markup and links."
+    },
+    {
+      "slug": "more-work-less-understanding",
+      "body_source": "outputs/span-of-control-approved.html",
+      "publication_source": "outputs/span-of-control-publication.json",
+      "image_source": "outputs/article-covers/span-of-control-code-hydra-logos.png",
+      "source_body_sha256": "f0ad1dae927da703bc0a3534cba83e5e5b24030681a7364921aec80081f87467",
+      "body_sha256": "428f8fa78839bb461fa7d3b679d1f9ada273de052c02977d7169da3307149248",
+      "image_sha256": "9a096c516ceb47b0a990b2a9f415d1a38238488514fcfc70c7cc043a27a34482",
+      "transformation": "Remove leading duplicate h1 only; preserve all remaining body text, markup and links."
+    },
+    {
+      "slug": "when-ai-develops-a-gut-feeling",
+      "body_source": "outputs/gut-feeling-article.html",
+      "publication_source": "outputs/gut-feeling-publication-record.json",
+      "image_source": "outputs/article-covers/intuition-and-machine-confidence.png",
+      "source_body_sha256": "d9788a4898b35eb30a5e6907189436ca035ba81a88e9137e6099d916ff10e684",
+      "body_sha256": "c7056454781d675d73f4bfd8a0e364284a7627f887cc260acbadac4e95af1fbe",
+      "image_sha256": "0107c8efdd470a5192a95b63db8f0d26368aec9d67c30da84e206704b15bcbc4",
+      "transformation": "Remove leading duplicate h1 only; preserve all remaining body text, markup and links."
+    },
+    {
+      "slug": "the-times-are-changing",
+      "body_source": "outputs/times-changing-article.html",
+      "publication_source": "outputs/times-changing-publication.json",
+      "image_source": "outputs/article-covers/memory.png",
+      "source_body_sha256": "b6126a3228f01d4d87e77a6f557824119b1ce99973a39f64da02611a767809d6",
+      "body_sha256": "6ec6e9069193c7c277cfd2c1de327b3acd6ff9428fd3ce45c5b658cf135173a6",
+      "image_sha256": "aeaccab5d45dc4bd8560403a97f43efc9877f7d00d966c24e0117c82f8ded327",
+      "transformation": "Remove leading duplicate h1 only; preserve all remaining body text, markup and links."
+    }
+  ],
+  "existing_body_sha256": {
+    "ai-value-and-return": "b00a9c18853d45b291f22a53be587c4837919714367280b34a2d3eba9e534b54",
+    "five-technical-problems": "0ab07fe3f9994656b1e3e98d37ce542f0ca36709abae53fb1c8d3da9417c9f4f",
+    "the-agent-is-cheap": "2a6c72e3922742af98428c5d36f224c981f1649c2abfbc6fc854240db394cc0e",
+    "the-work-ai-leaves-behind": "3cfb4bda11528ceddccf5e83489853047d28a567361f376054f82fe0e6ab897a",
+    "when-ai-does-the-work": "f58bd4ab8b8d9a07d048b75f8b203c9e447aadfdc8f8fdbd83264c4b00e34048",
+    "who-remains-responsible": "66ada4ebb5861d33c318b7db0ca088cc18078b6e62a7e68d3715e7e0bde1524d"
+  }
+}
