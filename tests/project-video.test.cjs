@@ -95,6 +95,35 @@ function setup({ networkState = 1, error = null } = {}) {
 
 const settled = () => new Promise(resolve => setImmediate(resolve));
 
+test('homepage videos leave initial connections available until a preview is visible or played', () => {
+  const homepage = readFileSync(join(__dirname, '../index.html'), 'utf8');
+  const videoTags = [...homepage.matchAll(/<video\b[^>]*>/g)].map(match => match[0]);
+  const previews = videoTags.filter(tag => !tag.includes('id="landscape-film"'));
+  assert.equal(previews.length, 6);
+  for (const tag of previews) {
+    assert.match(tag, /\bpreload="none"/);
+    assert.doesNotMatch(tag, /\bautoplay\b/);
+    assert.match(tag, /\bposter="\/assets\//);
+    assert.match(tag, /\bcontrols\b/);
+  }
+  const documentary = videoTags.find(tag => tag.includes('id="landscape-film"'));
+  assert.ok(documentary);
+  assert.match(documentary, /\bpreload="none"/);
+});
+
+test('initialising previews does not start any playback; entering view starts only the active card', async () => {
+  const page = setup();
+  await settled();
+  assert.ok(page.cards.every(card => card.video.playCalls === 0));
+  page.enter(1); // The inactive card being nearby must not fetch/play its media.
+  await settled();
+  assert.ok(page.cards.every(card => card.video.playCalls === 0));
+  page.enter(0);
+  await settled();
+  assert.equal(page.cards[0].video.playCalls, 1);
+  assert.equal(page.cards[1].video.playCalls, 0);
+});
+
 test('transient source selection does not replace a healthy video with a still image', async () => {
   const page = setup({ networkState: 3 });
   const { video, container } = page.cards[0];
