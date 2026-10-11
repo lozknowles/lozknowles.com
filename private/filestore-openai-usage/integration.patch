@@ -125,3 +125,48 @@ index 74d8d1b..9766923 100644
        <span class="portal-connection"><i aria-hidden="true"></i> MEMBERS OF ONE</span>
        <form method="post" action="/logout">
          <input type="hidden" name="csrf" value="{{ csrf }}">
+diff --git a/scripts/run-tunnel.ps1 b/scripts/run-tunnel.ps1
+index 60361d0..4a44d94 100644
+--- a/scripts/run-tunnel.ps1
++++ b/scripts/run-tunnel.ps1
+@@ -19,19 +19,27 @@ while ($true) {
+     }
+     $Timestamp = (Get-Date).ToUniversalTime().ToString('yyyy-MM-ddTHH:mm:ssZ')
+     Add-Content -LiteralPath $Log -Value "$Timestamp tunnel_connecting target=192.168.178.21:2222 listen=127.0.0.1:18765"
+-    & $Ssh -NT `
+-        -i $Key `
+-        -o IdentitiesOnly=yes `
+-        -p 2222 `
+-        -o BatchMode=yes `
+-        -o StrictHostKeyChecking=yes `
+-        -o ExitOnForwardFailure=yes `
+-        -o ServerAliveInterval=30 `
+-        -o ServerAliveCountMax=3 `
+-        -o ConnectTimeout=10 `
+-        -R '127.0.0.1:18765:127.0.0.1:8769' `
+-        'loz@192.168.178.21' 2>&1 | Add-Content -LiteralPath $Log
+-    $ExitCode = $LASTEXITCODE
++    # PowerShell 5 treats native stderr as a terminating error under Stop. A
++    # dropped SSH connection must return to the retry loop, not exit the task.
++    $PreviousErrorActionPreference = $ErrorActionPreference
++    try {
++        $ErrorActionPreference = 'Continue'
++        & $Ssh -NT `
++            -i $Key `
++            -o IdentitiesOnly=yes `
++            -p 2222 `
++            -o BatchMode=yes `
++            -o StrictHostKeyChecking=yes `
++            -o ExitOnForwardFailure=yes `
++            -o ServerAliveInterval=30 `
++            -o ServerAliveCountMax=3 `
++            -o ConnectTimeout=10 `
++            -R '127.0.0.1:18765:127.0.0.1:8769' `
++            'loz@192.168.178.21' 2>&1 | Add-Content -LiteralPath $Log
++        $ExitCode = $LASTEXITCODE
++    } finally {
++        $ErrorActionPreference = $PreviousErrorActionPreference
++    }
+     $Timestamp = (Get-Date).ToUniversalTime().ToString('yyyy-MM-ddTHH:mm:ssZ')
+     Add-Content -LiteralPath $Log -Value "$Timestamp tunnel_disconnected exit_code=$ExitCode retry_seconds=10"
+     Start-Sleep -Seconds 10
