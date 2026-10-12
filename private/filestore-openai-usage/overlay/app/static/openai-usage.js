@@ -70,7 +70,7 @@
     recommendation.dataset.state = chosen ? (chosen.stale ? 'stale' : 'ready') : 'unavailable';
     recommendationName.textContent = chosen ? chosen.name : 'No current suggestion';
     recommendationReason.textContent = chosen ?
-      `${chosen.stale ? 'Last known suggestion; readings are over ten minutes old, so refresh to confirm. ' : ''}All reported Codex limits had allowance at the last check. The ${chosen.next.label} window resets ${timeUntil(chosen.next.at)} and has the earliest reported reset among eligible accounts. Lowest reported remaining allowance: ${chosen.lowest}%.` :
+      `${chosen.stale ? 'Last known suggestion; reading freshness could not be confirmed. Refresh to check. ' : ''}All reported Codex limits had allowance at the last check. The ${chosen.next.label} window resets ${timeUntil(chosen.next.at)} and has the earliest reported reset among eligible accounts. Lowest reported remaining allowance: ${chosen.lowest}%.` :
       'No account has usable reported Codex limits across every window it reports.';
     for (const [index, card] of [...grid.children].entries()) {
       card.classList.toggle('usage-card-suggested', index === chosen?.index && !chosen.stale);
