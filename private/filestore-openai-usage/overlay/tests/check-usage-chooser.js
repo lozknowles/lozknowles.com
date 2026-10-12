@@ -30,9 +30,12 @@ assert.strictEqual(choose(data).name, 'Pro Lite', 'malformed percentage excludes
 data = base(); data.accounts[1].codex.value.weekly = null;
 assert.strictEqual(choose(data).name, 'Plus', 'missing limit is not zero');
 data = base(); data.updated_at = new Date(now - 11 * 60000).toISOString();
-assert.strictEqual(choose(data), null, 'stale snapshot gets no recommendation');
+assert.strictEqual(choose(data).name, 'Plus', 'stale snapshot retains a last-known recommendation');
+assert.strictEqual(choose(data).stale, true, 'stale recommendation is explicitly marked');
+data = base(); data.updated_at = new Date(now).toISOString();
+assert.strictEqual(choose(data).stale, false, 'fresh recommendation is not marked stale');
 data = base(); data.accounts.forEach(row => {row.codex.status = 'unavailable';});
 assert.strictEqual(choose(data), null, 'all unavailable gets no recommendation');
 data = base(); data.accounts[2].codex.value.five_hour.resets_at = data.accounts[1].codex.value.weekly.resets_at;
 assert.strictEqual(choose(data).name, 'Pro Lite', 'tie favors higher conservative headroom');
-console.log('chooser scenarios passed: 8');
+console.log('chooser scenarios passed: 9');

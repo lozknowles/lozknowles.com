@@ -39,7 +39,8 @@
   function chooseAccount(data) {
     const updated = Date.parse(data?.updated_at);
     const now = Date.now();
-    if (!Number.isFinite(updated) || Math.abs(now - updated) > 600000 || !Array.isArray(data?.accounts)) return null;
+    if (!Array.isArray(data?.accounts)) return null;
+    const stale = !Number.isFinite(updated) || Math.abs(now - updated) > 600000;
     const candidates = [];
     data.accounts.forEach((account, index) => {
       if (account?.codex?.status !== 'current' || !account.codex.value) return;
@@ -59,20 +60,21 @@
           !Number.isFinite(Date.parse(value.resets_at)) || Date.parse(value.resets_at) <= now)) return;
       const next = reported.map(([label, value]) => ({label, at: Date.parse(value.resets_at)}))
         .sort((a, b) => a.at - b.at)[0];
-      candidates.push({index, name: account.name, next, lowest: Math.min(...reported.map(([, value]) => value.remaining_percent))});
+      candidates.push({index, name: account.name, next, lowest: Math.min(...reported.map(([, value]) => value.remaining_percent)), stale});
     });
     candidates.sort((a, b) => a.next.at - b.next.at || b.lowest - a.lowest || a.index - b.index);
     return candidates[0] || null;
   }
   function updateRecommendation() {
     const chosen = chooseAccount(latestData);
-    recommendation.dataset.state = chosen ? 'ready' : 'unavailable';
+    recommendation.dataset.state = chosen ? (chosen.stale ? 'stale' : 'ready') : 'unavailable';
     recommendationName.textContent = chosen ? chosen.name : 'No current suggestion';
     recommendationReason.textContent = chosen ?
-      `All reported Codex limits have allowance. The ${chosen.next.label} window resets ${timeUntil(chosen.next.at)} and has the earliest reported reset among eligible accounts. Lowest reported remaining allowance: ${chosen.lowest}%.` :
-      'No account has fresh, non-exhausted Codex limits across every window it reports.';
+      `${chosen.stale ? 'Last known suggestion; readings are over ten minutes old, so refresh to confirm. ' : ''}All reported Codex limits had allowance at the last check. The ${chosen.next.label} window resets ${timeUntil(chosen.next.at)} and has the earliest reported reset among eligible accounts. Lowest reported remaining allowance: ${chosen.lowest}%.` :
+      'No account has usable reported Codex limits across every window it reports.';
     for (const [index, card] of [...grid.children].entries()) {
-      card.classList.toggle('usage-card-suggested', index === chosen?.index);
+      card.classList.toggle('usage-card-suggested', index === chosen?.index && !chosen.stale);
+      card.classList.toggle('usage-card-last-known', index === chosen?.index && chosen.stale);
     }
   }
   const node = (tag, className, value) => {
@@ -151,14 +153,16 @@
       if (!response.ok) throw new Error(`HTTP ${response.status}`);
       render(await response.json());
     } catch (_) {
-      latestData = null;
       updateRecommendation();
-      status.textContent = 'Could not load usage. Your session or the provider may be unavailable.';
+      status.textContent = latestData ?
+        'Could not refresh usage. Last checked readings are shown; your session or the provider may be unavailable.' :
+        'Could not load usage. Your session or the provider may be unavailable.';
     } finally {
       refresh.disabled = false;
     }
   }
   refresh.addEventListener('click', () => load(true));
+  document.addEventListener('visibilitychange', () => { if (!document.hidden) load(); });
   load();
   setInterval(() => {
     if (document.hidden) return;
