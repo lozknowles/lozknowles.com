@@ -9,6 +9,6 @@ class WoprBoundary(unittest.TestCase):
    self.assertNotIn(text,page+js)
  def test_regression_status_is_fetched_in_both_modes(self):
   js=(ROOT/'assets/wopr-light-display.js').read_text()
-  self.assertIn('fetchHealth();healthPoll=setInterval(fetchHealth,10000)',js)
+  self.assertIn('fetchHealth();healthPoll=setInterval(fetchHealth,5000)',js)
   self.assertNotIn('if(serverMode){fetchHealth()',js)
   self.assertIn("['M','MSI']",js);self.assertIn("['A','macomarchy']",js)

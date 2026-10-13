@@ -1,6 +1,6 @@
 #!/usr/bin/env python3
 """Validate bounded public telemetry and atomically replace one JSON file."""
-import json,math,os,sys,tempfile,time
+import json,math,os,subprocess,sys,tempfile,time
 from pathlib import Path
 raw=sys.stdin.read(3073)
 if len(raw)>3072:raise ValueError('Oversized snapshot')
@@ -14,11 +14,21 @@ require(valid_sample({k:d[k] for k in ('sampled_at','values')}))
 if 'servers' in d:
  require(type(d['servers']) is dict and set(d['servers'])=={'H','S','C'})
  require(all(s is None or valid_sample(s) for s in d['servers'].values()))
+ try:
+  result=subprocess.run(['/usr/bin/python3','/home/loz/bin/wopr-health-sample.py'],
+   capture_output=True,text=True,timeout=5,check=True)
+  require(len(result.stdout)<=1024)
+  local=json.loads(result.stdout)
+  d['servers']['C']=local if valid_sample(local) else None
+ except (OSError,ValueError,subprocess.SubprocessError):d['servers']['C']=None
 if 'power' in d:
  require(type(d['power']) is dict and set(d['power'])=={'wopr'})
  p=d['power']['wopr']
  require(p is None or (type(p) is dict and set(p)=={'watts','observed_at'} and type(p['watts']) in (int,float) and math.isfinite(p['watts']) and 0<=p['watts']<=4000 and type(p['observed_at']) is int and abs(time.time()-p['observed_at'])<30))
  d['power']={'wopr':None if p is None else {'watts':p['watts'],'observed_at':p['observed_at']}}
+require(valid_sample({k:d[k] for k in ('sampled_at','values')}))
+if 'servers' in d:require(all(s is None or valid_sample(s) for s in d['servers'].values()))
+if 'power' in d and d['power']['wopr'] is not None:require(abs(time.time()-d['power']['wopr']['observed_at'])<30)
 root=Path('/var/www/lozknowles.com/public_html/dist');staging=root.parent/'wopr-health-private'
 staging.mkdir(mode=0o700,exist_ok=True)
 fd,name=tempfile.mkstemp(dir=staging)

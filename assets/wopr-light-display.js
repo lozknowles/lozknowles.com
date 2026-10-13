@@ -103,7 +103,7 @@
    document.getElementById('mode').textContent=serverMode?'WOPR':'Server';
    document.getElementById('mode').setAttribute('aria-pressed',String(serverMode));
    clearInterval(healthPoll);healthPoll=null;
-   fetchHealth();healthPoll=setInterval(fetchHealth,10000);
+   fetchHealth();healthPoll=setInterval(fetchHealth,5000);
  }
  function drawHealth(segment){
    array.dataset.phase=segment.id+'-bars';

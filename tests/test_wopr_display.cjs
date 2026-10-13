@@ -43,7 +43,7 @@ async function boot(watts, width = 1280, observedAt = epoch) {
   return {ids, timers, context, windowEvents, tick(ms) {now = ms; timers.get(210)();},
     advanceWall(seconds) {wallEpoch += seconds; timers.get(1000)();},
     async updatePower(value, at = epoch) {currentPower = value === null ? null : {watts: value, observed_at: at};
-      await timers.get(10000)(); await new Promise(resolve => setImmediate(resolve));}};
+      await timers.get(5000)(); await new Promise(resolve => setImmediate(resolve));}};
 }
 
 (async () => {

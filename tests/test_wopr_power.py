@@ -62,6 +62,31 @@ class PowerBoundary(unittest.TestCase):
                 self.assertNotEqual(code, 0)
                 self.assertIsNone(output)
 
+    def test_receiver_uses_local_c_and_keeps_other_data_on_c_failure(self):
+        with tempfile.TemporaryDirectory() as directory:
+            root = pathlib.Path(directory)
+            (root / 'dist').mkdir()
+            sampler = root / 'sample.py'
+            source = RECEIVER.replace(
+                "root=Path('/var/www/lozknowles.com/public_html/dist')",
+                f'root=Path({str(root / "dist")!r})',
+            ).replace('/home/loz/bin/wopr-health-sample.py', str(sampler))
+            now = int(time.time())
+            h = {'sampled_at': now, 'values': [12.0] * 6}
+            payload = {'version': 1, **h, 'servers': {'H': h, 'S': h, 'C': None},
+                       'power': {'wopr': {'watts': 42.0, 'observed_at': now}}}
+            for valid in (True, False):
+                sampler.write_text(
+                    f'import json,time\nprint(json.dumps({h!r}))\n' if valid else
+                    'raise RuntimeError("sample failed")\n')
+                result = subprocess.run([sys.executable, '-c', source], input=json.dumps(payload),
+                                        text=True, capture_output=True)
+                self.assertEqual(result.returncode, 0, result.stderr)
+                output = json.loads((root / 'dist/wopr-health.json').read_text())
+                self.assertEqual(output['servers']['C'], h if valid else None)
+                self.assertEqual(output['servers']['H'], h)
+                self.assertEqual(output['power']['wopr']['watts'], 42.0)
+
 
 if __name__ == '__main__':
     unittest.main()
