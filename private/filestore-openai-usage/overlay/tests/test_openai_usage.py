@@ -4,7 +4,7 @@ import json
 import httpx
 import pytest
 
-from app.codex_usage import parse_codex_response
+from app.codex_usage import CodexAccountMismatch, parse_codex_response
 from app.main import create_app
 from app.openai_usage import Account, OpenAIUsageCollector, load_accounts
 
@@ -149,7 +149,7 @@ def test_codex_window_parser_uses_documented_durations_and_account_binding():
     assert parsed['value']['five_hour']['remaining_percent'] == 75
     assert parsed['value']['weekly']['remaining_percent'] == 50
     assert parsed['value']['other_windows'] == []
-    with pytest.raises(ValueError):
+    with pytest.raises(CodexAccountMismatch):
         parse_codex_response(account, limits, 'different-id')
     mixed = {**limits, 'rateLimitsByLimitId': {'other-model': limits['rateLimitsByLimitId']['codex']},
              'rateLimits': limits['rateLimitsByLimitId']['codex']}
@@ -173,6 +173,19 @@ def test_codex_nonstandard_window_is_available_without_inventing_five_hour_or_we
     }]
     with pytest.raises(ValueError):
         parse_codex_response(account, limits, 'wrong-id')
+
+
+def test_codex_account_mismatch_has_safe_specific_status(monkeypatch):
+    async def wrong_account(*_args):
+        raise CodexAccountMismatch('Codex account mismatch')
+
+    monkeypatch.setattr('app.openai_usage.read_codex_usage', wrong_account)
+    account = Account('Expected', ('codex',), codex_account_id='expected-id')
+    result = asyncio.run(OpenAIUsageCollector((account,)).snapshot())
+    codex = result['accounts'][0]['codex']
+    assert codex['value'] is None
+    assert codex['reason'] == 'Signed-in Codex account does not match configured account'
+    assert 'expected-id' not in json.dumps(result)
 
 
 def test_combined_spend_counts_same_organization_once(monkeypatch):

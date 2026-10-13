@@ -15,7 +15,7 @@ from pathlib import Path
 
 import httpx
 
-from .codex_usage import read_codex_usage
+from .codex_usage import CodexAccountMismatch, read_codex_usage
 
 BASE_URL = 'https://api.openai.com/v1/organization'
 ENV_NAME = re.compile(r'^OPENAI_ADMIN_KEY_[A-Z0-9_]+$')
@@ -218,6 +218,8 @@ class OpenAIUsageCollector:
                 row['codex'] = await read_codex_usage(account.codex_account_id, account.codex_home)
                 if not row['subscription'] and row['codex']['plan']:
                     row['subscription'] = row['codex']['plan']
+            except CodexAccountMismatch:
+                row['codex'] = unavailable('Signed-in Codex account does not match configured account')
             except (OSError, ValueError, TypeError, KeyError, TimeoutError, RuntimeError):
                 row['codex'] = unavailable('Codex profile or rate limits unavailable')
         if 'api' not in account.products:

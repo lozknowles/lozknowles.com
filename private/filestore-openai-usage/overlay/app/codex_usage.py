@@ -10,6 +10,10 @@ from datetime import UTC, datetime
 from pathlib import Path
 
 
+class CodexAccountMismatch(ValueError):
+    """The signed-in profile is not the configured account."""
+
+
 def _window(item: object) -> dict | None:
     if not isinstance(item, dict):
         return None
@@ -32,7 +36,7 @@ def _window(item: object) -> dict | None:
 
 def parse_codex_response(account: dict, limits: dict, expected_id: str) -> dict:
     if limits.get('accountId') != expected_id:
-        raise ValueError('Codex account mismatch')
+        raise CodexAccountMismatch('Codex account mismatch')
     info = account.get('account') or {}
     if not isinstance(info, dict) or info.get('type') != 'chatgpt':
         raise ValueError('Codex is not signed in with ChatGPT')
