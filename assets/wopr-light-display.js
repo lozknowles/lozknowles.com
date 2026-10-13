@@ -39,15 +39,47 @@
  }
  function drawPower(){
    if(!powerReadout)return;
-   const sample=health?.power?.wopr,age=sample?Date.now()/1000-sample.observed_at:Infinity;
-   const fresh=sample&&Number.isFinite(sample.watts)&&sample.watts>=0&&sample.watts<=4000&&Number.isInteger(sample.observed_at)&&age>=-5&&age<=35;
-   const label=fresh?'WOPR POWER  '+sample.watts.toFixed(1)+' W':'WOPR POWER  unavailable';
+   const watts=freshWatts();
+   const label=watts===null?'WOPR POWER  unavailable':'WOPR POWER  '+watts.toFixed(1)+' W';
    if(powerReadout.textContent!==label)powerReadout.textContent=label;
-   powerReadout.dataset.state=fresh?'live':'unknown';
+   powerReadout.dataset.state=watts===null?'unknown':'live';
  }
- const segments=[{id:'H',start:5000,end:10000},{id:'S',start:10000,end:15000},{id:'C',start:20000,end:25000}];
+ function freshWatts(){
+   const sample=health?.power?.wopr,age=sample?Date.now()/1000-sample.observed_at:Infinity;
+   return sample&&Number.isFinite(sample.watts)&&sample.watts>=0&&sample.watts<=4000&&Number.isInteger(sample.observed_at)&&age>=-5&&age<=35?sample.watts:null;
+ }
+ const segments=[{kind:'server',id:'H',start:5000,end:10000},{kind:'server',id:'S',start:10000,end:15000},{kind:'server',id:'C',start:20000,end:25000},{kind:'power',id:'P',start:25000,end:30000}];
  const letters={H:['10001','10001','11111','10001','10001','10001'],S:['01111','10000','01110','00001','00001','11110'],C:['01111','10000','10000','10000','10000','01111']};
- const currentSegment=()=>serverMode?segments.find(s=>cycleMs%25000>=s.start&&cycleMs%25000<s.end):null;
+ const currentSegment=()=>serverMode?segments.find(s=>cycleMs%30000>=s.start&&cycleMs%30000<s.end):null;
+ const glyphs={
+   '0':['111','101','101','101','111'],'1':['010','110','010','010','111'],
+   '2':['111','001','111','100','111'],'3':['111','001','111','001','111'],
+   '4':['101','101','111','001','001'],'5':['111','100','111','001','111'],
+   '6':['111','100','111','101','111'],'7':['111','001','010','010','010'],
+   '8':['111','101','111','101','111'],'9':['111','101','111','001','111'],
+   '.':['0','0','0','0','1'],'W':['10001','10001','10101','10101','01010'],
+   '-':['000','000','111','000','000']
+ };
+ function drawPowerLights(){
+   const watts=freshWatts(),label=watts===null?'---':watts.toFixed(1)+'W';
+   const glyphWidth=[...label].reduce((sum,char)=>sum+glyphs[char][0].length,0)+label.length-1;
+   const scale=glyphWidth*2<=cols-2?2:1,used=glyphWidth*scale,left=Math.floor((cols-used)/2),top=Math.floor((rows-10)/2);
+   const color={hex:watts===null?'#ff341c':'#ffc13e'};
+   array.dataset.phase='wopr-power';status.hidden=false;
+   const caption=watts===null?'WOPR power unavailable or stale':'WOPR power · '+watts.toFixed(1)+' W';
+   const description=watts===null?'WOPR plug power unavailable':'WOPR plug power '+watts.toFixed(1)+' watts';
+   if(status.textContent!==caption)status.textContent=caption;
+   if(array.getAttribute('aria-label')!==description)array.setAttribute('aria-label',description);
+   for(let i=0;i<leds.length;i++)set(i,false,color);
+   let x=left;
+   for(const char of label){
+     const glyph=glyphs[char],width=glyph[0].length;
+     for(let y=0;y<5;y++)for(let col=0;col<width;col++)if(glyph[y][col]==='1'){
+       for(let dy=0;dy<2;dy++)for(let dx=0;dx<scale;dx++)set((top+y*2+dy)*cols+x+col*scale+dx,true,color);
+     }
+     x+=(width+1)*scale;
+   }
+ }
  function drawLetter(segment){
    status.hidden=true;array.dataset.phase=segment.id+'-letter';array.setAttribute('aria-label',segment.id+' server identifier');
    metricLabels.forEach(el=>el.hidden=true);
@@ -65,7 +97,7 @@
      const response=await fetch('/wopr-health.json',{cache:'no-store',signal:AbortSignal.timeout(5000)});
      if(!response.ok)throw new Error('unavailable');
      const data=await response.json();if(!validHealth(data))throw new Error('invalid');health=data;
-   }catch{health=null;}finally{fetching=false;drawMachines();drawPower();}
+   }catch{health=null;}finally{fetching=false;drawMachines();drawPower();if(!running&&currentSegment()?.kind==='power')drawPowerLights();}
  }
  function configureMode(){
    document.getElementById('mode').textContent=serverMode?'WOPR':'Server';
@@ -100,19 +132,20 @@
  ];
  const pick=()=>{let n=Math.random()*100;for(const c of hues){n-=c.weight;if(n<0)return c}return hues[0]};
  function makeGrid(){
-   const server=!!currentSegment();
+   const segment=currentSegment(),server=!!segment,power=segment?.kind==='power';
    cols=innerWidth<600?(server?32:22):(server?48:32);
    rows=server?12:6;
+   array.dataset.grid=power?'power':server?'server':'lights';
    array.classList.toggle('server-view',server);array.replaceChildren();leds=[];metricLabels=[];
    array.style.gridTemplateColumns='repeat('+cols+',minmax(0,1fr))';
    array.style.gridTemplateRows='repeat('+rows+',minmax(0,1fr))';
    for(let i=0;i<cols*rows;i++){
      const row=Math.floor(i/cols),col=i%cols,el=document.createElement('i');el.className='led';el.setAttribute('aria-hidden','true');
      el.style.gridRow=String(row+1);el.style.gridColumn=String(col+1);
-     if(server&&col>=12&&row%2===0)el.style.visibility='hidden';
+     if(server&&!power&&col>=12&&row%2===0)el.style.visibility='hidden';
      array.appendChild(el);leds.push(el);
    }
-   if(server)metricNames.forEach((name,i)=>{
+   if(server&&!power)metricNames.forEach((name,i)=>{
      const label=document.createElement('div');label.className='metric-label';label.hidden=true;label.setAttribute('aria-hidden','true');
      label.style.gridRow=String(i*2+1);label.style.gridColumn='13 / -1';array.appendChild(label);metricLabels.push(label);
    });
@@ -128,8 +161,10 @@
    const now=performance.now();if(running)cycleMs+=now-lastFrame;lastFrame=now;
    const segment=currentSegment();
    const expected=innerWidth<600?(segment?32:22):(segment?48:32);
-   if(cols!==expected)makeGrid();
-   if(segment){drawHealth(segment);return;}
+   const grid=segment?.kind==='power'?'power':segment?'server':'lights';
+   if(cols!==expected||array.dataset.grid!==grid)makeGrid();
+   if(segment?.kind==='server'){drawHealth(segment);return;}
+   if(segment?.kind==='power'){drawPowerLights();return;}
    array.dataset.phase='wopr';
    status.hidden=true;
    array.setAttribute('aria-label','Animated WOPR indicator lights');
@@ -163,12 +198,13 @@
    running=!running;e.currentTarget.textContent=running?'Pause':'Resume';
    if(running)start();else clearInterval(timer);
  });
- document.getElementById('mode').addEventListener('click',()=>{serverMode=!serverMode;cycleMs=0;lastFrame=performance.now();configureMode();if(running)draw();else{status.hidden=true;}});
+ document.getElementById('mode').addEventListener('click',()=>{serverMode=!serverMode;cycleMs=0;lastFrame=performance.now();configureMode();draw();});
  document.getElementById('next').addEventListener('click',()=>{pattern=(pattern+1)%4;if(running)draw()});
  document.getElementById('speed').addEventListener('input',e=>{rate=Number(e.target.value);if(running)start()});
  document.getElementById('full').addEventListener('click',async()=>{
    try{if(!document.fullscreenElement)await document.documentElement.requestFullscreen();else await document.exitFullscreen()}catch{}
  });
+ setInterval(()=>{if(!running){drawPower();if(currentSegment()?.kind==='power')drawPowerLights();}},1000);
  let hideTimer;
  addEventListener('pointermove',()=>{const c=document.getElementById('controls');c.classList.add('show');clearTimeout(hideTimer);hideTimer=setTimeout(()=>c.classList.remove('show'),2600)});
  addEventListener('resize',()=>{makeGrid();draw()});
