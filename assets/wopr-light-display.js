@@ -4,6 +4,7 @@
  let serverMode=new URLSearchParams(location.search).get('mode')!=='lights';
  let cycleMs=0,lastFrame=performance.now(),health=null,healthPoll=null,fetching=false;
  const status=document.getElementById('health-status');
+ const powerReadout=document.getElementById('wopr-power');
  const metricNames=['CPU','RAM','Swap','Root disk','Data disk','GPU'];
  const machines=[['H','hpubuntu'],['S','Sentinel'],['C','cottageserver'],['A','macomarchy'],['M','MSI']];
  const rack=document.getElementById('machines');
@@ -36,6 +37,14 @@
      readings.textContent=available?metricNames.map((name,i)=>name+' '+(sample.values[i]===null?'N/A':sample.values[i].toFixed(1)+'%')).join(' · '):'No current telemetry';
    });
  }
+ function drawPower(){
+   if(!powerReadout)return;
+   const sample=health?.power?.wopr,age=sample?Date.now()/1000-sample.observed_at:Infinity;
+   const fresh=sample&&Number.isFinite(sample.watts)&&sample.watts>=0&&sample.watts<=4000&&Number.isInteger(sample.observed_at)&&age>=-5&&age<=35;
+   const label=fresh?'WOPR POWER  '+sample.watts.toFixed(1)+' W':'WOPR POWER  unavailable';
+   if(powerReadout.textContent!==label)powerReadout.textContent=label;
+   powerReadout.dataset.state=fresh?'live':'unknown';
+ }
  const segments=[{id:'H',start:5000,end:10000},{id:'S',start:10000,end:15000},{id:'C',start:20000,end:25000}];
  const letters={H:['10001','10001','11111','10001','10001','10001'],S:['01111','10000','01110','00001','00001','11110'],C:['01111','10000','10000','10000','10000','01111']};
  const currentSegment=()=>serverMode?segments.find(s=>cycleMs%25000>=s.start&&cycleMs%25000<s.end):null;
@@ -56,7 +65,7 @@
      const response=await fetch('/wopr-health.json',{cache:'no-store',signal:AbortSignal.timeout(5000)});
      if(!response.ok)throw new Error('unavailable');
      const data=await response.json();if(!validHealth(data))throw new Error('invalid');health=data;
-   }catch{health=null;}finally{fetching=false;drawMachines();}
+   }catch{health=null;}finally{fetching=false;drawMachines();drawPower();}
  }
  function configureMode(){
    document.getElementById('mode').textContent=serverMode?'WOPR':'Server';
@@ -115,6 +124,7 @@
  }
  function draw(){
    drawMachines();
+   drawPower();
    const now=performance.now();if(running)cycleMs+=now-lastFrame;lastFrame=now;
    const segment=currentSegment();
    const expected=innerWidth<600?(segment?32:22):(segment?48:32);

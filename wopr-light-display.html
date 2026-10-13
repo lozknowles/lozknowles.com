@@ -63,6 +63,8 @@ body{display:grid;place-items:center}
 .rack{position:fixed;left:50%;bottom:5vh;transform:translateX(-50%);width:min(94vw,1100px);display:grid;gap:5px;padding:12px 24px;border:1px solid #302721;background:linear-gradient(100deg,#241d19,#101112 8%,#191919 50%,#111213 92%,#2a1b15);box-shadow:inset 0 0 18px #000;z-index:6;font:clamp(12px,1vw,16px) ui-monospace,Consolas,monospace;color:#d2c3aa;visibility:hidden;opacity:0;pointer-events:none}
 .rack.open{visibility:visible;opacity:1}
 .display{display:grid;justify-items:center;gap:14px;max-height:94vh}
+.power-readout{font:clamp(12px,1.2vw,16px) ui-monospace,Consolas,monospace;letter-spacing:.12em;color:#d4ac78;text-shadow:0 0 8px #d65b2940}
+.power-readout[data-state=live]{color:#ffe0a2}
 .machine{display:grid;grid-template-columns:12px 140px 215px 1fr;align-items:center;gap:14px;min-height:26px}
 .machine strong{color:#ffe0a2;font-weight:normal;letter-spacing:.04em}
 .machine-state{color:#ffc13e;font-size:.85em}
@@ -103,6 +105,7 @@ input{width:85px;accent-color:#ed7140}
 <main class="panel" aria-label="Full-screen WOPR-inspired indicator light panel">
  <div class="display">
   <div class="array" id="array" role="img" tabindex="0" aria-describedby="machines" aria-label="Rows of glowing red, orange, amber, pale yellow and green indicator lights"></div>
+  <div class="power-readout" id="wopr-power" role="status">WOPR POWER  unavailable</div>
   <section class="rack" id="machines" role="tooltip" aria-label="Machine telemetry"></section>
  </div>
 </main>
@@ -114,6 +117,6 @@ input{width:85px;accent-color:#ed7140}
   <button id="full" type="button">Full screen</button>
 </div>
 <div id="health-status" role="status" style="position:fixed;top:12px;left:0;right:0;text-align:center;color:#abb1b1;font:12px ui-monospace,monospace;pointer-events:none" hidden></div>
-<script src="/assets/wopr-light-display.js?v=20261001-hover"></script>
+<script src="/assets/wopr-light-display.js?v=20261013-power"></script>
 </body>
 </html>
