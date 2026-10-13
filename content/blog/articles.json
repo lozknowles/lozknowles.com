@@ -1,5 +1,19 @@
 [
   {
+    "slug": "the-agent-finished-the-job",
+    "title": "The Agent Finished the Job. Where Did the Work Go?",
+    "date": "2026-10-13",
+    "category": "Governance",
+    "summary": "A contract can specify where data may be processed. Can the integrator show where an AI agent actually worked?",
+    "original": "https://medium.com/@knowleslawrence1/the-agent-finished-the-job-where-did-the-work-go-13d65cd4a7a9",
+    "image": {
+      "file": "the-agent-finished-the-job.png",
+      "alt": "A map of the UK and network routes connecting an AI agent to overseas data centres, illustrating cross-border processing questions.",
+      "width": 1672,
+      "height": 941
+    }
+  },
+  {
     "slug": "the-hidden-danger-isnt-a-rogue-ai",
     "title": "The Hidden Danger Isn’t a Rogue AI",
     "date": "2026-10-09",

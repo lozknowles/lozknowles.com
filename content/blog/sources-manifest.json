@@ -2,6 +2,16 @@
   "existing_articles": "Original six article sources copied without changes from blog branch commit 9ddacf4.",
   "new_articles": [
     {
+      "slug": "the-agent-finished-the-job",
+      "body_source": "outputs/where-did-the-work-go-2026-10-13/body.html",
+      "publication_source": "outputs/where-did-the-work-go-2026-10-13/publication.json",
+      "image_source": "outputs/article-assets/where-did-the-work-go-cover.png",
+      "source_body_sha256": "1e3f307600b1b21cd25b6c8355d3dd264d5313d77bb178859babcb3313506495",
+      "body_sha256": "d1b7ead15846a9f18b5648ec61967147ae35a55c4bc1df84228b6d4afdd8d936",
+      "image_sha256": "058ff4c6b3ec091c6c1b949d8688773822cd4400f9bd7c02a1d36ec671f80785",
+      "transformation": "Copied reviewed body and image without changes; the blog template supplies the article title."
+    },
+    {
       "slug": "the-hidden-danger-isnt-a-rogue-ai",
       "body_source": "outputs/hidden-danger-2026-10-09/article.html",
       "publication_source": "outputs/hidden-danger-2026-10-09/publication.json",

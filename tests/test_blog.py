@@ -26,15 +26,15 @@ class BlogTests(unittest.TestCase):
     def tearDownClass(cls):
         cls.directory.cleanup()
 
-    def test_ten_unique_articles_and_newest_first(self):
-        self.assertEqual(len(self.posts), 10)
+    def test_unique_articles_and_newest_first(self):
+        self.assertEqual(len(self.posts), 11)
         slugs = [p['slug'] for p in self.posts]
-        self.assertEqual(len(set(slugs)), 10)
+        self.assertEqual(len(set(slugs)), 11)
         self.assertTrue(all(re.fullmatch('[a-z0-9-]+', slug) for slug in slugs))
         dates = [p['date'] for p in self.posts]
         self.assertEqual(dates, sorted(dates, reverse=True))
         home = (self.blog / 'index.html').read_text(encoding='utf-8')
-        self.assertEqual(home.count('<article class="card">'), 10)
+        self.assertEqual(home.count('<article class="card">'), 11)
         for post in self.posts:
             page = (self.blog / post['slug'] / 'index.html').read_text(encoding='utf-8')
             self.assertEqual(page.count('<h1>'), 1)
@@ -54,7 +54,7 @@ class BlogTests(unittest.TestCase):
     def test_all_reviewed_bodies_are_preserved(self):
         hashes = dict(self.manifest['existing_body_sha256'])
         hashes.update({m['slug']: m['body_sha256'] for m in self.manifest['new_articles']})
-        self.assertEqual(len(hashes), 10)
+        self.assertEqual(len(hashes), 11)
         for post in self.posts:
             slug = post['slug']
             bodyfile = ROOT / 'content/blog' / f'{slug}.html'
@@ -71,8 +71,8 @@ class BlogTests(unittest.TestCase):
     def test_covers_are_exact_reviewed_bytes_with_alt_and_dimensions(self):
         entries = {m['slug']: m for m in self.manifest['new_articles']}
         home = (self.blog / 'index.html').read_text(encoding='utf-8')
-        self.assertEqual(len(entries), 4)
-        self.assertEqual(home.count('class="card-cover"'), 4)
+        self.assertEqual(len(entries), 5)
+        self.assertEqual(home.count('class="card-cover"'), 5)
         for post in self.posts:
             if 'image' not in post:
                 continue
