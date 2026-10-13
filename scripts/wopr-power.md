@@ -6,4 +6,6 @@ Private files on hpubuntu: `/home/loz/.config/wopr-power/device.json` contains t
 
 The collector publishes only `power.wopr: {"watts": number, "observed_at": unix_seconds}` or `null` to the existing cottageserver receiver. The receiver validates the public fields and writes `/wopr-health.json`. The browser polls every ten seconds and shows unavailable if a reading is absent, invalid, or more than 35 seconds old. Zero watts is a valid reading. A five-second plug timeout produces `null` while server readings continue.
 
+The SSH publication call has a 20-second timeout and the oneshot service has a 35-second start limit. These are bounded mitigations for observed post-authentication SSH command latency to cottageserver; the underlying latency is unresolved. The timer still schedules ten seconds after each completed run. The browser's 35-second freshness limit is independent and must not be extended merely to hide slow publication.
+
 Deployment order: install the new receiver first, then the new sampler and collector, then publish the matching HTML and JS. Check the timer, several JSON updates and the rendered page on desktop/mobile. Rollback order: restore the previous collector before restoring the previous receiver, because the old receiver rejects the `power` field. Restore the previous HTML and JS together. Keep private files private during rollback.

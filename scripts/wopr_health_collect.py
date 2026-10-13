@@ -28,4 +28,4 @@ def collect():
 
 if __name__=='__main__':
  data=collect()
- subprocess.run(['ssh','-o','BatchMode=yes','-o','ConnectTimeout=5','-p','2222','cottageserver','python3 /home/loz/bin/wopr-health-receive.py'],input=json.dumps(data),text=True,timeout=10,check=True)
+ subprocess.run(['ssh','-o','BatchMode=yes','-o','ConnectTimeout=5','-p','2222','cottageserver','python3 /home/loz/bin/wopr-health-receive.py'],input=json.dumps(data),text=True,timeout=20,check=True)
