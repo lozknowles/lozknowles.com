@@ -2,7 +2,7 @@
 Description=Refresh WOPR utilisation snapshot
 [Timer]
 OnBootSec=10
-OnUnitInactiveSec=10
+OnUnitInactiveSec=4
 AccuracySec=1
 [Install]
 WantedBy=timers.target
