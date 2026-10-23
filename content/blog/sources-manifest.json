@@ -2,6 +2,16 @@
   "existing_articles": "Original six article sources copied without changes from blog branch commit 9ddacf4.",
   "new_articles": [
     {
+      "slug": "if-the-agents-stop",
+      "body_source": "outputs/if-agents-stop-2026-10-23/article.md",
+      "publication_source": "outputs/if-agents-stop-2026-10-23/publication.json",
+      "image_source": "outputs/article-assets/if-agents-stop-hero-v3.png",
+      "source_body_sha256": "373660011d5a93e6358739e76c0b091dedd0bcd73461e977945122c0908d778e",
+      "body_sha256": "35c80393c8f52a3873c01980761525eb9e3afba07f2b1c1a5a8bd30c9a360b8b",
+      "image_sha256": "be4eec7253146b0fe4b80a452a19a879c67244381e6dcf0c9a9a87ddeee65f9b",
+      "transformation": "Markdown rendered to HTML using Python Markdown extra; leading title removed because blog template supplies h1."
+    },
+    {
       "slug": "the-agent-finished-the-job",
       "body_source": "outputs/where-did-the-work-go-2026-10-13/body.html",
       "publication_source": "outputs/where-did-the-work-go-2026-10-13/publication.json",
