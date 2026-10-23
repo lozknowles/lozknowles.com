@@ -1,5 +1,19 @@
 [
   {
+    "slug": "if-the-agents-stop",
+    "title": "If the Agents Stop, Who Still Knows How to Do the Work?",
+    "date": "2026-10-23",
+    "category": "Economics & governance",
+    "summary": "AI financing matters. So does the practical question of who can take over when an agent or its provider stops.",
+    "original": "https://medium.com/@knowleslawrence1/if-the-agents-stop-who-still-knows-how-to-do-the-work-84ac7b36425d",
+    "image": {
+      "file": "if-the-agents-stop.png",
+      "alt": "A large AI infrastructure vessel bearing market tickers drifts down a river, evoking the risk of being sold down the river when a provider fails.",
+      "width": 1672,
+      "height": 941
+    }
+  },
+  {
     "slug": "the-agent-finished-the-job",
     "title": "The Agent Finished the Job. Where Did the Work Go?",
     "date": "2026-10-13",
