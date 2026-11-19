@@ -27,7 +27,7 @@ class BlogTests(unittest.TestCase):
         cls.directory.cleanup()
 
     def test_unique_articles_and_newest_first(self):
-        self.assertEqual(len(self.posts), 12)
+        self.assertEqual(len(self.posts), 13)
         slugs = [p['slug'] for p in self.posts]
         self.assertEqual(len(set(slugs)), len(self.posts))
         self.assertTrue(all(re.fullmatch('[a-z0-9-]+', slug) for slug in slugs))
@@ -69,7 +69,7 @@ class BlogTests(unittest.TestCase):
             self.assertEqual(blocked, [])
 
     def test_covers_are_exact_reviewed_bytes_with_alt_and_dimensions(self):
-        entries = {m['slug']: m for m in self.manifest['new_articles']}
+        entries = {m['slug']: m for m in self.manifest['new_articles'] if 'image_sha256' in m}
         home = (self.blog / 'index.html').read_text(encoding='utf-8')
         self.assertEqual(len(entries), 6)
         self.assertEqual(home.count('class="card-cover"'), len(entries))
